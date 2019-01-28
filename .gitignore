@@ -1,0 +1,6 @@
+*
+!*/
+!.gitignore
+!/src/java/servlet/*
+!/src/java/util/*
+!index.html
