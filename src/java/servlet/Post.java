@@ -13,6 +13,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Map;
@@ -20,6 +21,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import org.mindrot.jbcrypt.BCrypt;
 import util.TooManyColumns;
 
 /**
@@ -34,6 +37,19 @@ public class Post extends HttpServlet {
         response.setHeader("Access-Control-Allow-Origin", GitHubIgnore.URL);
         PrintWriter out = response.getWriter();
         String type = request.getParameter("type");
+        HttpSession session = request.getSession();
+        try {
+            String bruker = request.getParameter("brukernavn");
+            String passord = request.getParameter("passord");
+            if (checkPassword(bruker, passord)) {
+                session.setAttribute("bruker", bruker);
+            }
+        } catch (Exception e) {
+            if (session.getAttribute("bruker") == null) {
+                e.printStackTrace(out);
+                return;
+            }
+        }
         try {
             if (type.equals("insertMatvaretabell")) {
                 String matvareNavn = request.getParameter("navn");
@@ -74,6 +90,18 @@ public class Post extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace(out);
         }
+    }
+
+    private boolean checkPassword(String brukernavn, String password) throws Exception {
+        Class.forName("com.mysql.jdbc.Driver");
+        Connection c = DriverManager.getConnection("jdbc:mysql://localhost/users", "kosthold", "");
+        String query = "SELECT passord FROM users WHERE brukernavn LIKE ?";
+        PreparedStatement ps = c.prepareStatement(query);
+        ps.setString(1, brukernavn);
+        ResultSet rs = ps.executeQuery();
+        rs.first();
+        String hashedPassword = rs.getString(1);
+        return BCrypt.checkpw(password, hashedPassword);
     }
 
     private int insertIntoLogg(String[][] arr) throws Exception {
