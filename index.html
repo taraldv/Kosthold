@@ -104,7 +104,60 @@
 	<script type="text/javascript" src="githubIgnore.js"></script>
 	<script type="text/javascript">
 
-		buildHTML();
+		checkAuth();
+		
+
+		function request(data,func){
+			var oReq = new XMLHttpRequest();
+			oReq.addEventListener('load',func);
+			oReq.open("POST", url);
+			oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+			oReq.withCredentials = true;
+			oReq.send(data);	
+		}
+
+		function checkAuth(){
+			request("type=auth",function(){
+				if(this.response ==1){
+					removeChildren(document.body);
+					buildHTML();
+				} else {
+					document.body.appendChild(getLoginForm());
+				}
+			});
+		}
+
+		function getLoginForm(){
+
+			var brukernavnInput = document.createElement("input");
+			brukernavnInput.setAttribute("type","text");
+			brukernavnInput.setAttribute("id","brukernavnInput");
+
+			var passordInput = document.createElement("input");
+			passordInput.setAttribute("type","password");
+			passordInput.setAttribute("id","passordInput");
+
+			var submitInput = document.createElement("input");
+			submitInput.setAttribute("type","submit");
+
+			var loginForm = document.createElement("form");
+			loginForm.appendChild(brukernavnInput);
+			loginForm.appendChild(passordInput);
+			loginForm.appendChild(submitInput);
+			loginForm.onsubmit = function(){
+				var brukernavn = document.getElementById("brukernavnInput").value;
+				var passord = document.getElementById("passordInput").value;
+				request("type=auth"+"&brukernavn="+brukernavn+"&passord="+encodeURIComponent(passord),function(){
+					location.reload();
+				});
+				return false;
+			}
+
+
+
+
+			return loginForm;
+		}
 
 		function buildHTML(){
 			var loggDiv = getDiv("centerDiv");
@@ -120,6 +173,8 @@
 			document.body.appendChild(loggDiv);
 			document.body.appendChild(måltidDiv);
 			document.body.appendChild(nyMatvareDiv);
+
+			document.body.addEventListener("click",removeAutocompleteDiv);
 		}
 
 		function getMatvaretabellFormData(){
@@ -143,20 +198,26 @@
 
 		function getMatvaretabellForm(){
 
-			var standard = ["Kilojoule","Kilokalorier","Fett","Karbohydrat","Sukker, tilsatt","Protein","Salt"];
+			var standard = [["Kilojoule","kJ"],
+			["Kilokalorier","kcal"],
+			["Fett","g"],
+			["Mettet","g"],
+			["Enumettet","g"],
+			["Flerumettet","g"],
+			["Karbohydrat","g"],
+			["Sukker, tilsatt","g"],
+			["Kostfiber","g"],
+			["Protein","g"],
+			["Salt","g"]];
 
 			var form = document.createElement("form");
 			form.setAttribute("autocomplete","off");
 			form.onsubmit = function(){
 				var matvaretabellInputNavn = document.getElementById("matvaretabellInputNavn");
 				var navn = matvaretabellInputNavn.value;
-				var oReq = new XMLHttpRequest();
-				oReq.addEventListener('load',function(){
+				request("type=insertMatvaretabell"+"&navn="+navn+getMatvaretabellFormData(),function(){
 					handleInsertResponse(this.response);
 				})
-				oReq.open("POST", url, true);
-				oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-				oReq.send("type=insertMatvaretabell"+"&navn="+navn+getMatvaretabellFormData());
 				return false;
 			};
 
@@ -203,7 +264,7 @@
 			this.setAttribute("id","activatedAutocomplete");
 		}
 
-		function leggTilInnholdForMatvare(tekst){
+		function leggTilInnholdForMatvare(arr){
 			var typeInput = document.createElement("input");
 			typeInput.setAttribute("type","text");
 			typeInput.setAttribute("data-tabell","næringsinnhold");
@@ -212,6 +273,7 @@
 			typeInput.addEventListener("focusout",autocompleteFocusOut);
 
 			var verdiInput = document.createElement("input");
+			verdiInput.addEventListener("focusin",removeAutocompleteDiv);
 			verdiInput.setAttribute("type","number");
 			verdiInput.setAttribute("step",".01");
 			verdiInput.setAttribute("class","numberInput");
@@ -223,8 +285,9 @@
 			containerDiv.appendChild(autocompleteContainer);
 			containerDiv.appendChild(verdiInput);
 
-			if(tekst){
-				typeInput.value = tekst;
+			if(arr){
+				typeInput.value = arr[0];
+				verdiInput.placeholder = arr[1];
 				return containerDiv;
 			}
 
@@ -237,7 +300,7 @@
 			} else {
 				var bodyNode = document.body;
 				removeChildren(bodyNode);
-				bodyNode.insertAdjacentHTML('afterbegin',error);
+				bodyNode.insertAdjacentHTML('afterbegin',response);
 			}
 		}
 
@@ -248,14 +311,9 @@
 				var måltidNavnInput = document.getElementById("måltidNavnInput");
 				var navn = måltidNavnInput.value;
 				if(navn.length>1){
-					var oReq = new XMLHttpRequest();
-					oReq.addEventListener('load',function(){
+					request("type=insertMåltider"+"&navn="+navn+getCollectionDataForForm("måltidCollection"),function(){
 						handleInsertResponse(this.response);
-					});
-					oReq.open("POST", url, true);
-					oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-					oReq.send("type=insertMåltider"+"&navn="+navn+getCollectionDataForForm("måltidCollection"));
-					
+					})					
 				}
 				return false;
 			};
@@ -302,14 +360,9 @@
 			var form = document.createElement("form");
 			form.setAttribute("autocomplete","off");
 			form.onsubmit = function(){
-				var oReq = new XMLHttpRequest();
-				oReq.addEventListener('load',function(){
+				request("type=insertLogg"+getCollectionDataForForm("matvareCollection"),function(){
 					handleInsertResponse(this.response);
 				})
-				oReq.open("POST", url, true);
-				oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-				oReq.send("type=insertLogg"+getCollectionDataForForm("matvareCollection"));
-				return false;
 			};
 
 			var loggSubmit = document.createElement("input");
@@ -328,15 +381,11 @@
 			removeAutocompleteDiv();
 			var parent = this.parentNode;
 			var tabell = this.getAttribute("data-tabell");
-			var oReq = new XMLHttpRequest();
-			oReq.addEventListener('load',function(){
+			request("type=autocomplete&string="+this.value+"&table="+tabell,function(){
 				var obj = JSON.parse(this.response);
 				var whichInputActivatedAutocomplete = document.getElementById("activatedAutocomplete");
-				activatedAutocomplete.parentNode.appendChild(getAutocompleteDiv(obj));
-			})
-			oReq.open("POST", url, true);
-			oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-			oReq.send("type=autocomplete&string="+this.value+"&table="+tabell);
+				whichInputActivatedAutocomplete.parentNode.appendChild(getAutocompleteDiv(obj));
+			});
 		}
 
 		function getMatvareInputWithAutocompleteDiv(databaseNavn,whichCollection){
@@ -366,6 +415,7 @@
 
 			var matvareMengdeInput = document.createElement("input");
 			matvareMengdeInput.setAttribute("type","number");
+			matvareMengdeInput.addEventListener("focusin",removeAutocompleteDiv);
 			matvareMengdeInput.setAttribute("id","matvareMengdeInput");
 
 			var mengdeBeskrivelse = document.createElement("div");
@@ -413,7 +463,8 @@
 			return mainDiv;
 		}
 
-		function checkMåltidNavn(navn){
+		/*function checkMåltidNavn(navn){
+
 			var oReq = new XMLHttpRequest();
 			oReq.addEventListener('load',function(){
 				var måltidNavnInput = document.getElementById("måltidNavnInput");
@@ -423,7 +474,7 @@
 			oReq.open("POST", url, true);
 			oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 			oReq.send("type=checkMåltider&string="+navn);
-		}
+		}*/
 
 		function inputValidering(inputNode,boolean,errorTekst){
 			inputNode.setCustomValidity("");
@@ -445,8 +496,9 @@
 
 		function removeAutocompleteDiv(){
 			var elem = document.getElementById("autocompleteDiv");
-			if(elem){
+			while(elem){
 				elem.remove();
+				var elem = document.getElementById("autocompleteDiv");
 			}
 
 		}
@@ -469,7 +521,13 @@
 					var parent = this.parentNode.parentNode;
 					var firstChild = parent.firstChild;
 					firstChild.value = this.innerText;
-					firstChild.setAttribute("data-id",this.getAttribute("data-id"));
+					var id = this.getAttribute("data-id");
+					if(isNaN(parseInt(id))){
+						var mengdeInput = parent.nextSibling;
+						mengdeInput.placeholder = id;
+					} else {
+						firstChild.setAttribute("data-id",id);
+					}			
 					removeAutocompleteDiv();
 				})
 				autocompleteDiv.appendChild(tempDiv);
