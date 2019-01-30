@@ -9,10 +9,8 @@ import ignore.GitHubIgnore;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Map;
@@ -21,7 +19,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import util.KostholdDatabase;
 import util.Login;
+import util.ResultSetConverter;
 import util.TooManyColumns;
 
 /**
@@ -38,7 +38,7 @@ public class Post extends HttpServlet {
         PrintWriter out = response.getWriter();
         String type = request.getParameter("type");
         HttpSession session = request.getSession();
-        
+
         Login login = new Login(request.getParameter("brukernavn"), request.getParameter("passord"));
         try {
             if (login.checkPassword()) {
@@ -46,7 +46,6 @@ public class Post extends HttpServlet {
                 session.setMaxInactiveInterval(0);
                 return;
             } else if (session.getAttribute("bruker") == null) {
-                out.print("bruker er null");
                 session.invalidate();
                 return;
             } else if (type.equals("auth")) {
@@ -70,11 +69,15 @@ public class Post extends HttpServlet {
                 String[][] matvareOgMengdeArray = mapToArrayInArray(request.getParameterMap(), 1);
                 out.print(insertIntoLogg(matvareOgMengdeArray));
             } else if (type.equals("getMatvaretabell")) {
-                out.print(resultSetToJSON(databaseQuery("SELECT matvareId,matvare FROM matvaretabellen;")));
-            } else if (type.equals("checkMåltider")) {
-                String navn = request.getParameter("string");
-                String navnQuery = "SELECT 1 FROM måltider WHERE navn LIKE ?;";
-                out.print(resultSetToJSON(oneStringQuery(navnQuery, navn)));
+                out.print(ResultSetConverter.toJSON(KostholdDatabase.databaseQuery("SELECT matvareId,matvare FROM matvaretabellen;")));
+            } else if (type.equals("getMåltider")) {
+                out.print(ResultSetConverter.toJSON(KostholdDatabase.databaseQuery("SELECT * FROM måltider;")));
+            } else if (type.equals("getMåltiderIngredienser")) {
+                String getMåltiderIngredienserQuery = "SELECT matvaretabellen.matvare,ingredienser.matvareId,mengde FROM ingredienser"
+                        + " LEFT JOIN matvaretabellen ON ingredienser.matvareId = matvaretabellen.matvareId"
+                        + " WHERE måltidId = ?;";
+                out.print(ResultSetConverter.toJSON(KostholdDatabase.oneIntQuery(getMåltiderIngredienserQuery, Integer.parseInt(request.getParameter("måltidId")))));
+                //out.print(resultSetToJSON(databaseQuery("SELECT * FROM måltider;")));
             } else if (type.equals("autocomplete")) {
                 String matchingParameter = request.getParameter("string");
                 String whichTable = request.getParameter("table");
@@ -84,7 +87,7 @@ public class Post extends HttpServlet {
                 } else if (whichTable.equals("næringsinnhold")) {
                     autocompleteQuery = "SELECT næringsinnhold,benevning FROM benevninger WHERE næringsinnhold LIKE ? LIMIT 15;";
                 }
-                String completeJson = resultSetToJSON(oneStringQuery(autocompleteQuery, "%" + matchingParameter + "%"));
+                String completeJson = ResultSetConverter.toJSON(KostholdDatabase.oneStringQuery(autocompleteQuery, "%" + matchingParameter + "%"));
                 if (completeJson.length() > 2) {
                     String jsonAddition = "\"search\":\"" + matchingParameter + "\",";
                     completeJson = new StringBuffer(completeJson).insert(1, jsonAddition).toString();
@@ -99,7 +102,7 @@ public class Post extends HttpServlet {
     }
 
     private int insertIntoLogg(String[][] arr) throws Exception {
-        Connection c = getDatabaseConnection();
+        Connection c = KostholdDatabase.getDatabaseConnection();
         String query = "INSERT INTO logg(dato,matvareId,mengde) VALUES ";
         for (int i = 0; i < arr.length; i++) {
             if (i != 0) {
@@ -113,25 +116,29 @@ public class Post extends HttpServlet {
             ps.setInt(1 + (2 * j), Integer.parseInt(arr[j][0]));
             ps.setDouble(2 + (2 * j), Double.parseDouble(arr[j][1]));
         }
-        return ps.executeUpdate();
+        int result = ps.executeUpdate();
+        c.close();
+        return result;
     }
 
     private int insertIntoMatvaretabellen(String navn, String[][] arr) throws Exception {
         TooManyColumns tmc = new TooManyColumns(arr);
         String query = tmc.getQuery();
         ArrayList<Double> list = tmc.getList();
-        Connection c = getDatabaseConnection();
+        Connection c = KostholdDatabase.getDatabaseConnection();
         PreparedStatement ps = c.prepareStatement(query);
         ps.setString(1, navn);
         for (int x = 0; x < list.size(); x++) {
             ps.setDouble(x + 2, list.get(x));
         }
 
-        return ps.executeUpdate();
+        int result = ps.executeUpdate();
+        c.close();
+        return result;
     }
 
     private int insertMåltidAndGetLastID(String navn) throws Exception {
-        Connection c = getDatabaseConnection();
+        Connection c = KostholdDatabase.getDatabaseConnection();
         String query = "INSERT INTO måltider(navn) VALUES (?);";
         PreparedStatement ps = c.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, navn);
@@ -139,11 +146,12 @@ public class Post extends HttpServlet {
         ResultSet rs = ps.getGeneratedKeys();
         rs.next();
         String lastId = rs.getString("GENERATED_KEY");
+        c.close();
         return Integer.parseInt(lastId);
     }
 
     private int insertSQL(String[][] arr, int lastId) throws Exception {
-        Connection c = getDatabaseConnection();
+        Connection c = KostholdDatabase.getDatabaseConnection();
         String query = "INSERT INTO ingredienser (måltidId, matvareId, mengde) VALUES ";
         for (int i = 0; i < arr.length; i++) {
             if (i != 0) {
@@ -158,7 +166,10 @@ public class Post extends HttpServlet {
             ps.setDouble(2 + (2 * j), Double.parseDouble(arr[j][1]));
 
         }
-        return ps.executeUpdate();
+
+        int result = ps.executeUpdate();
+        c.close();
+        return result;
     }
 
     private String[][] mapToArrayInArray(Map<String, String[]> map, int offset) {
@@ -174,41 +185,4 @@ public class Post extends HttpServlet {
         return out;
     }
 
-    private ResultSet oneStringQuery(String query, String match) throws Exception {
-        Connection c = getDatabaseConnection();
-        PreparedStatement ps = c.prepareStatement(query);
-        ps.setString(1, match);
-        return ps.executeQuery();
-    }
-
-    private Connection getDatabaseConnection() throws Exception {
-        Class.forName("com.mysql.jdbc.Driver");
-        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/kosthold", "kosthold", "");
-        return connection;
-    }
-
-    private ResultSet databaseQuery(String query) throws Exception {
-        Connection c = getDatabaseConnection();
-        ResultSet rset = c.createStatement().executeQuery(query);
-        return rset;
-    }
-
-    private String resultSetToJSON(ResultSet rset) throws Exception {
-        String json = "{";
-        ResultSetMetaData rsmd = rset.getMetaData();
-        for (int x = 0; rset.next(); x++) {
-            if (x != 0) {
-                json += ",";
-            }
-            json += "\"" + x + "\":{";
-            for (int y = 0; y < rsmd.getColumnCount(); y++) {
-                if (y != 0) {
-                    json += ",";
-                }
-                json += "\"" + rsmd.getColumnLabel(y + 1) + "\":\"" + rset.getString(y + 1) + "\"";
-            }
-            json += "}";
-        }
-        return json += "}";
-    }
 }

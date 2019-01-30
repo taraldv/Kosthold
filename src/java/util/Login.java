@@ -6,7 +6,6 @@
 package util;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.servlet.http.HttpSession;
@@ -25,16 +24,16 @@ public class Login {
         this.passord = passord;
     }
 
-    public Boolean checkPassword() {
+    public Boolean checkPassword() throws Exception {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection c = DriverManager.getConnection("jdbc:mysql://localhost/users", "kosthold", "");
+            Connection c = KostholdDatabase.getDatabaseConnection();
             String query = "SELECT passord FROM users WHERE brukernavn LIKE ?";
             PreparedStatement ps = c.prepareStatement(query);
             ps.setString(1, brukernavn);
             ResultSet rs = ps.executeQuery();
             rs.first();
             String hashedPassword = rs.getString(1);
+            c.close();
             //  return hashedPassword;
             return org.mindrot.jbcrypt.BCrypt.checkpw(passord, hashedPassword);
         } catch (Exception e) {
