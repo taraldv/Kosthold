@@ -10,7 +10,13 @@
 	<script type="text/javascript">
 
 		checkAuth();
-		
+
+		function passordGenerator(){
+			var passord = "2BT7cK%AzNdZ%L@s6noGo1jq7N!pwV";
+			request("type=passordGen&passord="+encodeURIComponent(passord),function(){
+				console.log(this.response);
+			})
+		}
 
 		function request(data,func){
 			var oReq = new XMLHttpRequest();
