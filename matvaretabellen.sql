@@ -1883,7 +1883,7 @@ CREATE TABLE users(
 	PRIMARY KEY(brukerId)
 );
 
-INSERT INTO users(brukernavn,passord) VALUES('admin@tarves.no','*Mq25KRQ*HS%7mS49lo!KDALe0$yUT');
+INSERT INTO users(brukernavn,passord) VALUES('admin@tarves.no',' ');
 
 CREATE TABLE logg(
 	loggId INTEGER AUTO_INCREMENT,

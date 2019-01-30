@@ -8,7 +8,9 @@ package util;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Random;
 import javax.servlet.http.HttpSession;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
  *
@@ -22,6 +24,13 @@ public class Login {
     public Login(String brukernavn, String passord) {
         this.brukernavn = brukernavn;
         this.passord = passord;
+    }
+
+    static public String generatePasswordHash(String password) {
+        Random rand = new Random();
+        int randomNum = 15 + rand.nextInt((15) + 1);
+        String hashed = BCrypt.hashpw(password, BCrypt.gensalt(randomNum));
+        return hashed;
     }
 
     public Boolean checkPassword() throws Exception {

@@ -29,7 +29,7 @@ import util.TooManyColumns;
  * @author Tarald
  */
 public class Post extends HttpServlet {
-
+    
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json;charset=UTF-8");
@@ -38,7 +38,7 @@ public class Post extends HttpServlet {
         PrintWriter out = response.getWriter();
         String type = request.getParameter("type");
         HttpSession session = request.getSession();
-
+        
         Login login = new Login(request.getParameter("brukernavn"), request.getParameter("passord"));
         try {
             if (login.checkPassword()) {
@@ -68,6 +68,8 @@ public class Post extends HttpServlet {
             } else if (type.equals("insertLogg")) {
                 String[][] matvareOgMengdeArray = mapToArrayInArray(request.getParameterMap(), 1);
                 out.print(insertIntoLogg(matvareOgMengdeArray));
+            } else if (type.equals("passordGen")) {
+                out.print(Login.generatePasswordHash(request.getParameter("passord")));
             } else if (type.equals("getMatvaretabell")) {
                 out.print(ResultSetConverter.toJSON(KostholdDatabase.databaseQuery("SELECT matvareId,matvare FROM matvaretabellen;")));
             } else if (type.equals("getMåltider")) {
@@ -100,7 +102,7 @@ public class Post extends HttpServlet {
             e.printStackTrace(out);
         }
     }
-
+    
     private int insertIntoLogg(String[][] arr) throws Exception {
         Connection c = KostholdDatabase.getDatabaseConnection();
         String query = "INSERT INTO logg(dato,matvareId,mengde) VALUES ";
@@ -120,7 +122,7 @@ public class Post extends HttpServlet {
         c.close();
         return result;
     }
-
+    
     private int insertIntoMatvaretabellen(String navn, String[][] arr) throws Exception {
         TooManyColumns tmc = new TooManyColumns(arr);
         String query = tmc.getQuery();
@@ -131,12 +133,12 @@ public class Post extends HttpServlet {
         for (int x = 0; x < list.size(); x++) {
             ps.setDouble(x + 2, list.get(x));
         }
-
+        
         int result = ps.executeUpdate();
         c.close();
         return result;
     }
-
+    
     private int insertMåltidAndGetLastID(String navn) throws Exception {
         Connection c = KostholdDatabase.getDatabaseConnection();
         String query = "INSERT INTO måltider(navn) VALUES (?);";
@@ -149,7 +151,7 @@ public class Post extends HttpServlet {
         c.close();
         return Integer.parseInt(lastId);
     }
-
+    
     private int insertSQL(String[][] arr, int lastId) throws Exception {
         Connection c = KostholdDatabase.getDatabaseConnection();
         String query = "INSERT INTO ingredienser (måltidId, matvareId, mengde) VALUES ";
@@ -164,25 +166,25 @@ public class Post extends HttpServlet {
         for (int j = 0; j < arr.length; j++) {
             ps.setInt(1 + (2 * j), Integer.parseInt(arr[j][0]));
             ps.setDouble(2 + (2 * j), Double.parseDouble(arr[j][1]));
-
+            
         }
-
+        
         int result = ps.executeUpdate();
         c.close();
         return result;
     }
-
+    
     private String[][] mapToArrayInArray(Map<String, String[]> map, int offset) {
-
+        
         String[][] out = new String[(map.size() - offset) / 2][2];
         String[][] temp = map.values().toArray(new String[0][0]);
-
+        
         for (int i = offset; i < temp.length; i += 2) {
             out[(i - offset) / 2][0] = temp[i][0];
             out[(i - offset) / 2][1] = temp[i + 1][0];
         }
-
+        
         return out;
     }
-
+    
 }
