@@ -11,9 +11,10 @@
 
 		checkAuth();
 
+		passordGenerator();
+		/* ikke i bruk */
 		function passordGenerator(){
-			var passord = "2BT7cK%AzNdZ%L@s6noGo1jq7N!pwV";
-			request("type=passordGen&passord="+encodeURIComponent(passord),function(){
+			request("type=passordGen&passord="+encodeURIComponent("passordString"),function(){
 				console.log(this.response);
 			})
 		}
