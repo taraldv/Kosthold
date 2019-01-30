@@ -1884,7 +1884,6 @@ CREATE TABLE users(
 );
 
 INSERT INTO users(brukernavn,passord) VALUES('admin@tarves.no','*Mq25KRQ*HS%7mS49lo!KDALe0$yUT');
-INSERT INTO users(brukernavn,passord) VALUES('tarves@gmail.com','$2a$15$.1sC0pGNKOjlwZne0qp74.IPk1eKFaThVY3GLDkdj3boqM8c1C2ZC');
 
 CREATE TABLE logg(
 	loggId INTEGER AUTO_INCREMENT,
