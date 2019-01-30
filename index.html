@@ -3,102 +3,7 @@
 <head>
 	<title>Kosthold</title>
 	<meta charset="utf-8">
-	<style type="text/css">
-	*{
-		margin: 0;
-		padding:0;
-		font-family: sans-serif;
-		/*text-align: center;*/
-	}
-	body{
-		background-color: whitesmoke;
-		font-size: 1.2em;
-		overflow-y:scroll;
-	}
-	#autocompleteDiv div strong {
-		text-decoration: none;
-		color: #0505FF;
-
-	}
-
-	#autocompleteDiv div{
-		border-bottom: 1px solid grey;
-		background-color: white;
-	}
-	#autocompleteDiv{
-		width: 400px;
-		text-align: left;
-		position: absolute;
-		z-index: 3;
-		border: 1px solid grey;
-	}
-	.centerDiv{
-		margin-bottom: 15px;
-		padding-bottom: 15px;
-		text-align: center;
-		width: 50%;
-		margin:auto;
-		border-bottom: solid 1px black;
-	}
-	.autocompleteContainerDiv{
-		display: inline-block;
-	}
-	.divButton{
-		margin-left: 5px;
-		padding-left: 5px;
-		padding-right: 5px;
-		border: 1px solid grey;
-		display: inline-block;
-	}
-	.divButton:hover,#autocompleteDiv div:hover,.autocompleteDivSelected{
-		cursor: pointer;
-		background-color: #a0db8e;
-	}
-	input[type='number'] {
-		margin-left: 5px;
-		width: 50px;
-		-moz-appearance:textfield;
-	}
-	input[type='submit']{
-		width: 150px;
-	}
-	.removeFromCollectionDiv{
-		width: 40%;
-		margin: auto;
-		padding: 5px;
-	}
-	.removeFromCollectionDiv:hover{
-		cursor: pointer;
-		background-color: #DB8EA0;
-	}
-	.removeFromCollectionDiv input{
-		pointer-events: none;
-	}
-	.collection div input{
-		font-size: 0.8em;
-		width: 300px;
-	}
-	#innholdDiv div div input{
-		font-size: 0.8em;
-		width: 100px;
-	}
-	#innholdDiv div input{
-		font-size: 0.8em;
-		width: 50px;
-	}
-	.collection div input:last-child{
-		margin-left: 5px;
-		font-size: 0.8em;
-		width: 50px;
-	}
-	input{
-		font-size: 1em;
-		width: 400px;
-	}
-	.inlineDiv{
-		display: inline-block;
-	}
-</style>
+	<link rel="stylesheet" type="text/css" href="main.css">
 </head>
 <body>
 	<script type="text/javascript" src="githubIgnore.js"></script>
@@ -129,20 +34,39 @@
 
 		function getLoginForm(){
 
+
 			var brukernavnInput = document.createElement("input");
 			brukernavnInput.setAttribute("type","text");
 			brukernavnInput.setAttribute("id","brukernavnInput");
+
+			var brukernavn = document.createElement("div");
+			brukernavn.innerText = "brukernavn";
+
+			var brukernavnDiv = document.createElement("div");
+			brukernavnDiv.appendChild(brukernavn);
+			brukernavnDiv.appendChild(brukernavnInput);
+			
 
 			var passordInput = document.createElement("input");
 			passordInput.setAttribute("type","password");
 			passordInput.setAttribute("id","passordInput");
 
+			passord = document.createElement("div");
+			passord.innerText = "passord";
+
+			var passordInputDiv = document.createElement("div");
+			passordInputDiv.appendChild(passord);
+			passordInputDiv.appendChild(passordInput);
+			
+
 			var submitInput = document.createElement("input");
 			submitInput.setAttribute("type","submit");
+			submitInput.value = "Login";
 
 			var loginForm = document.createElement("form");
-			loginForm.appendChild(brukernavnInput);
-			loginForm.appendChild(passordInput);
+			loginForm.setAttribute("id","loginForm");
+			loginForm.appendChild(brukernavnDiv);
+			loginForm.appendChild(passordInputDiv);
 			loginForm.appendChild(submitInput);
 			loginForm.onsubmit = function(){
 				var brukernavn = document.getElementById("brukernavnInput").value;
@@ -160,6 +84,12 @@
 		}
 
 		function buildHTML(){
+			
+			var leftDiv = getDiv("inlineDiv mainDiv");
+			leftDiv.appendChild(getMåltidButtons());
+
+			var rightDiv = getDiv("inlineDiv mainDiv");
+
 			var loggDiv = getDiv("centerDiv");
 			loggDiv.appendChild(getLoggForm());
 
@@ -169,14 +99,84 @@
 			var nyMatvareDiv = getDiv("centerDiv");
 			nyMatvareDiv.appendChild(getMatvaretabellForm());
 			
+			var centerDiv = getDiv("inlineDiv mainDiv");
 
-			document.body.appendChild(loggDiv);
-			document.body.appendChild(måltidDiv);
-			document.body.appendChild(nyMatvareDiv);
+			centerDiv.appendChild(loggDiv);
+			centerDiv.appendChild(måltidDiv);
+			centerDiv.appendChild(nyMatvareDiv);
+
+			document.body.appendChild(leftDiv);
+			document.body.appendChild(centerDiv);
+			document.body.appendChild(rightDiv);
 
 			document.body.addEventListener("click",removeAutocompleteDiv);
 		}
 
+		/*Brukes av 'Lagre matvare knapper og måltid knapper'*/
+		function matvareCollectionInsert(){
+			/*hvis funksjonen er aktivert av en request eller click */
+			if(this.response){
+				var matvareCollection = document.getElementById("matvareCollection");
+				var data = JSON.parse(this.response);
+				var length = Object.keys(data).length;
+				for(i=0;i<length;i++){
+					matvareCollection.appendChild(localFunc(data[i].matvare,data[i].matvareId,data[i].mengde));
+				}
+			} else {
+				var whichCollection = this.getAttribute("collection");
+				var matvareCollection = document.getElementById(whichCollection);
+				var matvareInput = this.parentNode.firstChild.lastChild.firstChild;
+				var gramInput = this.parentNode.firstChild.nextSibling.lastChild;
+				matvareCollection.appendChild(localFunc(matvareInput.value,matvareInput.getAttribute("data-id"),gramInput.value));
+				matvareInput.value = "";
+				gramInput.value = "";
+			}
+
+			function localFunc(navn,id,mengde){
+				var tempDiv = getDiv("removeFromCollectionDiv");
+				tempDiv.addEventListener("click",function(){
+					this.remove();
+				});
+
+				var tempNavnInput = document.createElement("input");
+				tempNavnInput.setAttribute("disabled","");
+				tempNavnInput.setAttribute("data-id",id);
+				tempNavnInput.value = navn;
+
+				var tempMengdeInput = document.createElement("input");
+				tempMengdeInput.setAttribute("disabled","");
+				tempMengdeInput.value = mengde;
+
+				tempDiv.appendChild(tempNavnInput);
+				tempDiv.appendChild(tempMengdeInput);
+				return tempDiv;
+			}
+		}
+
+		/* generer en div med knapper som kan trykkes for å legge en lagret måltid til loggen */
+		function getMåltidButtons(){
+
+			var mainDiv = getDiv(false,"måltidButtonsDiv");
+			request("type=getMåltider",function(){
+				var json = JSON.parse(this.response);
+				var length = Object.keys(json).length;
+				var måltidButtonsDiv = document.getElementById("måltidButtonsDiv");
+				for(i=0;i<length;i++){
+					var tempDiv = getDiv("måltidButton");
+					tempDiv.setAttribute("data-id",json[i].måltidId);
+					tempDiv.innerText = json[i].navn;
+					tempDiv.addEventListener("click",function(){
+						var måltidId = this.getAttribute("data-id");
+						request("type=getMåltiderIngredienser&måltidId="+måltidId,matvareCollectionInsert);
+					});
+					måltidButtonsDiv.appendChild(tempDiv);
+				}
+			});
+
+			return mainDiv;
+		}
+
+		/* henter all data fra 'innholdDiv' som blir brukt til å legge til en ny matvare i matvaretabellen */
 		function getMatvaretabellFormData(){
 			var output = "";
 			var matvaretabellInputDiv = document.getElementById("innholdDiv");
@@ -196,6 +196,7 @@
 			return output;
 		}
 
+		/* generer en form som blir brukt til å legge til en ny matvare i matvaretabellen */
 		function getMatvaretabellForm(){
 
 			var standard = [["Kilojoule","kJ"],
@@ -230,7 +231,7 @@
 				leggTilInnholdForMatvare();
 			})
 
-			var innholdDiv = getDiv("noClass","innholdDiv");
+			var innholdDiv = getDiv(false,"innholdDiv");
 
 			
 			var matvaretabellInputNavnBeskrivelse = getDiv();
@@ -256,14 +257,15 @@
 			return form;
 		}
 
+		/* bruker disse to til å knytte autocomplete div til den aktive input */
 		function autocompleteFocusOut(){
 			this.setAttribute("id","");
 		}
-
 		function autocompleteFocusIn(){
 			this.setAttribute("id","activatedAutocomplete");
 		}
 
+		/* legger til en tom div med 2 input for å velge en type innhold til ny matvare i matvaretabellen (Salt etc) */
 		function leggTilInnholdForMatvare(arr){
 			var typeInput = document.createElement("input");
 			typeInput.setAttribute("type","text");
@@ -281,10 +283,11 @@
 			var autocompleteContainer = getDiv("autocompleteContainerDiv");
 			autocompleteContainer.appendChild(typeInput);
 
-			var containerDiv = document.createElement("div");
+			var containerDiv = getDiv("innholdDivs");
 			containerDiv.appendChild(autocompleteContainer);
 			containerDiv.appendChild(verdiInput);
 
+			/* bruker arr til å legge til de mest vanlige */
 			if(arr){
 				typeInput.value = arr[0];
 				verdiInput.placeholder = arr[1];
@@ -294,8 +297,9 @@
 			document.getElementById("innholdDiv").appendChild(containerDiv);
 		}
 
+		/* insert sender tilbake tall når det funka, ellers limes inn error */
 		function handleInsertResponse(response){
-			if(response == 1){
+			if(!isNaN(response)){
 				window.location.reload();
 			} else {
 				var bodyNode = document.body;
@@ -304,6 +308,7 @@
 			}
 		}
 
+		/* genererer form til å lagre ett nytt måltid med ingredienser fra matvaretabellen */
 		function getMåltidForm(){
 			var form = document.createElement("form");
 			form.setAttribute("autocomplete","off");
@@ -343,6 +348,7 @@
 			return form;
 		}
 
+		/* brukes av både måltidForm og loggForm til å hente data til request*/
 		function getCollectionDataForForm(collection){
 			var output = "";
 			var matvareCollection = document.getElementById(collection);
@@ -356,6 +362,7 @@
 			return output;
 		}
 
+		/* generer form som brukes til å logge kosthold fra matvaretabellen */
 		function getLoggForm(){
 			var form = document.createElement("form");
 			form.setAttribute("autocomplete","off");
@@ -376,7 +383,7 @@
 			return form;
 		}
 
-
+		/* brukes av logg, måltid og matvare forms til autocomplete */
 		function autocomplete(){
 			removeAutocompleteDiv();
 			var parent = this.parentNode;
@@ -388,6 +395,9 @@
 			});
 		}
 
+		/* generere en div med 2 input og forklaringer, hvor hoved input har autocomplete, brukes av logg og måltid 
+		TODO: select autocomplete med piltaster
+		*/
 		function getMatvareInputWithAutocompleteDiv(databaseNavn,whichCollection){
 			var matvareInput = document.createElement("input");
 			matvareInput.setAttribute("type","text");
@@ -427,33 +437,8 @@
 
 			var lagreMatvareButtonDiv = getDiv("divButton");
 			lagreMatvareButtonDiv.innerHTML = "Lagre matvare";
-			lagreMatvareButtonDiv.addEventListener("click",function(){
-
-				var matvareInput = this.parentNode.firstChild.lastChild.firstChild;
-
-				var gramInput = this.parentNode.firstChild.nextSibling.lastChild;
-
-				var matvareCollection = document.getElementById(whichCollection);
-				var tempDiv = getDiv("removeFromCollectionDiv");
-				tempDiv.addEventListener("click",function(){
-					this.remove();
-				});
-
-				var tempNavnInput = document.createElement("input");
-				tempNavnInput.setAttribute("disabled","");
-				tempNavnInput.setAttribute("data-id",matvareInput.getAttribute("data-id"));
-				tempNavnInput.value = matvareInput.value;
-
-				var tempMengdeInput = document.createElement("input");
-				tempMengdeInput.setAttribute("disabled","");
-				tempMengdeInput.value = gramInput.value;
-
-				tempDiv.appendChild(tempNavnInput);
-				tempDiv.appendChild(tempMengdeInput);
-				matvareCollection.appendChild(tempDiv);
-				matvareInput.value = "";
-				gramInput.value = "";
-			})
+			lagreMatvareButtonDiv.setAttribute("collection",whichCollection);
+			lagreMatvareButtonDiv.addEventListener("click",matvareCollectionInsert)
 
 			var mainDiv = getDiv("inlineDiv");
 			mainDiv.appendChild(matvareBeskrivelseDiv);
@@ -463,19 +448,7 @@
 			return mainDiv;
 		}
 
-		/*function checkMåltidNavn(navn){
-
-			var oReq = new XMLHttpRequest();
-			oReq.addEventListener('load',function(){
-				var måltidNavnInput = document.getElementById("måltidNavnInput");
-				var obj = JSON.parse(this.response);
-				inputValidering(måltidNavnInput,!obj[0],"Navnet eksisterer allerede");
-			})
-			oReq.open("POST", url, true);
-			oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-			oReq.send("type=checkMåltider&string="+navn);
-		}*/
-
+		/* TODO validering av input*/
 		function inputValidering(inputNode,boolean,errorTekst){
 			inputNode.setCustomValidity("");
 			inputNode.parentNode.classList.remove("has-error");
@@ -485,7 +458,7 @@
 			}
 		}
 
-
+		/* brukes av autocomplete */
 		function highlightString(original, stringToMatch){
 			var index = original.toLowerCase().indexOf(stringToMatch.toLowerCase());
 			var beforeString = original.slice(0,index);
@@ -503,8 +476,9 @@
 
 		}
 
+		/* generere div med tekst fra json til autocomplete */
 		function getAutocompleteDiv(json){
-			var autocompleteDiv = getDiv("noClass","autocompleteDiv")
+			var autocompleteDiv = getDiv(false,"autocompleteDiv")
 
 			var searchWord = json.search;
 			var length = Object.keys(json).length;
