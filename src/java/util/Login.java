@@ -27,9 +27,7 @@ public class Login {
     }
 
     static public String generatePasswordHash(String password) {
-        Random rand = new Random();
-        int randomNum = 15 + rand.nextInt((15) + 1);
-        String hashed = BCrypt.hashpw(password, BCrypt.gensalt(randomNum));
+        String hashed = BCrypt.hashpw(password, BCrypt.gensalt(17));
         return hashed;
     }
 
