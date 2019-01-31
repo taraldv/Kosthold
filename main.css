@@ -23,6 +23,10 @@ input{
 	font-size: 1em;
 	width: 400px;
 }
+table{
+	border-collapse: collapse;
+	border:solid 1px black;
+}
 /* ids */
 
 #autocompleteDiv div strong {
@@ -77,6 +81,9 @@ input{
 	z-index: 3;
 	border: 1px solid grey;
 }
+#måltidButtonsDiv{
+
+}
 /* classes */
 
 .innholdDivs{
@@ -93,12 +100,12 @@ input{
 	border: 1px solid grey;
 	display: inline-block;
 }
-.divButton:hover,#autocompleteDiv div:hover,.autocompleteDivSelected{
+.divButton:hover,#autocompleteDiv div:hover,.autocompleteDivSelected,.måltidButton:hover{
 	cursor: pointer;
 	background-color: #a0db8e;
 }
 .removeFromCollectionDiv{
-	display: inline-block;
+	/*display: inline-block;*/
 	margin: auto;
 	padding: 5px;
 }
@@ -125,6 +132,7 @@ input{
 }
 .mainDiv{
 	width: 30%;
+	vertical-align: top;
 }
 .mainDiv:nth-child(2){
 	width: 40%;
@@ -134,4 +142,10 @@ input{
 	padding-bottom: 25px;
 	margin:auto;
 	border-bottom: solid 1px black;
+}
+.måltidButton{
+	display: inline-block;
+	padding: 15px;
+	margin: 5px;
+	border: solid 1px black;
 }

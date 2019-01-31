@@ -18,7 +18,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import util.KostholdDatabase;
 import util.Login;
 import util.ResultSetConverter;
@@ -37,29 +36,32 @@ public class Post extends HttpServlet {
         response.setHeader("Access-Control-Allow-Credentials", "true");
         PrintWriter out = response.getWriter();
         String type = request.getParameter("type");
-        HttpSession session = request.getSession();
-        
-        /*if (type.equals("passordGen")) {
+
+        if (type.equals("passordGen")) {
             out.print(Login.generatePasswordHash(request.getParameter("passord")));
-        }*/
-        
-        Login login = new Login(request.getParameter("brukernavn"), request.getParameter("passord"));
+        }
+
         try {
-            if (login.checkPassword()) {
-                login.setSession(session);
-                session.setMaxInactiveInterval(0);
-                return;
-            } else if (session.getAttribute("bruker") == null) {
-                session.invalidate();
-                return;
+
+            Login login = new Login(request.getParameter("brukernavn"), request.getParameter("passord"), request.getSession());
+
+            /*hvis gyldig login, skip til brukerId */
+            if (!login.validSession()) {
+                /* ikke gyldig session, men prøver på login */
+                if (login.validLogin()) {
+                    out.print(1);
+                    return;
+                } else {
+                    login.invalidate();
+                    return;
+                }
+                /* gyldig session, og spør etter bekreftelse */
             } else if (type.equals("auth")) {
                 out.print(1);
                 return;
             }
-        } catch (Exception e) {
-            e.printStackTrace(out);
-        }
-        try {
+            int brukerId = login.getBrukerId();
+            /*  */
             if (type.equals("insertMatvaretabell")) {
                 String matvareNavn = request.getParameter("navn");
                 String[][] matvareIngrediensOgVerdier = mapToArrayInArray(request.getParameterMap(), 2);
@@ -67,21 +69,27 @@ public class Post extends HttpServlet {
             } else if (type.equals("insertMåltider")) {
                 String[][] ingrediensOgVerdiArray = mapToArrayInArray(request.getParameterMap(), 2);
                 String navn = request.getParameter("navn");
-                int lastInsertedId = insertMåltidAndGetLastID(navn);
+                int lastInsertedId = insertMåltidAndGetLastID(navn, brukerId);
                 out.print(insertSQL(ingrediensOgVerdiArray, lastInsertedId));
+            } else if (type.equals("getLogg")) {
+                /*TODO henter 31 distinct(dato) rader*/
+                String additionalStuff = ",m.Kilokalorier,m.Fett,m.Karbohydrat,m.`Sukker, tilsatt`,m.kostfiber,m.Protein,m.Salt,m.Kalsium";
+                String getLoggQuery = "SELECT m.matvare,mengde,dato" + additionalStuff + " FROM logg "
+                        + "LEFT JOIN matvaretabellen m ON logg.matvareId = m.matvareId "
+                        + "WHERE logg.brukerId = " + brukerId + "";
+                out.print(ResultSetConverter.toJSON(KostholdDatabase.databaseQuery(getLoggQuery)));
             } else if (type.equals("insertLogg")) {
                 String[][] matvareOgMengdeArray = mapToArrayInArray(request.getParameterMap(), 1);
-                out.print(insertIntoLogg(matvareOgMengdeArray));
+                out.print(insertIntoLogg(matvareOgMengdeArray, brukerId));
             } else if (type.equals("getMatvaretabell")) {
                 out.print(ResultSetConverter.toJSON(KostholdDatabase.databaseQuery("SELECT matvareId,matvare FROM matvaretabellen;")));
             } else if (type.equals("getMåltider")) {
-                out.print(ResultSetConverter.toJSON(KostholdDatabase.databaseQuery("SELECT * FROM måltider;")));
+                out.print(ResultSetConverter.toJSON(KostholdDatabase.databaseQuery("SELECT * FROM måltider WHERE brukerId = " + brukerId + ";")));
             } else if (type.equals("getMåltiderIngredienser")) {
-                String getMåltiderIngredienserQuery = "SELECT matvaretabellen.matvare,ingredienser.matvareId,mengde FROM ingredienser"
-                        + " LEFT JOIN matvaretabellen ON ingredienser.matvareId = matvaretabellen.matvareId"
+                String getMåltiderIngredienserQuery = "SELECT m.matvare,i.matvareId,mengde FROM ingredienser i"
+                        + " LEFT JOIN matvaretabellen m ON i.matvareId = m.matvareId"
                         + " WHERE måltidId = ?;";
                 out.print(ResultSetConverter.toJSON(KostholdDatabase.oneIntQuery(getMåltiderIngredienserQuery, Integer.parseInt(request.getParameter("måltidId")))));
-                //out.print(resultSetToJSON(databaseQuery("SELECT * FROM måltider;")));
             } else if (type.equals("autocomplete")) {
                 String matchingParameter = request.getParameter("string");
                 String whichTable = request.getParameter("table");
@@ -105,14 +113,14 @@ public class Post extends HttpServlet {
         }
     }
 
-    private int insertIntoLogg(String[][] arr) throws Exception {
+    private int insertIntoLogg(String[][] arr, int brukerId) throws Exception {
         Connection c = KostholdDatabase.getDatabaseConnection();
-        String query = "INSERT INTO logg(dato,matvareId,mengde) VALUES ";
+        String query = "INSERT INTO logg(dato,matvareId,mengde,brukerId) VALUES ";
         for (int i = 0; i < arr.length; i++) {
             if (i != 0) {
                 query += ",";
             }
-            query += "(CURDATE(),?,?)";
+            query += "(CURDATE(),?,?," + brukerId + ")";
         }
         query += ";";
         PreparedStatement ps = c.prepareStatement(query);
@@ -141,9 +149,9 @@ public class Post extends HttpServlet {
         return result;
     }
 
-    private int insertMåltidAndGetLastID(String navn) throws Exception {
+    private int insertMåltidAndGetLastID(String navn, int brukerId) throws Exception {
         Connection c = KostholdDatabase.getDatabaseConnection();
-        String query = "INSERT INTO måltider(navn) VALUES (?);";
+        String query = "INSERT INTO måltider(navn,brukerId) VALUES (?," + brukerId + ");";
         PreparedStatement ps = c.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, navn);
         ps.executeUpdate();
