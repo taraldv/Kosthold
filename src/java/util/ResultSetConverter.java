@@ -7,6 +7,7 @@ package util;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.util.ArrayList;
 
 /**
  *
@@ -31,5 +32,13 @@ public class ResultSetConverter {
             json += "}";
         }
         return json += "}";
+    }
+
+    public static String oneColumnToString(ResultSet rset) throws Exception {
+        String output = "";
+        while (rset.next()) {
+            output += ",m.`" + rset.getString(1) + "`";
+        }
+        return output;
     }
 }

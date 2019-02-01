@@ -30,14 +30,50 @@
 
 			request("type=getLogg",function(){
 				var dataObject = parseLoggData(JSON.parse(this.response));
-				//mainDiv.appendChild(getMonthlyStatsDiv(data));
-				//mainDiv.appendChild(getWeeklyStatsDiv(data));
-				//mainDiv.appendChild(getDagligStatsDiv(data));
+				mainDiv.appendChild(getStatsDivTable(dataObject.daily,"daglig"));
+				mainDiv.appendChild(getStatsDivTable(dataObject.weekly,"ukentlig / 7"));
+				mainDiv.appendChild(getStatsDivTable(dataObject.monthly,"månedlig / 31"));
 				mainDiv.appendChild(getDagligLoggDiv(dataObject.logg));
-				console.log(this.response);
 			})
 
 
+			return mainDiv;
+		}
+
+		function getStatsDivTable(sumObject,tableCaption){
+			let mainDiv = getDiv();
+			let table = document.createElement("table");
+			let cap = document.createElement("caption");
+			cap.innerText=tableCaption;
+			table.appendChild(cap);
+			let keys = Object.keys(sumObject);
+			let y = 4;
+			let antallRader = parseInt(keys.length/y);
+			if(keys.length % y > 0){
+				antallRader += 1;
+			}
+			for(let i=0;i<antallRader;i++){
+				var tempRad = document.createElement("tr");
+				for(let j=0;j<y;j++){
+					let index = i*y+j;
+					if(keys[index]){
+						let tempTD = document.createElement("td");
+						let tempDiv = getDiv("");
+						let tempBeskrivelseDiv = getDiv("");
+						tempBeskrivelseDiv.innerText = keys[index];
+						let tempMengdeDiv = getDiv("");
+						/* runder av til 1 desimal */
+						tempMengdeDiv.innerText = Math.round(sumObject[keys[index]] * 10) / 10;
+						tempDiv.appendChild(tempBeskrivelseDiv);
+						tempDiv.appendChild(tempMengdeDiv);
+						tempTD.appendChild(tempDiv);
+						tempRad.appendChild(tempTD)
+					}
+				}
+				table.appendChild(tempRad);
+			}
+
+			mainDiv.appendChild(table);
 			return mainDiv;
 		}
 
@@ -83,7 +119,7 @@
 		function parseLoggData(data){
 			
 			var length = Object.keys(data).length;
-			var output = {logg:[],daily:[],weekly:[],monthly:[]};
+			var output = {logg:[],daily:{},weekly:{},monthly:{}};
 
 			main:
 			for(i=0;i<length;i++){
@@ -100,6 +136,7 @@
 
 
 				if(innen24Timer){
+					mergeObjects(output.daily,næringsinnholdObjekt);
 					/* går igjennom array for å finne duplikat */
 					for(j=0;j<output.logg.length;j++){
 						var loggMatvare = output.logg[j][0];
@@ -111,13 +148,36 @@
 					}
 					/* legger til matvare hvis den ikke finnes i array */
 					output.logg.push([dataMatvare,parseFloat(dataMengde)]);
-				} else if(innen1Uke){
-
-				} else if(innen1Mnd){
-
+				}
+				if(innen1Uke){
+					mergeObjects(output.weekly,næringsinnholdObjekt);
+				}
+				if(innen1Mnd){
+					mergeObjects(output.monthly,næringsinnholdObjekt);
 				}
 			}
+			averageObjects(output.weekly,7);
+			averageObjects(output.monthly,31);
 			return output;
+		}
+
+		function averageObjects(obj,heltall){
+			for (let key in obj){
+				obj[key] = obj[key]/heltall;
+			}
+		}
+
+		function mergeObjects(mainObj,subObj){
+			let subKeys = Object.keys(subObj);
+			let subLength = subKeys.length;
+			for(let k=0;k<subLength;k++){
+				let tempKey = subKeys[k];
+				if(mainObj[tempKey]){
+					mainObj[tempKey] += subObj[tempKey];
+				} else {
+					mainObj[tempKey] = subObj[tempKey];
+				}
+			}
 		}
 
 		function getDagligLoggDiv(loggArr){
@@ -149,17 +209,6 @@
 			return mainDiv;
 		}
 
-		function getMonthlyStatsDiv(json){
-
-		}
-
-		function getWeeklyStatsDiv(json){
-
-		}
-
-		function getDagligStatsDiv(json){
-
-		}
 
 		function request(data,func){
 			var oReq = new XMLHttpRequest();

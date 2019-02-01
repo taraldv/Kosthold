@@ -27,6 +27,11 @@ table{
 	border-collapse: collapse;
 	border:solid 1px black;
 }
+td{
+	border:solid 1px black;
+	margin: 10px;
+	padding: 10px;
+}
 /* ids */
 
 #autocompleteDiv div strong {
@@ -138,10 +143,9 @@ table{
 	width: 40%;
 }
 .centerDiv{
-	margin-bottom: 25px;
-	padding-bottom: 25px;
+	margin-bottom: 50px;
+	padding-bottom: 50px;
 	margin:auto;
-	border-bottom: solid 1px black;
 }
 .måltidButton{
 	display: inline-block;

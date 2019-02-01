@@ -73,11 +73,7 @@ public class Post extends HttpServlet {
                 out.print(insertSQL(ingrediensOgVerdiArray, lastInsertedId));
             } else if (type.equals("getLogg")) {
                 /*TODO henter 31 distinct(dato) rader*/
-                String additionalStuff = ",m.Kilokalorier,m.Fett,m.Karbohydrat,m.`Sukker, tilsatt`,m.kostfiber,m.Protein,m.Salt,m.Kalsium";
-                String getLoggQuery = "SELECT m.matvare,mengde,dato" + additionalStuff + " FROM logg "
-                        + "LEFT JOIN matvaretabellen m ON logg.matvareId = m.matvareId "
-                        + "WHERE logg.brukerId = " + brukerId + "";
-                out.print(ResultSetConverter.toJSON(KostholdDatabase.databaseQuery(getLoggQuery)));
+                out.print(brukerDefinertLogg(brukerId));
             } else if (type.equals("insertLogg")) {
                 String[][] matvareOgMengdeArray = mapToArrayInArray(request.getParameterMap(), 1);
                 out.print(insertIntoLogg(matvareOgMengdeArray, brukerId));
@@ -111,6 +107,20 @@ public class Post extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace(out);
         }
+    }
+
+    private String brukerDefinertLogg(int brukerId) throws Exception {
+        String brukerDefinertQuery = "SELECT b.næringsinnhold FROM benevinger b "
+                + "LEFT JOIN brukerBenevningMål bm ON b.benevningId = bm.benevningId WHERE bm.brukerId = " + brukerId + ";";
+        String additionalStuff = ResultSetConverter.oneColumnToString(KostholdDatabase.databaseQuery(brukerDefinertQuery));
+        
+        //String additionalStuff = ",m.Kilokalorier,m.Fett,m.Karbohydrat,m.`Sukker, tilsatt`,m.kostfiber,m.Protein,m.Salt,m.Kalsium";
+        String getLoggQuery = "SELECT m.matvare,mengde,dato" + additionalStuff + " FROM logg "
+                + "LEFT JOIN matvaretabellen m ON logg.matvareId = m.matvareId "
+                + "WHERE logg.brukerId = " + brukerId + ";";
+        String output = ResultSetConverter.toJSON(KostholdDatabase.databaseQuery(getLoggQuery));
+        return output;
+
     }
 
     private int insertIntoLogg(String[][] arr, int brukerId) throws Exception {
