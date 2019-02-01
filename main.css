@@ -153,3 +153,9 @@ td{
 	margin: 5px;
 	border: solid 1px black;
 }
+.greenTD{
+	background-color: #b0e1a1;
+}
+.redTD{
+	background-color: #e1a1b0;
+}

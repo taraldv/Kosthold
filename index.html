@@ -34,15 +34,41 @@
 				mainDiv.appendChild(getStatsDivTable(dataObject.weekly,"ukentlig / 7"));
 				mainDiv.appendChild(getStatsDivTable(dataObject.monthly,"månedlig / 31"));
 				mainDiv.appendChild(getDagligLoggDiv(dataObject.logg));
+				request("type=getLoggMål",colorStatsDivTable);
 			})
 
 
 			return mainDiv;
 		}
 
+		function colorStatsDivTable(){
+			let data = JSON.parse(this.response);
+			var tableElements = document.getElementsByClassName("statsTabell");
+			for(let obj in data){
+				for(let x=0;x<tableElements.length;x++){
+					let tableRows = tableElements[x].children;
+					for(let i=1;i<tableRows.length;i++){
+						let tableDataElements = tableRows[i].children;
+						for(let j=0;j<tableDataElements.length;j++){
+							let dataNavn = tableDataElements[j].getAttribute("dataNavn");
+							let dataMengde = parseFloat(tableDataElements[j].getAttribute("dataMengde"));
+							if(data[obj].næringsinnhold == dataNavn){
+								if(dataMengde > data[obj].nedreMål && dataMengde < data[obj].øvreMål){
+									tableDataElements[j].setAttribute("class","greenTD");
+								} else {
+									tableDataElements[j].setAttribute("class","redTD")
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
 		function getStatsDivTable(sumObject,tableCaption){
 			let mainDiv = getDiv();
 			let table = document.createElement("table");
+			table.setAttribute("class","statsTabell");
 			let cap = document.createElement("caption");
 			cap.innerText=tableCaption;
 			table.appendChild(cap);
@@ -58,12 +84,16 @@
 					let index = i*y+j;
 					if(keys[index]){
 						let tempTD = document.createElement("td");
+						tempTD.setAttribute("dataNavn",keys[index]);
 						let tempDiv = getDiv("");
 						let tempBeskrivelseDiv = getDiv("");
 						tempBeskrivelseDiv.innerText = keys[index];
 						let tempMengdeDiv = getDiv("");
 						/* runder av til 1 desimal */
-						tempMengdeDiv.innerText = Math.round(sumObject[keys[index]] * 10) / 10;
+						let tempValue = Math.round(sumObject[keys[index]] * 10) / 10;
+						tempMengdeDiv.innerText = tempValue;
+						tempTD.setAttribute("dataNavn",keys[index]);
+						tempTD.setAttribute("dataMengde",tempValue);
 						tempDiv.appendChild(tempBeskrivelseDiv);
 						tempDiv.appendChild(tempMengdeDiv);
 						tempTD.appendChild(tempDiv);

@@ -29,6 +29,7 @@ import util.TooManyColumns;
  */
 public class Post extends HttpServlet {
 
+    /* TODO, erstatte type med en annen URL */
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json;charset=UTF-8");
@@ -71,6 +72,10 @@ public class Post extends HttpServlet {
                 String navn = request.getParameter("navn");
                 int lastInsertedId = insertMåltidAndGetLastID(navn, brukerId);
                 out.print(insertSQL(ingrediensOgVerdiArray, lastInsertedId));
+            } else if (type.equals("getLoggMål")) {
+                String målQuery = "SELECT øvreMål,nedreMål,b.næringsinnhold FROM brukerBenevningMål "
+                        + "LEFT JOIN benevninger b ON b.benevningId = brukerBenevningMål.benevningId WHERE brukerId =" + brukerId + ";";
+                out.print(ResultSetConverter.toJSON(KostholdDatabase.databaseQuery(målQuery)));
             } else if (type.equals("getLogg")) {
                 /*TODO henter 31 distinct(dato) rader*/
                 out.print(brukerDefinertLogg(brukerId));
@@ -110,10 +115,10 @@ public class Post extends HttpServlet {
     }
 
     private String brukerDefinertLogg(int brukerId) throws Exception {
-        String brukerDefinertQuery = "SELECT b.næringsinnhold FROM benevinger b "
+        String brukerDefinertQuery = "SELECT b.næringsinnhold FROM benevninger b "
                 + "LEFT JOIN brukerBenevningMål bm ON b.benevningId = bm.benevningId WHERE bm.brukerId = " + brukerId + ";";
         String additionalStuff = ResultSetConverter.oneColumnToString(KostholdDatabase.databaseQuery(brukerDefinertQuery));
-        
+
         //String additionalStuff = ",m.Kilokalorier,m.Fett,m.Karbohydrat,m.`Sukker, tilsatt`,m.kostfiber,m.Protein,m.Salt,m.Kalsium";
         String getLoggQuery = "SELECT m.matvare,mengde,dato" + additionalStuff + " FROM logg "
                 + "LEFT JOIN matvaretabellen m ON logg.matvareId = m.matvareId "

@@ -1,29 +1,20 @@
 DROP TABLE IF EXISTS ingredienser;
 DROP TABLE IF EXISTS logg;
+DROP TABLE IF EXISTS brukerBenevningMål;
 DROP TABLE IF EXISTS måltider;
 DROP TABLE IF EXISTS benevninger;
 DROP TABLE IF EXISTS matvaretabellen;
 DROP TABLE IF EXISTS users;
 
 
-
-
-
-CREATE TABLE måltider(
-	måltidId INTEGER AUTO_INCREMENT,
-	navn varchar(150) UNIQUE,
-	PRIMARY KEY(måltidId)
-);
-
-
-
 CREATE TABLE benevninger(
+	benevningId INTEGER AUTO_INCREMENT,
 	næringsinnhold varchar(30),
 	benevning varchar(10),
-	PRIMARY KEY(næringsinnhold)
+	PRIMARY KEY(benevningId)
 );
 
-INSERT INTO benevninger VALUES('Spiselig del','%'),
+INSERT INTO benevninger(næringsinnhold,benevning) VALUES('Spiselig del','%'),
 ('Vann','g'),
 ('Kilojoule','kJ'),
 ('Kilokalorier','kcal'),
@@ -1864,6 +1855,33 @@ INSERT INTO matvaretabellen VALUES
 (1720,'Tilskuddsblanding, fra 6 mnd, drikkeklar',100,88,286,68,3.2,1.3,0.29,0.12,0.69,0.11,0,1.2,0.01,1.13,0.6,0.52,0.06,0,0,0,0.01,0,0,0.01,0.07,0.53,0,8.3,0,6.6,0,0.3,1.4,0,0,72,0,0,1.2,1,0.08,0.16,0.6,0.05,11,0.2,12,56,0.9,21,76,7,0.7,2,0.06,38,15),
 (1721,'Tilskuddsblanding, fra 6 mnd, pulver',100,3,2171,519,27.8,11.2,2.41,1.02,5.73,0.92,0,9.9,0.07,9.35,5,4.34,0.52,0,0,0,0.06,0.02,0.01,0.06,0.61,4.41,0,54.9,6.5,51.9,0,4,10.3,0.3,0,468,0,0,8.6,7.2,0.49,0.88,4.7,0.4,77,1.5,78,355,5.4,126,508,38,4.4,11,0.36,191,89);
 
+CREATE TABLE users(
+	brukerId INTEGER AUTO_INCREMENT,
+	brukernavn varchar(150) NOT NULL,
+	passord varchar(150) NOT NULL,
+	PRIMARY KEY(brukerId)
+);
+
+INSERT INTO users(brukernavn,passord) VALUES('admin@tarves.no',' ');
+
+CREATE TABLE brukerBenevningMål(
+	brukerMålId INTEGER AUTO_INCREMENT,
+	benevningId INTEGER NOT NULL,
+	brukerId INTEGER NOT NULL,
+	øvreMål INTEGER,
+	nedreMål INTEGER,
+	PRIMARY KEY(brukerMålId),
+	FOREIGN KEY(benevningId) REFERENCES benevninger(benevningId),
+	FOREIGN KEY(brukerId) REFERENCES users(brukerId)
+);
+
+CREATE TABLE måltider(
+	måltidId INTEGER AUTO_INCREMENT,
+	navn varchar(150) UNIQUE,
+	brukerId INTEGER NOT NULL,
+	PRIMARY KEY(måltidId),
+	FOREIGN KEY(brukerId) REFERENCES users(brukerId)
+);
 
 CREATE TABLE ingredienser(
 	ingredienseId INTEGER AUTO_INCREMENT,
@@ -1874,16 +1892,6 @@ CREATE TABLE ingredienser(
 	FOREIGN KEY(matvareId) REFERENCES matvaretabellen(matvareId),
 	FOREIGN KEY(måltidId) REFERENCES måltider(måltidId)
 );
-
-
-CREATE TABLE users(
-	brukerId INTEGER AUTO_INCREMENT,
-	brukernavn varchar(150) NOT NULL,
-	passord varchar(150) NOT NULL,
-	PRIMARY KEY(brukerId)
-);
-
-INSERT INTO users(brukernavn,passord) VALUES('admin@tarves.no',' ');
 
 CREATE TABLE logg(
 	loggId INTEGER AUTO_INCREMENT,
