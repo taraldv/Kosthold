@@ -9,6 +9,7 @@ import crypto.ValidSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import javax.servlet.ServletException;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import util.TooManyColumns;
 import util.database.KostholdDatabase;
 import util.http.StandardResponse;
+import util.insert.ParameterMap;
 import util.sql.ResultSetConverter;
 
 /**
@@ -40,30 +42,32 @@ public class Matvare extends HttpServlet {
         int brukerId = vs.getId();
         try {
             if (type.equals("insertMatvaretabell")) {
-                String matvareNavn = request.getParameter("navn");
-                String[][] matvareIngrediensOgVerdier = mapToArrayInArray(request.getParameterMap(), 2);
-                out.print(insertIntoMatvaretabellen(matvareNavn, matvareIngrediensOgVerdier));
-            }else if (type.equals("getMatvaretabell")) {
+                out.print(insertMatvaretabellen(request.getParameter("navn"), ParameterMap.convertMapToArray(request.getParameterMap(), 2)));
+            } else if (type.equals("getMatvaretabell")) {
                 out.print(ResultSetConverter.toJSON(KostholdDatabase.normalQuery("SELECT matvareId,matvare FROM matvaretabellen;")));
-            } 
+            }
         } catch (Exception e) {
             e.printStackTrace(out);
         }
     }
 
-    private int insertIntoMatvaretabellen(String navn, String[][] arr) throws Exception {
+    /* TODO flytt denne dynamisk column insert */
+    private int insertMatvaretabellen(String matvareNavn, String[][] arr) throws Exception {
         TooManyColumns tmc = new TooManyColumns(arr);
         String query = tmc.getQuery();
         ArrayList<Double> list = tmc.getList();
-        Connection c = KostholdDatabase.getDatabaseConnection();
-        PreparedStatement ps = c.prepareStatement(query);
-        ps.setString(1, navn);
+        
+        Class.forName("com.mysql.jdbc.Driver");
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/kosthold", "kosthold", "");
+        
+        PreparedStatement ps = connection.prepareStatement(query);
+        ps.setString(1, matvareNavn);
         for (int x = 0; x < list.size(); x++) {
             ps.setDouble(x + 2, list.get(x));
         }
 
         int result = ps.executeUpdate();
-        c.close();
+        connection.close();
         return result;
     }
 }

@@ -7,12 +7,6 @@ package servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +16,6 @@ import crypto.SessionLogin;
 import crypto.ValidSession;
 import util.sql.ResultSetConverter;
 import util.http.StandardResponse;
-import util.TooManyColumns;
 
 /**
  *
@@ -43,10 +36,6 @@ public class Post extends HttpServlet {
         if (!vs.validateSession()) {
             return;
         }
-        int brukerId = vs.getId();
-
-        out.print(request.getSession().getAttribute("brukernavn") + "\n");
-        out.print(request.getSession().getAttribute("brukerId") + "\n");
 
         /* nullPointerException hvis type ikke er en del av request */
         try {
