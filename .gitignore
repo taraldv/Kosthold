@@ -1,8 +1,7 @@
-*
-!*/
-!.gitignore
-!/src/java/servlet/*
-!/src/java/util/*
-!index.html
-!matvaretabellen.sql
-!main.css
+/web*
+/build*
+/dist*
+/nbproject*
+/test*
+/src/conf*
+build.xml
