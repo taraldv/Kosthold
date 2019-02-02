@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import crypto.SessionLogin;
 import java.io.PrintWriter;
-import util.StandardResponse;
+import util.http.StandardResponse;
 
 /**
  *
