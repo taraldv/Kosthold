@@ -5,13 +5,9 @@
  */
 package crypto;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import javax.servlet.http.HttpSession;
-import crypto.BCrypt;
-import java.io.PrintWriter;
 import util.database.KostholdDatabase;
+import util.sql.ResultSetContainer;
 
 /**
  *
@@ -50,10 +46,9 @@ public class SessionLogin {
         /* sjeker om strings ikke er null, ikke vits med sql spørring med tom string */
         if (validReqestStrings()) {
             String query = "SELECT passord,brukerId FROM users WHERE brukernavn LIKE ?";
-            ResultSet rs = KostholdDatabase.oneStringQuery(query, brukernavn);
-            rs.first();
-            String hashedPassword = rs.getString(1);
-            int brukerId = rs.getInt(2);
+            ResultSetContainer rsc = KostholdDatabase.oneStringQuery(query, brukernavn);
+            String hashedPassword = rsc.getData()[0][0];
+            int brukerId = Integer.parseInt(rsc.getData()[0][1]);
 
             /* hvis gyldig passord, set attributes */
             if (crypto.BCrypt.checkpw(passord, hashedPassword)) {

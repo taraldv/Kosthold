@@ -16,6 +16,7 @@ import crypto.SessionLogin;
 import crypto.ValidSession;
 import util.sql.ResultSetConverter;
 import util.http.StandardResponse;
+import util.sql.ResultSetContainer;
 
 /**
  *
@@ -31,7 +32,7 @@ public class Post extends HttpServlet {
         PrintWriter out = sr.getWriter();
         String type = request.getParameter("type");
         ValidSession vs = new ValidSession(out, request.getSession());
-        
+
         /* stopper request hvis ugylid session */
         if (!vs.validateSession()) {
             return;
@@ -44,9 +45,7 @@ public class Post extends HttpServlet {
                 out.print(SessionLogin.generatePasswordHash(request.getParameter("passord")));
             }
 
-            
-            /*  */
-             if (type.equals("autocomplete")) {
+            if (type.equals("autocomplete")) {
                 String matchingParameter = request.getParameter("string");
                 String whichTable = request.getParameter("table");
                 String autocompleteQuery = "";
@@ -55,7 +54,8 @@ public class Post extends HttpServlet {
                 } else if (whichTable.equals("næringsinnhold")) {
                     autocompleteQuery = "SELECT næringsinnhold,benevning FROM benevninger WHERE næringsinnhold LIKE ? LIMIT 15;";
                 }
-                String completeJson = ResultSetConverter.toJSON(KostholdDatabase.oneStringQuery(autocompleteQuery, "%" + matchingParameter + "%"));
+                ResultSetContainer rsc = KostholdDatabase.oneStringQuery(autocompleteQuery, "%" + matchingParameter + "%");
+                String completeJson = rsc.getJSON();
                 if (completeJson.length() > 2) {
                     String jsonAddition = "\"search\":\"" + matchingParameter + "\",";
                     completeJson = new StringBuffer(completeJson).insert(1, jsonAddition).toString();
@@ -66,12 +66,5 @@ public class Post extends HttpServlet {
             e.printStackTrace(out);
         }
     }
-
-
-
-  
-
-   
-
 
 }

@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import util.sql.ResultSetContainer;
 
 /**
  *
@@ -57,27 +58,27 @@ public class KostholdDatabase {
         return result;
     }
 
-    static public ResultSet oneStringQuery(String query, String inputString) throws Exception {
+    static public ResultSetContainer oneStringQuery(String query, String inputString) throws Exception {
         PreparedStatement ps = getprepStatement(query, 0);
         ps.setString(1, inputString);
-        ResultSet rs = ps.executeQuery();
+        ResultSetContainer rsc = new ResultSetContainer(ps.executeQuery());
         ps.getConnection().close();
-        return rs;
+        return rsc;
     }
 
-    static public ResultSet oneIntQuery(String query, int inputInt) throws Exception {
+    static public ResultSetContainer oneIntQuery(String query, int inputInt) throws Exception {
         PreparedStatement ps = getprepStatement(query, 0);
         ps.setInt(1, inputInt);
-        ResultSet rs = ps.executeQuery();
+        ResultSetContainer rsc = new ResultSetContainer(ps.executeQuery());
         ps.getConnection().close();
-        return rs;
+        return rsc;
     }
 
-    static public ResultSet normalQuery(String query) throws Exception {
-        ResultSet rset;
+    static public ResultSetContainer normalQuery(String query) throws Exception {
+        ResultSetContainer rsc;
         try (Connection c = getDatabaseConnection()) {
-            rset = c.createStatement().executeQuery(query);
+            rsc = new ResultSetContainer(c.createStatement().executeQuery(query));
         }
-        return rset;
+        return rsc;
     }
 }

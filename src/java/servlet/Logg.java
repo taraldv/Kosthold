@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.database.KostholdDatabase;
 import util.insert.ParameterMap;
-import util.sql.ResultSetConverter;
 import util.http.StandardResponse;
 import util.sql.MultiLineSqlQuery;
 
@@ -56,7 +55,7 @@ public class Logg extends HttpServlet {
     private String getLoggMål(int brukerId) throws Exception {
         String målQuery = "SELECT øvreMål,nedreMål,b.næringsinnhold FROM brukerBenevningMål "
                 + "LEFT JOIN benevninger b ON b.benevningId = brukerBenevningMål.benevningId WHERE brukerId =" + brukerId + ";";
-        return ResultSetConverter.toJSON(KostholdDatabase.normalQuery(målQuery));
+        return KostholdDatabase.normalQuery(målQuery).getJSON();
     }
 
     private int insertLogg(String[][] arr, int brukerId) throws Exception {
@@ -70,13 +69,12 @@ public class Logg extends HttpServlet {
     private String getLogg(int brukerId) throws Exception {
         String brukerDefinertQuery = "SELECT b.næringsinnhold FROM benevninger b "
                 + "LEFT JOIN brukerBenevningMål bm ON b.benevningId = bm.benevningId WHERE bm.brukerId = " + brukerId + ";";
-        String additionalStuff = ResultSetConverter.oneColumnToString(KostholdDatabase.normalQuery(brukerDefinertQuery));
+        String additionalStuff = KostholdDatabase.normalQuery(brukerDefinertQuery).getOneColumnToString();
 
         String getLoggQuery = "SELECT m.matvare,mengde,dato" + additionalStuff + " FROM logg "
                 + "LEFT JOIN matvaretabellen m ON logg.matvareId = m.matvareId "
                 + "WHERE logg.brukerId = " + brukerId + ";";
-        String output = ResultSetConverter.toJSON(KostholdDatabase.normalQuery(getLoggQuery));
-        return output;
+        return KostholdDatabase.normalQuery(getLoggQuery).getJSON();
 
     }
 

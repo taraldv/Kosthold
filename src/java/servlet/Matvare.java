@@ -20,7 +20,7 @@ import util.TooManyColumns;
 import util.database.KostholdDatabase;
 import util.http.StandardResponse;
 import util.insert.ParameterMap;
-import util.sql.ResultSetConverter;
+import util.sql.ResultSetContainer;
 
 /**
  *
@@ -44,7 +44,8 @@ public class Matvare extends HttpServlet {
             if (type.equals("insertMatvaretabell")) {
                 out.print(insertMatvaretabellen(request.getParameter("navn"), ParameterMap.convertMapToArray(request.getParameterMap(), 2)));
             } else if (type.equals("getMatvaretabell")) {
-                out.print(ResultSetConverter.toJSON(KostholdDatabase.normalQuery("SELECT matvareId,matvare FROM matvaretabellen;")));
+                ResultSetContainer rsc = KostholdDatabase.normalQuery("SELECT matvareId,matvare FROM matvaretabellen;");
+                out.print(rsc.getJSON());
             }
         } catch (Exception e) {
             e.printStackTrace(out);
@@ -56,10 +57,10 @@ public class Matvare extends HttpServlet {
         TooManyColumns tmc = new TooManyColumns(arr);
         String query = tmc.getQuery();
         ArrayList<Double> list = tmc.getList();
-        
+
         Class.forName("com.mysql.jdbc.Driver");
         Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/kosthold", "kosthold", "");
-        
+
         PreparedStatement ps = connection.prepareStatement(query);
         ps.setString(1, matvareNavn);
         for (int x = 0; x < list.size(); x++) {
