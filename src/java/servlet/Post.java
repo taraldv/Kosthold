@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import util.database.KostholdDatabase;
 import crypto.SessionLogin;
 import crypto.ValidSession;
-import util.sql.ResultSetConverter;
 import util.http.StandardResponse;
 import util.sql.ResultSetContainer;
 
