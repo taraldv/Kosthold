@@ -5,7 +5,6 @@
  */
 package servlet;
 
-import ignore.GitHubIgnore;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -19,8 +18,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.KostholdDatabase;
-import util.Login;
+import crypto.SessionLogin;
 import util.ResultSetConverter;
+import util.StandardResponse;
 import util.TooManyColumns;
 
 /**
@@ -30,38 +30,22 @@ import util.TooManyColumns;
 public class Post extends HttpServlet {
 
     /* TODO, erstatte type med en annen URL */
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("application/json;charset=UTF-8");
-        response.setHeader("Access-Control-Allow-Origin", GitHubIgnore.URL);
-        response.setHeader("Access-Control-Allow-Credentials", "true");
-        PrintWriter out = response.getWriter();
+        StandardResponse sr = new StandardResponse(response);
+        PrintWriter out = sr.getWriter();
         String type = request.getParameter("type");
-
-        if (type.equals("passordGen")) {
-            out.print(Login.generatePasswordHash(request.getParameter("passord")));
-        }
-
+        
+        out.print(request.getSession().getAttribute("brukernavn") + "\n");
+        out.print(request.getSession().getAttribute("brukerId") + "\n");
         try {
-
-            Login login = new Login(request.getParameter("brukernavn"), request.getParameter("passord"), request.getSession());
-
-            /*hvis gyldig login, skip til brukerId */
-            if (!login.validSession()) {
-                /* ikke gyldig session, men prøver på login */
-                if (login.validLogin()) {
-                    out.print(1);
-                    return;
-                } else {
-                    login.invalidate();
-                    return;
-                }
-                /* gyldig session, og spør etter bekreftelse */
-            } else if (type.equals("auth")) {
-                out.print(1);
-                return;
+            
+            if (type.equals("passordGen")) {
+                out.print(SessionLogin.generatePasswordHash(request.getParameter("passord")));
             }
-            int brukerId = login.getBrukerId();
+            
+            int brukerId = SessionLogin.getIdIfValidSession(request.getSession());
             /*  */
             if (type.equals("insertMatvaretabell")) {
                 String matvareNavn = request.getParameter("navn");
@@ -113,7 +97,7 @@ public class Post extends HttpServlet {
             e.printStackTrace(out);
         }
     }
-
+    
     private String brukerDefinertLogg(int brukerId) throws Exception {
         String brukerDefinertQuery = "SELECT b.næringsinnhold FROM benevninger b "
                 + "LEFT JOIN brukerBenevningMål bm ON b.benevningId = bm.benevningId WHERE bm.brukerId = " + brukerId + ";";
@@ -125,9 +109,9 @@ public class Post extends HttpServlet {
                 + "WHERE logg.brukerId = " + brukerId + ";";
         String output = ResultSetConverter.toJSON(KostholdDatabase.databaseQuery(getLoggQuery));
         return output;
-
+        
     }
-
+    
     private int insertIntoLogg(String[][] arr, int brukerId) throws Exception {
         Connection c = KostholdDatabase.getDatabaseConnection();
         String query = "INSERT INTO logg(dato,matvareId,mengde,brukerId) VALUES ";
@@ -147,7 +131,7 @@ public class Post extends HttpServlet {
         c.close();
         return result;
     }
-
+    
     private int insertIntoMatvaretabellen(String navn, String[][] arr) throws Exception {
         TooManyColumns tmc = new TooManyColumns(arr);
         String query = tmc.getQuery();
@@ -158,12 +142,12 @@ public class Post extends HttpServlet {
         for (int x = 0; x < list.size(); x++) {
             ps.setDouble(x + 2, list.get(x));
         }
-
+        
         int result = ps.executeUpdate();
         c.close();
         return result;
     }
-
+    
     private int insertMåltidAndGetLastID(String navn, int brukerId) throws Exception {
         Connection c = KostholdDatabase.getDatabaseConnection();
         String query = "INSERT INTO måltider(navn,brukerId) VALUES (?," + brukerId + ");";
@@ -176,7 +160,7 @@ public class Post extends HttpServlet {
         c.close();
         return Integer.parseInt(lastId);
     }
-
+    
     private int insertSQL(String[][] arr, int lastId) throws Exception {
         Connection c = KostholdDatabase.getDatabaseConnection();
         String query = "INSERT INTO ingredienser (måltidId, matvareId, mengde) VALUES ";
@@ -191,25 +175,25 @@ public class Post extends HttpServlet {
         for (int j = 0; j < arr.length; j++) {
             ps.setInt(1 + (2 * j), Integer.parseInt(arr[j][0]));
             ps.setDouble(2 + (2 * j), Double.parseDouble(arr[j][1]));
-
+            
         }
-
+        
         int result = ps.executeUpdate();
         c.close();
         return result;
     }
-
+    
     private String[][] mapToArrayInArray(Map<String, String[]> map, int offset) {
-
+        
         String[][] out = new String[(map.size() - offset) / 2][2];
         String[][] temp = map.values().toArray(new String[0][0]);
-
+        
         for (int i = offset; i < temp.length; i += 2) {
             out[(i - offset) / 2][0] = temp[i][0];
             out[(i - offset) / 2][1] = temp[i + 1][0];
         }
-
+        
         return out;
     }
-
+    
 }
