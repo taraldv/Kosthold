@@ -1859,10 +1859,11 @@ CREATE TABLE users(
 	brukerId INTEGER AUTO_INCREMENT,
 	brukernavn varchar(150) NOT NULL,
 	passord varchar(150) NOT NULL,
+	admin boolean NOT NULL,
 	PRIMARY KEY(brukerId)
 );
 
-INSERT INTO users(brukernavn,passord) VALUES('admin@tarves.no',' ');
+INSERT INTO users(brukernavn,passord,admin) VALUES('admin@tarves.no',' ',false);
 
 CREATE TABLE brukerBenevningMål(
 	brukerMålId INTEGER AUTO_INCREMENT,

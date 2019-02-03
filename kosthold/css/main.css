@@ -1,0 +1,199 @@
+/* nodes */
+
+*{
+	margin: 0;
+	padding:0;
+	font-family: sans-serif;
+}
+body{
+	background-color: whitesmoke;
+	font-size: 1.2em;
+	overflow-y:scroll;
+}
+input[type='number'] {
+	margin-left: 5px;
+	width: 50px;
+	-moz-appearance:textfield;
+}
+input[type='submit']{
+	width: 150px;
+}
+input{
+	font-size: 1em;
+	width: 400px;
+}
+table{
+	border-collapse: collapse;
+	border:solid 1px black;
+}
+td{
+	border:solid 1px black;
+	margin: 10px;
+	padding: 10px;
+}
+a{
+	text-decoration: none;
+	color:black;
+	font-size: 1.4em;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+a:hover{
+	color:#cd00cd;
+	cursor: pointer;
+}
+form{
+
+	border: 1px solid #666666;
+	background-color: #BAC9D0;
+}
+/* ids */
+
+#selectedNavigation{
+	text-decoration: underline overline #cd00cd;
+}
+
+#navigation{
+	margin-bottom: 10px;
+	padding: 10px;
+	border-bottom: 1px solid #666666;
+	background-color: #e6e6e6;
+}
+
+#autocompleteDiv div strong {
+	text-decoration: none;
+	color: #0505FF;
+
+}
+#loginForm{
+	text-align: center;
+	padding: 20px;
+}
+#loginForm input{
+	width: 200px;
+}
+#loginForm div{
+	padding-bottom: 20px;
+}
+#loginForm div div{
+	padding-bottom: 0;
+}
+
+/* salt,sukker etc */
+#innholdDiv div div input{
+	font-size: 0.8em;
+	width: 100px;
+	border: 1px solid grey;
+}
+/* g,kg,kcal etc */
+#innholdDiv div input{
+	font-size: 0.8em;
+	margin-left: 0;
+	border: 1px solid grey;
+	border-left: 0;
+	width: 50px;
+}
+#innholdDiv div div{
+	padding-right: 0;
+}
+#innholdDiv {
+	text-align: left;
+	width: 710px;
+}
+#autocompleteDiv div{
+	border-bottom: 1px solid grey;
+	background-color: white;
+	display: block;
+}
+#autocompleteDiv .selectedAutocompleteDiv{
+	background-color: #b0e1a1;
+}
+#autocompleteDiv{
+	display: block;
+	width: 400px;
+	text-align: left;
+	position: absolute;
+	z-index: 3;
+	border: 1px solid grey;
+}
+#måltidButtonsDiv{
+
+}
+/* classes */
+
+.innholdDivs{
+	display: inline-block;
+	padding-right: 20px;
+}
+.autocompleteContainerDiv{
+	display: inline-block;
+}
+.divButton{
+	margin-left: 5px;
+	padding-left: 5px;
+	padding-right: 5px;
+	border: 1px solid grey;
+	display: inline-block;
+	background-color:#e6e6e6; 
+}
+.divButton:hover,#autocompleteDiv div:hover,.autocompleteDivSelected,.måltidButton:hover{
+	cursor: pointer;
+	background-color: #a0db8e;
+}
+.removeFromCollectionDiv{
+	/*display: inline-block;*/
+	margin: auto;
+	padding: 5px;
+}
+.removeFromCollectionDiv:hover{
+	cursor: pointer;
+	background-color: #DB8EA0;
+}
+.removeFromCollectionDiv input{
+	pointer-events: none;
+}
+.collection div input{
+	font-size: 0.8em;
+	width: 300px;
+}
+
+.collection div input:last-child{
+	margin-left: 5px;
+	font-size: 0.8em;
+	width: 50px;
+}
+
+.inlineDiv{
+	display: inline-block;
+}
+.mainDiv{
+	width: 30%;
+	vertical-align: top;
+}
+.mainDiv:nth-child(2){
+	width: 40%;
+}
+.centerDiv{
+	margin-bottom: 50px;
+	padding-bottom: 50px;
+	margin:auto;
+}
+.måltidButton{
+	display: inline-block;
+	padding: 15px;
+	margin: 5px;
+	border: solid 1px black;
+}
+.greenTD{
+	background-color: #b0e1a1;
+}
+.redTD{
+	background-color: #e1a1b0;
+}
+.formContainerDiv{
+	padding: 20px;
+	display: inline-block;
+}
+.formContainerDiv form{
+	padding: 5px;
+}
