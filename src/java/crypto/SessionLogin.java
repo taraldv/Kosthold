@@ -41,6 +41,8 @@ public class SessionLogin {
     public boolean validLogin() throws Exception {
         return checkPassword();
     }
+    
+
 
     private boolean checkPassword() throws Exception {
         /* sjeker om strings ikke er null, ikke vits med sql spørring med tom string */

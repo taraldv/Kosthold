@@ -33,6 +33,10 @@ public class ValidSession {
         }
     }
 
+    public void logOut() {
+        session.invalidate();
+    }
+
     public int getId() {
         return id;
     }

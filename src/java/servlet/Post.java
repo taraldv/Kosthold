@@ -40,11 +40,13 @@ public class Post extends HttpServlet {
         /* nullPointerException hvis type ikke er en del av request */
         try {
 
-            if (type.equals("passordGen")) {
+            if (type.equals("logout")) {
+                vs.logOut();
+            }else if (type.equals("auth")) {
+                out.print(1);
+            } else if (type.equals("passordGen")) {
                 out.print(SessionLogin.generatePasswordHash(request.getParameter("passord")));
-            }
-
-            if (type.equals("autocomplete")) {
+            } else if (type.equals("autocomplete")) {
                 String matchingParameter = request.getParameter("string");
                 String whichTable = request.getParameter("table");
                 String autocompleteQuery = "";
