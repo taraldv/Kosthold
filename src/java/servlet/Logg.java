@@ -37,10 +37,8 @@ public class Logg extends HttpServlet {
         int brukerId = vs.getId();
         try {
             if (type.equals("getLoggMål")) {
-
                 out.print(getLoggMål(brukerId));
             } else if (type.equals("getLogg")) {
-
                 out.print(getLogg(brukerId));
             } else if (type.equals("insertLogg")) {
                 out.print(insertLogg(ParameterMap.convertMapToArray(request.getParameterMap(), 1), brukerId));

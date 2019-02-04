@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS måltider;
 DROP TABLE IF EXISTS benevninger;
 DROP TABLE IF EXISTS matvaretabellen;
 DROP TABLE IF EXISTS users;
+DROP TRIGGER IF EXISTS userBenevning;
 
 
 CREATE TABLE benevninger(
@@ -1866,12 +1867,12 @@ CREATE TABLE users(
 INSERT INTO users(brukernavn,passord,admin) VALUES('admin@tarves.no',' ',false);
 
 CREATE TABLE brukerBenevningMål(
-	brukerMålId INTEGER AUTO_INCREMENT,
-	benevningId INTEGER NOT NULL,
-	brukerId INTEGER NOT NULL,
+	benevningId INTEGER,
+	brukerId INTEGER,
+	aktiv boolean,
 	øvreMål INTEGER,
 	nedreMål INTEGER,
-	PRIMARY KEY(brukerMålId),
+	PRIMARY KEY(benevningId,brukerId),
 	FOREIGN KEY(benevningId) REFERENCES benevninger(benevningId),
 	FOREIGN KEY(brukerId) REFERENCES users(brukerId)
 );
@@ -1913,3 +1914,25 @@ SET brukerId = 1;
 
 ALTER TABLE matvaretabellen
 ADD FOREIGN KEY (brukerId) REFERENCES users(brukerId); 
+
+DELIMITER ::
+
+CREATE TRIGGER userBenevning
+AFTER INSERT ON users
+FOR EACH ROW
+BEGIN
+	DECLARE done INT DEFAULT FALSE;
+	DECLARE b_Id INTEGER;
+	DECLARE cur CURSOR FOR SELECT benevningId FROM benevninger;
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+	OPEN cur;
+	luup: LOOP
+		FETCH cur INTO b_Id;
+		IF done THEN
+			LEAVE luup;
+		END IF;
+		INSERT INTO brukerBenevningMål(benevningId,brukerId,aktiv) VALUES(b_Id,NEW.brukerId,false);
+	END LOOP;
+END::
+
+DELIMITER ;
