@@ -66,7 +66,7 @@ public class Logg extends HttpServlet {
     /*TODO henter 31 distinct(dato) rader*/
     private String getLogg(int brukerId) throws Exception {
         String brukerDefinertQuery = "SELECT b.næringsinnhold FROM benevninger b "
-                + "LEFT JOIN brukerBenevningMål bm ON b.benevningId = bm.benevningId WHERE bm.brukerId = " + brukerId + ";";
+                + "LEFT JOIN brukerBenevningMål bm ON b.benevningId = bm.benevningId WHERE bm.brukerId = " + brukerId + " AND bm.aktiv = true;";
         String additionalStuff = KostholdDatabase.normalQuery(brukerDefinertQuery).getOneColumnToString();
 
         String getLoggQuery = "SELECT m.matvare,mengde,dato" + additionalStuff + " FROM logg "
