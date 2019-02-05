@@ -51,7 +51,7 @@ public class Logg extends HttpServlet {
     }
 
     private String getLoggMål(int brukerId) throws Exception {
-        String målQuery = "SELECT øvreMål,nedreMål,b.næringsinnhold FROM brukerBenevningMål "
+        String målQuery = "SELECT øvreMål,nedreMål,b.næringsinnhold,aktiv,b.benevning,b.benevningId FROM brukerBenevningMål "
                 + "LEFT JOIN benevninger b ON b.benevningId = brukerBenevningMål.benevningId WHERE brukerId =" + brukerId + ";";
         return KostholdDatabase.normalQuery(målQuery).getJSON();
     }

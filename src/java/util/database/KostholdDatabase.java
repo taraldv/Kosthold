@@ -88,6 +88,7 @@ public class KostholdDatabase {
         for (int i = 0; i < arr.length; i++) {
             String øvre = arr[i][1];
             String nedre = arr[i][2];
+            String id = arr[i][0];
             ps.setBoolean(1, Boolean.parseBoolean(arr[i][3]));
             
             if (øvre == null || øvre.length() == 0) {
@@ -102,7 +103,12 @@ public class KostholdDatabase {
                 ps.setInt(3, Integer.parseInt(nedre));
             }
             
-            ps.setString(4, arr[i][0]);
+            if (id == null || id.length() == 0) {
+                ps.setInt(4, 0);
+            } else {
+                ps.setInt(4, Integer.parseInt(id));
+            }
+            
             output += ps.executeUpdate();
         }
         return output;

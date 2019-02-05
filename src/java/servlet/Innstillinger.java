@@ -23,13 +23,14 @@ import util.sql.MultiLineSqlQuery;
  * @author Tarald
  */
 public class Innstillinger extends HttpServlet {
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         StandardResponse sr = new StandardResponse(response);
         PrintWriter out = sr.getWriter();
         ValidSession vs = new ValidSession(out, request.getSession());
+
         String type = request.getParameter("type");
         /* stopper request hvis ugylid session */
         if (!vs.validateSession()) {
@@ -38,26 +39,27 @@ public class Innstillinger extends HttpServlet {
         int brukerId = vs.getId();
         try {
             if (type.equals("endrePassord")) {
-                
+
             } else if (type.equals("endreBenevningMål")) {
                 String[][] arr = ParameterMapConverter.dynamiskConverter(request.getParameterMap(), 1, 4);
-                
+
+                //out.print(Arrays.deepToString(arr));
+
                 out.print(endreBenevningMål(arr, brukerId));
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace(out);
         }
-        
+
     }
-    
+
     private String endreBenevningMål(String[][] arr, int brukerId) throws Exception {
         String query = "UPDATE brukerBenevningMål SET"
                 + " aktiv = ?, øvreMål = ?, nedreMål = ?"
-                + " WHERE brukerId =" + brukerId + " AND benevningId = "
-                + "(SELECT benevningId FROM benevninger WHERE næringsinnhold LIKE ?);";
+                + " WHERE brukerId =" + brukerId + " AND benevningId = ?" + ";";
         int k = KostholdDatabase.multiUpdateQuery(query, arr);
         return Integer.toString(k);
     }
-    
+
 }
