@@ -81,4 +81,9 @@ public class KostholdDatabase {
         }
         return rsc;
     }
+    
+    static public int multiUpdateQuery(String query) throws Exception{
+        PreparedStatement ps = getprepStatement(query, 0);
+        return 0;
+    }
 }
