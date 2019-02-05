@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.database.KostholdDatabase;
-import util.insert.ParameterMap;
+import util.insert.ParameterMapConverter;
 import util.http.StandardResponse;
 import util.sql.MultiLineSqlQuery;
 
@@ -41,7 +41,7 @@ public class Logg extends HttpServlet {
             } else if (type.equals("getLogg")) {
                 out.print(getLogg(brukerId));
             } else if (type.equals("insertLogg")) {
-                out.print(insertLogg(ParameterMap.convertMapToArray(request.getParameterMap(), 1), brukerId));
+                out.print(insertLogg(ParameterMapConverter.twoParameterMap(request.getParameterMap(), 1), brukerId));
             }
 
         } catch (Exception e) {

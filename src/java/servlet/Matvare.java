@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import util.TooManyColumns;
 import util.database.KostholdDatabase;
 import util.http.StandardResponse;
-import util.insert.ParameterMap;
+import util.insert.ParameterMapConverter;
 import util.sql.ResultSetContainer;
 
 /**
@@ -42,7 +42,7 @@ public class Matvare extends HttpServlet {
         int brukerId = vs.getId();
         try {
             if (type.equals("insertMatvaretabell")) {
-                out.print(insertMatvaretabellen(request.getParameter("navn"), ParameterMap.convertMapToArray(request.getParameterMap(), 2)));
+                out.print(insertMatvaretabellen(request.getParameter("navn"), ParameterMapConverter.twoParameterMap(request.getParameterMap(), 2)));
             } else if (type.equals("getMatvaretabell")) {
                 ResultSetContainer rsc = KostholdDatabase.normalQuery("SELECT matvareId,matvare FROM matvaretabellen;");
                 out.print(rsc.getJSON());

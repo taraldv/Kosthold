@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.database.KostholdDatabase;
 import util.http.StandardResponse;
-import util.insert.ParameterMap;
+import util.insert.ParameterMapConverter;
 import util.sql.MultiLineSqlQuery;
 
 /**
@@ -23,7 +23,7 @@ import util.sql.MultiLineSqlQuery;
  * @author Tarald
  */
 public class Innstillinger extends HttpServlet {
-
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -38,24 +38,26 @@ public class Innstillinger extends HttpServlet {
         int brukerId = vs.getId();
         try {
             if (type.equals("endrePassord")) {
-
+                
             } else if (type.equals("endreBenevningMål")) {
-                String[][] arr = ParameterMap.convertMapToArray(request.getParameterMap(), 1);
-                out.print(Arrays.deepToString(arr));
-                //out.print(endreBenevningMål(, brukerId));
+                String[][] arr = ParameterMapConverter.dynamiskConverter(request.getParameterMap(), 1, 4);
+                
+                out.print(endreBenevningMål(arr, brukerId));
             }
-
+            
         } catch (Exception e) {
             e.printStackTrace(out);
         }
-
+        
     }
-
-    private String endreBenevningMål(String[][] arr, int brukerId) {
+    
+    private String endreBenevningMål(String[][] arr, int brukerId) throws Exception {
         String query = "UPDATE brukerBenevningMål SET"
                 + " aktiv = ?, øvreMål = ?, nedreMål = ?"
-                + " WHERE brukerId =" + brukerId + " AND benevningId = ?;";
-        return query;
+                + " WHERE brukerId =" + brukerId + " AND benevningId = "
+                + "(SELECT benevningId FROM benevninger WHERE næringsinnhold LIKE ?);";
+        int k = KostholdDatabase.multiUpdateQuery(query, arr);
+        return Integer.toString(k);
     }
-
+    
 }

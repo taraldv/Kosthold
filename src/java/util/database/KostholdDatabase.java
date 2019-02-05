@@ -81,9 +81,30 @@ public class KostholdDatabase {
         }
         return rsc;
     }
-    
-    static public int multiUpdateQuery(String query) throws Exception{
+
+    static public int multiUpdateQuery(String query, String[][] arr) throws Exception {
         PreparedStatement ps = getprepStatement(query, 0);
-        return 0;
+        int output = 0;
+        for (int i = 0; i < arr.length; i++) {
+            String øvre = arr[i][1];
+            String nedre = arr[i][2];
+            ps.setBoolean(1, Boolean.parseBoolean(arr[i][3]));
+            
+            if (øvre == null || øvre.length() == 0) {
+                ps.setInt(2, 0);
+            } else {
+                ps.setInt(2, Integer.parseInt(øvre));
+            }
+            
+            if (nedre == null || nedre.length() == 0) {
+                ps.setInt(3, 0);
+            } else {
+                ps.setInt(3, Integer.parseInt(nedre));
+            }
+            
+            ps.setString(4, arr[i][0]);
+            output += ps.executeUpdate();
+        }
+        return output;
     }
 }

@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.database.KostholdDatabase;
 import util.http.StandardResponse;
-import util.insert.ParameterMap;
+import util.insert.ParameterMapConverter;
 import util.sql.MultiLineSqlQuery;
 import util.sql.ResultSetContainer;
 
@@ -38,7 +38,7 @@ public class Måltid extends HttpServlet {
         int brukerId = vs.getId();
         try {
             if (type.equals("insertMåltider")) {
-                out.print(insertMåltider(brukerId, request.getParameter("navn"), ParameterMap.convertMapToArray(request.getParameterMap(), 2)));
+                out.print(insertMåltider(brukerId, request.getParameter("navn"), ParameterMapConverter.twoParameterMap(request.getParameterMap(), 2)));
             } else if (type.equals("getMåltider")) {
                 ResultSetContainer rsc = KostholdDatabase.normalQuery("SELECT * FROM måltider WHERE brukerId = " + brukerId + ";");
                 out.print(rsc.getJSON());
