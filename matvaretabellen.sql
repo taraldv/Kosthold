@@ -15,6 +15,8 @@ CREATE TABLE benevninger(
 	PRIMARY KEY(benevningId)
 );
 
+
+/* TODO fjerne spiselig del */
 INSERT INTO benevninger(næringsinnhold,benevning) VALUES('Spiselig del','%'),
 ('Vann','g'),
 ('Kilojoule','kJ'),

@@ -10,21 +10,6 @@ function passordGenerator(){
 	})
 }
 
-/* TODO hele dette lol */
-function setNæringsInstillinger(){
-
-}
-
-
-function applyGlobalDocumentEvents(){
-	
-	document.body.addEventListener("keyup",function(event){
-		
-		
-	});
-}
-
-
 
 function getSelectedAutocompleteIndex(children){
 	for(let i=0;i<children.length;i++){
@@ -46,6 +31,7 @@ function getNavigation(){
 	["/stats/","stats"],
 	["/måltider/","måltider"],
 	["/matvaretabellen/","matvaretabellen"],
+	["/innstillinger/","innstillinger"],
 	["/logg/","logg"]];
 	let currentUrl = window.location.href;
 	let urlArr = currentUrl.split("/");

@@ -193,8 +193,12 @@ function sumNæringsinnholdFraObject(obj){
 	let length = keys.length;
 	let mengde = obj.mengde;
 	for(x=0;x<length;x++){
+		/* skal ikke summere disse 3 objektene */
 		if(keys[x] != "matvare" && keys[x] != "mengde" && keys[x] != "dato"){
-			næringsinnholdSummert[keys[x]] = (parseFloat(mengde)/100)*obj[keys[x]];
+			/* null fra database blir string, TODO: kanskje endre databasen til å omgjøre null felt til 0 */
+			if(obj[keys[x]] != "null"){
+				næringsinnholdSummert[keys[x]] = (parseFloat(mengde)/100)*obj[keys[x]];
+			}
 		}
 	}
 	return næringsinnholdSummert;

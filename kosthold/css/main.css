@@ -119,8 +119,35 @@ form{
 #måltidButtonsDiv{
 
 }
+#næringstoffForklaringDiv div{
+	display: inline-block;
+	margin-left: 5px;
+	width: 52px;
+}
+#næringstoffForklaringDiv div:first-child{
+	width: 152px;
+	margin-left: 0;
+}
+#næringstoffForklaringDiv div:last-child{
+	width: auto;
+	padding-left: 20px;
+}
+
 /* classes */
 
+/* bloody alfa-TE */
+.benevningDiv{
+	width: 35px;
+}
+.næringstoffSjekk{
+	width:auto;
+	display: inline-block;
+	transform: scale(1.5);
+	margin-left: 10px;
+}
+.næringstoffInnhold{
+	width: 150px;
+}
 .innholdDivs{
 	display: inline-block;
 	padding-right: 20px;
