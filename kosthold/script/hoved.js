@@ -28,6 +28,7 @@ function getNavigation(){
 	let mainDiv = getDiv(false,"navigation");
 
 	let arr = [["/","index"],
+	["/vekt/","vekt"],
 	["/stats/","stats"],
 	["/måltider/","måltider"],
 	["/matvaretabellen/","matvaretabellen"],
@@ -265,6 +266,133 @@ function removeAutocompleteDiv(){
 
 }
 
+function getTableFromJSON(json){
+
+	let table = document.createElement("table");
+	let headerRow = document.createElement("tr");
+
+	/* keys til første element */
+	let keys = Object.keys(json[0]);
+
+	/* begyner på 1, siden 0 er data-id */
+	for(let j=1;j<keys.length;j++){
+		let tempHeader = document.createElement("th");
+		tempHeader.innerText = keys[j];
+		headerRow.appendChild(tempHeader);
+	}
+
+	table.appendChild(headerRow);
+
+	var length = Object.keys(json).length;
+
+	for(let i=0;i<length;i++){
+
+		table.appendChild(getStatsTableRow(json[i]));
+	}
+
+	return table;
+
+}
+
+function getStatsTableRow(obj){
+	/* eks: {vektId:"7",kilo:"89.5",dato:"2019-02-16"} */
+	let keys = Object.keys(obj);
+
+	let tempRow = document.createElement("tr");
+
+	/* obs: id må alltid være første element i object, id er vanligvis først i databasen */
+	tempRow.setAttribute("data-id",obj[keys[0]]);
+	tempRow.setAttribute("class","statsTableRow");
+
+	for(let i=1;i<keys.length;i++){
+		let tempTD = document.createElement("td");
+		tempTD.innerText = obj[keys[i]];
+		tempRow.appendChild(tempTD);
+	}
+
+	/* extra */
+	let deleteTD = document.createElement("td");
+	deleteTD.innerText = "slett";
+	deleteTD.setAttribute("class","deleteButton statsTableButton");
+	deleteTD.addEventListener("click",function(){
+		let id = this.parentNode.getAttribute("data-id");
+		/* IKKE DYNAMISK */
+		request("type=deleteVekt&vektId="+id,"Kosthold/Vekt",function(){
+			handleInsertResponse(this.response);
+		});
+	});
+
+	let updateTD = document.createElement("td");
+	updateTD.innerText = "endre";
+	updateTD.setAttribute("class","updateButton statsTableButton");
+	updateTD.addEventListener("click",function(){
+		let parentRow = this.parentNode;
+		updateRow(parentRow);
+	});
+
+	tempRow.appendChild(updateTD);
+	tempRow.appendChild(deleteTD);
+	return(tempRow);
+}
+
+/* TODO dynamisk */
+function updateRow(node){
+	let children = node.children;
+	let datoValue = children[0].innerText;
+	let kiloValue = children[1].innerText;
+	removeChildren(node);
+
+	let datoTD = document.createElement("td");
+	datoTD.setAttribute("class","statsTableDato");
+	let datoInsert = document.createElement("input");
+	datoInsert.setAttribute("class","TDInsert");
+	datoInsert.setAttribute("type","text");
+	datoInsert.setAttribute("placeholder",datoValue);
+	datoTD.appendChild(datoInsert);
+
+	let kiloTD = document.createElement("td");	
+	kiloTD.setAttribute("class","statsTableKilo");
+	let kiloInsert = document.createElement("input");
+	kiloInsert.setAttribute("class","TDInsert");
+	kiloInsert.setAttribute("type","number");
+	kiloInsert.setAttribute("step","0.01");
+	kiloInsert.setAttribute("placeholder",kiloValue);
+	kiloTD.appendChild(kiloInsert);
+
+	let bekreftTD = document.createElement("td")
+	bekreftTD.setAttribute("class","confirmButton statsTableButton");
+	bekreftTD.innerText = "bekreft";
+	bekreftTD.addEventListener("click",function(){
+		let parentRow = this.parentNode;
+		let id = parentRow.getAttribute("data-id");
+		let kilo = getInputValueOrPlaceholder(parentRow.firstChild.nextSibling.children[0]);
+		let dato = getInputValueOrPlaceholder(parentRow.firstChild.children[0]);
+		
+		request("type=updateVekt&vektId="+id+"&kilo="+kilo+"&dato="+dato,"Kosthold/Vekt",function(){
+			handleInsertResponse(this.response);
+		});
+	});
+	let avbrytTD = document.createElement("td")
+	avbrytTD.setAttribute("class","cancelButton statsTableButton");
+	avbrytTD.innerText = "avbryt";
+	avbrytTD.addEventListener("click",function(){
+		/* avbryter endring og setter tilbake en ny node lik den som ble fjernet */
+		let tempParentRow = this.parentNode;
+		let dato = tempParentRow.firstChild.children[0].getAttribute("placeholder");
+		let kilo = tempParentRow.firstChild.nextSibling.children[0].getAttribute("placeholder");
+		let id = tempParentRow.getAttribute("data-id");
+		let obj = {id:id,dato:dato,kilo:kilo}
+		let newRow = getStatsTableRow(obj);
+		tempParentRow.parentNode.insertBefore(newRow, tempParentRow);
+		tempParentRow.parentNode.removeChild(tempParentRow);
+	});
+
+	node.appendChild(datoTD);
+	node.appendChild(kiloTD);
+	node.appendChild(bekreftTD);
+	node.appendChild(avbrytTD);
+}
+
 function changeSelectedAutocompleteDiv(newNode){
 	if(newNode){
 		let children = newNode.parentNode.children;
@@ -356,4 +484,14 @@ function removeChildren(myNode){
 	while (myNode.firstChild) {
 		myNode.removeChild(myNode.firstChild);
 	}
+}
+
+function getInputValueOrPlaceholder(inputNode){
+	var output = "";
+	if(inputNode.value){
+		output = inputNode.value;
+	} else {
+		output = inputNode.getAttribute("placeholder");
+	}
+	return output;
 }

@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS ingredienser;
 DROP TABLE IF EXISTS logg;
+DROP TABLE IF EXISTS vekt;
 DROP TABLE IF EXISTS brukerBenevningMål;
 DROP TABLE IF EXISTS måltider;
 DROP TABLE IF EXISTS benevninger;
@@ -1867,6 +1868,15 @@ CREATE TABLE users(
 );
 
 INSERT INTO users(brukernavn,passord,admin) VALUES('admin@tarves.no',' ',false);
+
+CREATE TABLE vekt(
+	vektId INTEGER AUTO_INCREMENT,
+	brukerId INTEGER NOT NULL,
+	kilo DECIMAL(5,2) NOT NULL,
+	dato DATE NOT NULL,
+	FOREIGN KEY(brukerId) REFERENCES users(brukerId),
+	PRIMARY KEY(vektId)
+);
 
 CREATE TABLE brukerBenevningMål(
 	benevningId INTEGER,

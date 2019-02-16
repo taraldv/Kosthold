@@ -17,6 +17,13 @@
 		formContainer.appendChild(forklaringDiv);
 		formContainer.appendChild(getMatvaretabellForm());
 		document.body.appendChild(formContainer);
+
+		let tabellContainer = getDiv("formContainerDiv");
+		let tabellforklaringDiv = getDiv("");
+		tabellforklaringDiv.innerText = "din data i tabellen:";
+		tabellContainer.appendChild(tabellforklaringDiv);
+		tabellContainer.appendChild(getMatvaretabellTabell());
+		document.body.appendChild(tabellContainer);
 	</script>
 </body>
 </html>

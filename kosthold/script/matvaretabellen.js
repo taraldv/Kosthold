@@ -114,3 +114,14 @@ function leggTilInnholdForMatvare(arr){
 
 	document.getElementById("innholdDiv").appendChild(containerDiv);
 }
+
+
+function getMatvaretabellTabell(){
+	let containerDiv = getDiv(null,"statsContainer");
+	request("type=getVektLogg","Kosthold/Vekt",function(){
+		let data = JSON.parse(this.response);
+		let table =  getTabelFromJSON(data);
+		document.getElementById("statsContainer").appendChild(table);
+	});
+	return containerDiv;
+}
