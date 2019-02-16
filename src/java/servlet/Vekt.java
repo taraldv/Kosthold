@@ -68,7 +68,7 @@ public class Vekt extends HttpServlet {
     }
 
     private String getVektLogg(int brukerId) throws Exception {
-        String målQuery = "SELECT vektId,kilo,dato FROM vekt WHERE brukerId =" + brukerId + ";";
+        String målQuery = "SELECT vektId,dato,kilo FROM vekt WHERE brukerId =" + brukerId + ";";
         return KostholdDatabase.normalQuery(målQuery).getJSON();
     }
 

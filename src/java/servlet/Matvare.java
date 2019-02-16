@@ -46,10 +46,17 @@ public class Matvare extends HttpServlet {
             } else if (type.equals("getMatvaretabell")) {
                 ResultSetContainer rsc = KostholdDatabase.normalQuery("SELECT matvareId,matvare FROM matvaretabellen;");
                 out.print(rsc.getJSON());
+            } else if (type.equals("getBrukerMatvaretabell")) {
+                out.print(getBrukerMatvaretabell(brukerId));
             }
         } catch (Exception e) {
             e.printStackTrace(out);
         }
+    }
+
+    private String getBrukerMatvaretabell(int brukerId) throws Exception {
+        String query = "SELECT * FROM matvaretabellen WHERE brukerId = " + brukerId + ";";
+        return KostholdDatabase.normalQuery(query).getJSON();
     }
 
     /* TODO flytt denne dynamisk column insert */
