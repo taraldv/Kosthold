@@ -56,7 +56,8 @@ public class Måltid extends HttpServlet {
     }
 
     private int insertMåltider(int brukerId, String navn, String[][] arr) throws Exception {
-        int lastInsertedId = KostholdDatabase.oneStringInsert("INSERT INTO måltider(navn,brukerId) VALUES (?," + brukerId + ");", navn);
+        Object[] vars = {navn};
+        int lastInsertedId = KostholdDatabase.singleUpdateQuery("INSERT INTO måltider(navn,brukerId) VALUES (?," + brukerId + ");", vars, true);
         String baseline = "INSERT INTO ingredienser (måltidId, matvareId, mengde) VALUES ";
         String row = "(" + lastInsertedId + ",?,?)";
         String multiQuery = MultiLineSqlQuery.getStringFromArrayLength(arr.length, baseline, row);

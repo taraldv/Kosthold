@@ -34,15 +34,35 @@ public class KostholdDatabase {
         }
     }
 
-    static public int oneStringInsert(String query, String inputString) throws Exception {
-        PreparedStatement ps = getprepStatement(query, Statement.RETURN_GENERATED_KEYS);
-        ps.setString(1, inputString);
-        ps.executeUpdate();
-        ResultSet rs = ps.getGeneratedKeys();
-        rs.next();
-        String lastId = rs.getString("GENERATED_KEY");
+    static public int singleUpdateQuery(String query, Object[] var, boolean returnAutoIncrement) throws Exception {
+        int options = 0;
+        if (returnAutoIncrement) {
+            options = Statement.RETURN_GENERATED_KEYS;
+        }
+        PreparedStatement ps = getprepStatement(query, options);
+
+        for (int i = 0; i < var.length; i++) {
+            /* string,double eller int */
+            if (var[i] instanceof Integer) {
+                ps.setInt(i + 1, (int) var[i]);
+            } else if (var[i] instanceof Double) {
+                ps.setDouble(i + 1, (double) var[i]);
+            } else if (var[i] instanceof String) {
+                ps.setString(i + 1, (String) var[i]);
+            }
+        }
+
+        int output = ps.executeUpdate();
+
+        if (returnAutoIncrement) {
+            ResultSet keySet = ps.getGeneratedKeys();
+            keySet.next();
+            String lastId = keySet.getString("GENERATED_KEY");
+            ps.getConnection().close();
+            return Integer.parseInt(lastId);
+        }
         ps.getConnection().close();
-        return Integer.parseInt(lastId);
+        return output;
     }
 
     /* TODO dynamisk int,double,string fra input */
@@ -90,25 +110,25 @@ public class KostholdDatabase {
             String nedre = arr[i][2];
             String id = arr[i][0];
             ps.setBoolean(1, Boolean.parseBoolean(arr[i][3]));
-            
+
             if (øvre == null || øvre.length() == 0) {
                 ps.setInt(2, 0);
             } else {
                 ps.setInt(2, Integer.parseInt(øvre));
             }
-            
+
             if (nedre == null || nedre.length() == 0) {
                 ps.setInt(3, 0);
             } else {
                 ps.setInt(3, Integer.parseInt(nedre));
             }
-            
+
             if (id == null || id.length() == 0) {
                 ps.setInt(4, 0);
             } else {
                 ps.setInt(4, Integer.parseInt(id));
             }
-            
+
             output += ps.executeUpdate();
         }
         return output;
