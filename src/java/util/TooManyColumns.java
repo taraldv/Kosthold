@@ -81,8 +81,8 @@ public class TooManyColumns {
     }
 
     private void generateTableColumns() {
-        query = "INSERT INTO matvaretabellen(matvare";
-        String values = ") VALUES (?";
+        query = "INSERT INTO matvaretabellen(matvare,brukerId";
+        String values = ") VALUES (?,?";
         for (int i = 0; i < columns.length; i++) {
             for (int j = 0; j < arr.length; j++) {
                 String matvareNavn = arr[j][0];

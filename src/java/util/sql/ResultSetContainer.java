@@ -74,10 +74,10 @@ public class ResultSetContainer {
         return json += "}";
     }
 
-    public String getOneColumnToString() throws Exception {
+    public String getOneColumnToString(String prepend) throws Exception {
         String output = "";
         for (String[] dataArr : data) {
-            output += ",m.`" + dataArr[0] + "`";
+            output += "," + prepend + "`" + dataArr[0] + "`";
         }
         return output;
     }

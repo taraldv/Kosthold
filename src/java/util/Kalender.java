@@ -13,10 +13,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.TreeSet;
-import util.Day;
-import util.Exer;
-import util.Week;
-import util.Year;
 
 /**
  *
