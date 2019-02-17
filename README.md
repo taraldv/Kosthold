@@ -1,4 +1,4 @@
 # KostholdTreningLogg
-html/javascript frontend og java backend
+java backend, bruker apache tomcat
 
 kilde: "Matvaretabellen 2018. Mattilsynet. www.matvaretabellen.no".
