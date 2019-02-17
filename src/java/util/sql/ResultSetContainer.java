@@ -55,6 +55,7 @@ public class ResultSetContainer {
         return data;
     }
 
+    /* x er rader, y er kolonner */
     public String getJSON() throws Exception {
         String json = "{";
 

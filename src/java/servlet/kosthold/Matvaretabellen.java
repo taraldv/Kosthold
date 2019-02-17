@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +21,6 @@ import util.TooManyColumns;
 import util.database.KostholdDatabase;
 import util.http.StandardResponse;
 import util.insert.ParameterMapConverter;
-import util.sql.ResultSetContainer;
 
 /**
  *
@@ -48,11 +48,49 @@ public class Matvaretabellen extends HttpServlet {
             } else if (type.equals("deleteMatvare")) {
                 out.print(deleteMatvare(brukerId, Integer.parseInt(request.getParameter("brukerId"))));
             } else if (type.equals("updateMatvare")) {
+                Map<String, String[]> paras = request.getParameterMap();
 
+                out.print(updateMatvare(paras, brukerId, Integer.parseInt(request.getParameter("rowId"))));
+                //out.print(request.getParameter("rowData"));
             }
         } catch (Exception e) {
             e.printStackTrace(out);
         }
+    }
+
+    private int updateMatvare(Map<String, String[]> map, int brukerId, int matvareId) throws Exception {
+        String verifyQuery = "SELECT næringsinnhold FROM benevninger WHERE";
+        Object[] kolonneArray = map.keySet().toArray();
+        for (int x = 0; x < kolonneArray.length; x++) {
+            if (x != 0) {
+                verifyQuery += " OR";
+            }
+            verifyQuery += " næringsinnhold LIKE ?";
+        }
+        /* en slags måte å bruke preparedStatement på kolonneNavn, men tar 2 steg */
+        String[][] verifisertKolonneNavn = KostholdDatabase.multiQuery(verifyQuery, kolonneArray).getData();
+        String[][] mapData = map.values().toArray(new String[0][0]);
+        String updateQuery = "UPDATE matvaretabellen SET ";
+        Object[] vars = new Object[verifisertKolonneNavn.length + 1];
+
+        /* kan vel ikke være dynamisk? alt er jo strings, men skal være int */
+        for (int i = 0; i < verifisertKolonneNavn.length; i++) {
+            if (i != 0) {
+                updateQuery += ",";
+            }
+            updateQuery += "`"+verifisertKolonneNavn[i][0] + "`=?";
+            try {
+                /* mapData offset pga type,matvareId og matvare */
+                vars[i] = Double.parseDouble(mapData[i + 3][0]);
+            } catch (NumberFormatException e) {
+                /* fjerner NULL verdier */
+                vars[i] = new Double(0);
+            }
+        }
+        vars[vars.length - 1] = matvareId;
+        updateQuery += " WHERE matvareId = ? AND brukerId=" + brukerId;
+
+        return KostholdDatabase.singleUpdateQuery(updateQuery, vars, false);
     }
 
     private int deleteMatvare(int brukerId, int matvareId) throws Exception {
@@ -72,7 +110,7 @@ public class Matvaretabellen extends HttpServlet {
 
 
     /* TODO flytt denne dynamisk column insert */
-    /* må bruke to queries, første henter kolonner fra benevningTabell */
+ /* må bruke to queries, første henter kolonner fra benevningTabell */
     private int insertMatvaretabellen(String matvareNavn, int brukerId, String[][] arr) throws Exception {
         TooManyColumns tmc = new TooManyColumns(arr);
         String query = tmc.getQuery();

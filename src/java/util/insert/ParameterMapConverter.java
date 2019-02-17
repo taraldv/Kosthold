@@ -26,13 +26,17 @@ public class ParameterMapConverter {
         return out;
     }
 
+   /* public static String[][] mapToArrayKeepHeaders(Map<String, String[]> map) {
+        String[][] temp = map.values().toArray(new String[0][0]);
+    }*/
+
     /* POST fra innstillinger har samme 'name', så det blir annderledes
     TODO: endre alle post til samme 'name' ?*/
     public static String[][] dynamiskConverter(Map<String, String[]> map, int offset, int kol) {
-        
+
         /* map.size() == temp.length */
         String[][] temp = map.values().toArray(new String[0][0]);
-        
+
 
         /* temp[0] kommer til å ha feil antall parameter(1 stk), så flytter index med offset */
         String[][] out = new String[temp[0 + offset].length][kol];
@@ -40,7 +44,7 @@ public class ParameterMapConverter {
         /* snur egentlig på array, og eksluderer offset */
         for (int i = offset; i < temp.length; i++) {
             for (int j = 0; j < temp[i].length; j++) {
-                out[j][i-offset] = temp[i][j];
+                out[j][i - offset] = temp[i][j];
             }
         }
 

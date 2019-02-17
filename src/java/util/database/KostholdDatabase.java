@@ -65,6 +65,27 @@ public class KostholdDatabase {
         return output;
     }
 
+    static private void setPreparedStatementVariables(PreparedStatement ps, Object[] vars) throws Exception {
+        for (int i = 0; i < vars.length; i++) {
+            /* string,double eller int */
+            if (vars[i] instanceof Integer) {
+                ps.setInt(i + 1, (int) vars[i]);
+            } else if (vars[i] instanceof Double) {
+                ps.setDouble(i + 1, (double) vars[i]);
+            } else if (vars[i] instanceof String) {
+                ps.setString(i + 1, (String) vars[i]);
+            }
+        }
+    }
+
+    static public ResultSetContainer multiQuery(String query, Object[] vars) throws Exception {
+        PreparedStatement ps = getprepStatement(query, 0);
+        setPreparedStatementVariables(ps, vars);
+        ResultSetContainer rsc = new ResultSetContainer(ps.executeQuery());
+        ps.getConnection().close();
+        return rsc;
+    }
+
     /* TODO dynamisk int,double,string fra input */
     static public int multiInsertQuery(String[][] arr, String query) throws Exception {
         PreparedStatement ps = getprepStatement(query, 0);
@@ -78,6 +99,7 @@ public class KostholdDatabase {
         return result;
     }
 
+    /* bør flyttes til  multiQuery*/
     static public ResultSetContainer oneStringQuery(String query, String inputString) throws Exception {
         PreparedStatement ps = getprepStatement(query, 0);
         ps.setString(1, inputString);
@@ -86,6 +108,7 @@ public class KostholdDatabase {
         return rsc;
     }
 
+    /* bør flyttes til  multiQuery*/
     static public ResultSetContainer oneIntQuery(String query, int inputInt) throws Exception {
         PreparedStatement ps = getprepStatement(query, 0);
         ps.setInt(1, inputInt);
