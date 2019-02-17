@@ -28,7 +28,7 @@ public class Login extends HttpServlet {
         try {
             SessionLogin login = new SessionLogin(request.getParameter("brukernavn"), request.getParameter("passord"), request.getSession());
             if (login.validLogin()) {
-                sr.sendRedirect("https://kosthold.tarves.no");
+                sr.sendRedirect("https://www.tarves.no");
             } else {
                 login.invalidate();
                 out.print("feil passord eller brukernavn");

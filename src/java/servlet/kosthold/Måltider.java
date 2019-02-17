@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package servlet;
+package servlet.kosthold;
 
 import crypto.ValidSession;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import util.sql.ResultSetContainer;
  *
  * @author Tarald
  */
-public class Måltid extends HttpServlet {
+public class Måltider extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
