@@ -43,11 +43,10 @@ public class Vekt extends HttpServlet {
                 int vektId = Integer.parseInt(request.getParameter("vektId"));
                 out.print(deleteVekt(vektId, brukerId));
             } else if (type.equals("updateVekt")) {
-                
-               /* int vektId = Integer.parseInt(request.getParameter("vektId"));
+                int vektId = Integer.parseInt(request.getParameter("rowId"));
                 Double kiloVekt = Double.parseDouble(request.getParameter("kilo"));
                 String dato = request.getParameter("dato");
-                out.print(updateVekt(vektId, brukerId, kiloVekt, dato));*/
+                out.print(updateVekt(vektId, brukerId, kiloVekt, dato));
             }
 
         } catch (Exception e) {

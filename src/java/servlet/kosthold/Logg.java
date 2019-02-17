@@ -36,12 +36,19 @@ public class Logg extends HttpServlet {
         }
         int brukerId = vs.getId();
         try {
-            if (type.equals("getLoggMål")) {
-                out.print(getLoggMål(brukerId));
+            if (type.equals("getLoggTabell")) {
+                out.print(getLoggTabell(brukerId));
             } else if (type.equals("getLogg")) {
                 out.print(getLogg(brukerId));
             } else if (type.equals("insertLogg")) {
                 out.print(insertLogg(ParameterMapConverter.twoParameterMap(request.getParameterMap(), 1), brukerId));
+            } else if (type.equals("deleteLogg")) {
+                out.print(deleteLogg(brukerId, Integer.parseInt(request.getParameter("loggId"))));
+            } else if (type.equals("updateLogg")) {
+                int loggId = Integer.parseInt(request.getParameter("rowId"));
+                Double mengde = Double.parseDouble(request.getParameter("mengde"));
+                String dato = request.getParameter("dato");
+                out.print(updateLogg(brukerId, loggId, mengde, dato));
             }
 
         } catch (Exception e) {
@@ -50,10 +57,21 @@ public class Logg extends HttpServlet {
 
     }
 
-    private String getLoggMål(int brukerId) throws Exception {
-        String målQuery = "SELECT øvreMål,nedreMål,b.næringsinnhold,aktiv,b.benevning,b.benevningId FROM brukerBenevningMål "
-                + "LEFT JOIN benevninger b ON b.benevningId = brukerBenevningMål.benevningId WHERE brukerId =" + brukerId + ";";
-        return KostholdDatabase.normalQuery(målQuery).getJSON();
+    private int updateLogg(int brukerId, int loggId, Double mengde, String dato) throws Exception {
+        String updateQuery = "UPDATE logg SET mengde = ?, dato = ? WHERE loggId = ? AND brukerId = " + brukerId + ";";
+        Object[] vars = {mengde, dato, loggId};
+        return KostholdDatabase.singleUpdateQuery(updateQuery, vars, false);
+    }
+
+    private int deleteLogg(int brukerId, int loggId) throws Exception {
+        String deleteQuery = "DELETE FROM logg WHERE loggId = ? AND brukerId = " + brukerId + ";";
+        return KostholdDatabase.singleUpdateQuery(deleteQuery, new Object[]{loggId}, false);
+    }
+
+    private String getLoggTabell(int brukerId) throws Exception {
+        String query = "SELECT loggId,m.matvare,mengde,dato FROM logg "
+                + "LEFT JOIN matvaretabellen m ON m.matvareId = logg.matvareId WHERE logg.brukerId = " + brukerId + " ORDER BY loggId DESC;";
+        return KostholdDatabase.normalQuery(query).getJSON();
     }
 
     private int insertLogg(String[][] arr, int brukerId) throws Exception {

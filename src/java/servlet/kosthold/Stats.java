@@ -36,13 +36,9 @@ public class Stats extends HttpServlet {
         }
         int brukerId = vs.getId();
         try {
-            if (type.equals("getLoggMål")) {
-                out.print(getLoggMål(brukerId));
-            } else if (type.equals("getLogg")) {
-                out.print(getLogg(brukerId));
-            } else if (type.equals("insertLogg")) {
-                out.print(insertLogg(ParameterMapConverter.twoParameterMap(request.getParameterMap(), 1), brukerId));
-            }
+            if (type.equals("getStatsMål")) {
+                out.print(getStatsMål(brukerId));
+            } 
 
         } catch (Exception e) {
             e.printStackTrace(out);
@@ -50,29 +46,10 @@ public class Stats extends HttpServlet {
 
     }
 
-    private String getLoggMål(int brukerId) throws Exception {
+    private String getStatsMål(int brukerId) throws Exception {
         String målQuery = "SELECT øvreMål,nedreMål,b.næringsinnhold,aktiv,b.benevning,b.benevningId FROM brukerBenevningMål "
                 + "LEFT JOIN benevninger b ON b.benevningId = brukerBenevningMål.benevningId WHERE brukerId =" + brukerId + ";";
         return KostholdDatabase.normalQuery(målQuery).getJSON();
     }
 
-    private int insertLogg(String[][] arr, int brukerId) throws Exception {
-        String baseline = "INSERT INTO logg(dato,matvareId,mengde,brukerId) VALUES ";
-        String row = "(CURDATE(),?,?," + brukerId + ")";
-        String multiQuery = MultiLineSqlQuery.getStringFromArrayLength(arr.length, baseline, row);
-        return KostholdDatabase.multiInsertQuery(arr, multiQuery);
-    }
-
-    /*TODO henter 31 distinct(dato) rader*/
-    private String getLogg(int brukerId) throws Exception {
-        String brukerDefinertQuery = "SELECT b.næringsinnhold FROM benevninger b "
-                + "LEFT JOIN brukerBenevningMål bm ON b.benevningId = bm.benevningId WHERE bm.brukerId = " + brukerId + " AND bm.aktiv = true;";
-        String additionalStuff = KostholdDatabase.normalQuery(brukerDefinertQuery).getOneColumnToString(".m");
-
-        String getLoggQuery = "SELECT m.matvare,mengde,dato" + additionalStuff + " FROM logg "
-                + "LEFT JOIN matvaretabellen m ON logg.matvareId = m.matvareId "
-                + "WHERE logg.brukerId = " + brukerId + ";";
-        return KostholdDatabase.normalQuery(getLoggQuery).getJSON();
-
-    }
 }
