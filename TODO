@@ -1,9 +1,10 @@
 Java
-Måltider	Update/Delete 
-Stats		Grafer
-Stats		SQL henter 31 distinct(dato)
-Login		Glemt passord
-Trening		Refactor til samme standard som Kosthold
+Kosthold/Måltider		Update/Delete 
+Kosthold/Stats			Grafer
+Kosthold/Stats			SQL henter 31 distinct(dato)
+Kosthold/Login			Glemt passord
+Trening/Kalender		TreningHistorikk gjennomgang
+Trening/Input			Refactor 
 
 Javascript
 hoved.js	validere input?

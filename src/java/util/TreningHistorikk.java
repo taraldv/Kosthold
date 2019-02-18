@@ -6,6 +6,8 @@
 package util;
 
 import com.google.gson.Gson;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,12 +20,17 @@ import java.util.TreeSet;
  *
  * @author Tarald
  */
-public class Kalender {
+public class TreningHistorikk {
+
     private final static HashSet<String> uniqueExer = new HashSet<>();
     private final static HashSet<Integer> uniqueYear = new HashSet<>();
 
-    public static String getJSON(ResultSet rset) throws Exception {
+    public static String getJSON() throws Exception {
+        Class.forName("com.mysql.jdbc.Driver");
+        Connection c = DriverManager.getConnection("jdbc:mysql://localhost/trening", "trening", "");
+        ResultSet rset = c.createStatement().executeQuery("SELECT dato,excercise,avg_weight FROM trening ORDER BY dato");
         Day[] arr = parseSql(rset);
+        c.close();
         addWeight(arr);
         Year[] years = createFinal(arr);
         calcWeeklyPercent(years);
@@ -45,14 +52,14 @@ public class Kalender {
 
     }
 
-    private static void calcWeeklyPercent(Year[] arr){
+    private static void calcWeeklyPercent(Year[] arr) {
         for (Year year : arr) {
             for (Week week : year.getWeeks()) {
                 week.setPercent();
             }
         }
     }
-    
+
     private static Year[] createFinal(Day[] arr) {
         Year[] output = getFourLastYears();
         for (Day day : arr) {
@@ -81,17 +88,17 @@ public class Kalender {
         return output.toArray(new Year[0]);
     }
 
-    private static Year[] getFourLastYears(){
+    private static Year[] getFourLastYears() {
         int i = Calendar.getInstance().get(Calendar.YEAR);
         Year[] years = new Year[4];
         int x = 0;
         for (Year year : years) {
-            years[x]=new Year(i-x);
+            years[x] = new Year(i - x);
             x++;
         }
         return years;
     }
-    
+
     private static Day[] parseSql(ResultSet rset) throws Exception {
         ArrayList<Day> output = new ArrayList<>();
         Calendar calendar = new GregorianCalendar(0, 0, 0);
