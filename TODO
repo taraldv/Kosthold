@@ -3,6 +3,7 @@ Kosthold/Måltider		Update/Delete
 Kosthold/Stats			Grafer
 Kosthold/Stats			SQL henter 31 distinct(dato)
 Kosthold/Login			Glemt passord
+Kosthold/Vekt			Endre kosthold mål basert på vekt mål
 Trening/Kalender		TreningHistorikk gjennomgang / 4 sekunder er for mye
 	Trenger ikke hente all data i starten, henter 1 år om gangen
 Trening/Input			Refactor 
