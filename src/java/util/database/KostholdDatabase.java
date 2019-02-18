@@ -86,19 +86,6 @@ public class KostholdDatabase {
         return rsc;
     }
 
-    /* TODO dynamisk int,double,string fra input */
-    static public int multiInsertQuery(String[][] arr, String query) throws Exception {
-        PreparedStatement ps = getprepStatement(query, 0);
-        for (int j = 0; j < arr.length; j++) {
-            ps.setInt(1 + (2 * j), Integer.parseInt(arr[j][0]));
-            ps.setDouble(2 + (2 * j), Double.parseDouble(arr[j][1]));
-
-        }
-        int result = ps.executeUpdate();
-        ps.getConnection().close();
-        return result;
-    }
-
     static public ResultSetContainer normalQuery(String query) throws Exception {
         ResultSetContainer rsc;
         try (Connection c = getDatabaseConnection()) {
@@ -107,14 +94,15 @@ public class KostholdDatabase {
         return rsc;
     }
 
-    static public int multiUpdateQuery(String query, String[][] arr) throws Exception {
+    /* må gjøre det i flere steg pga hver rad har forskjellig WHERE clause */
+    static public int innstillingerMultipleUpdateQueries(String query, String[][] arr, int offset) throws Exception {
         PreparedStatement ps = getprepStatement(query, 0);
         int output = 0;
-        for (int i = 0; i < arr.length; i++) {
-            String øvre = arr[i][1];
-            String nedre = arr[i][2];
-            String id = arr[i][0];
-            ps.setBoolean(1, Boolean.parseBoolean(arr[i][3]));
+        for (int i = 0; i < arr[offset - 1].length; i++) {
+            String øvre = arr[offset + 1][i];
+            String nedre = arr[offset + 2][i];
+            String id = arr[offset][i];
+            ps.setBoolean(1, Boolean.parseBoolean(arr[offset + 3][i]));
 
             if (øvre == null || øvre.length() == 0) {
                 ps.setInt(2, 0);

@@ -8,19 +8,13 @@ package servlet.kosthold;
 import crypto.ValidSession;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.util.ArrayList;
 import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.TooManyColumns;
 import util.database.KostholdDatabase;
 import util.http.StandardResponse;
-import util.insert.ParameterMapConverter;
 
 /**
  *
@@ -42,7 +36,7 @@ public class Matvaretabellen extends HttpServlet {
         int brukerId = vs.getId();
         try {
             if (type.equals("insertMatvaretabell")) {
-                out.print(insertMatvaretabellen(request.getParameter("navn"), brukerId, ParameterMapConverter.twoParameterMap(request.getParameterMap(), 2)));
+                out.print(matvaretabellInsert(request.getParameterMap(), brukerId, request.getParameter("navn")));
             } else if (type.equals("getBrukerMatvaretabell")) {
                 out.print(getMatvaretabellTabell(brukerId));
             } else if (type.equals("deleteMatvare")) {
@@ -78,7 +72,7 @@ public class Matvaretabellen extends HttpServlet {
             if (i != 0) {
                 updateQuery += ",";
             }
-            updateQuery += "`"+verifisertKolonneNavn[i][0] + "`=?";
+            updateQuery += "`" + verifisertKolonneNavn[i][0] + "`=?";
             try {
                 /* mapData offset pga type,matvareId og matvare */
                 vars[i] = Double.parseDouble(mapData[i + 3][0]);
@@ -108,26 +102,38 @@ public class Matvaretabellen extends HttpServlet {
         return KostholdDatabase.normalQuery(getLoggQuery).getJSON();
     }
 
-
-    /* TODO flytt denne dynamisk column insert */
- /* må bruke to queries, første henter kolonner fra benevningTabell */
-    private int insertMatvaretabellen(String matvareNavn, int brukerId, String[][] arr) throws Exception {
-        TooManyColumns tmc = new TooManyColumns(arr);
-        String query = tmc.getQuery();
-        ArrayList<Double> list = tmc.getList();
-
-        Class.forName("com.mysql.jdbc.Driver");
-        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/kosthold", "kosthold", "");
-
-        PreparedStatement ps = connection.prepareStatement(query);
-        ps.setString(1, matvareNavn);
-        ps.setInt(2, brukerId);
-        for (int x = 0; x < list.size(); x++) {
-            ps.setDouble(x + 3, list.get(x));
+    private int matvaretabellInsert(Map<String, String[]> map, int brukerId, String matvare) throws Exception {
+        String verifyQuery = "SELECT næringsinnhold FROM benevninger WHERE";
+        Object[] kolonneArray = map.get("innhold");
+        for (int x = 0; x < kolonneArray.length; x++) {
+            if (x != 0) {
+                verifyQuery += " OR";
+            }
+            verifyQuery += " næringsinnhold LIKE ?";
         }
+        /* en slags måte å bruke preparedStatement på kolonneNavn, men tar 2 steg */
+        String[][] verifisertKolonneNavn = KostholdDatabase.multiQuery(verifyQuery, kolonneArray).getData();
 
-        int result = ps.executeUpdate();
-        connection.close();
-        return result;
+        String[][] mapData = map.values().toArray(new String[0][0]);
+
+        String columnString = "INSERT INTO matvaretabellen (matvare,brukerId";
+        String valueString = "VALUES (?,?";
+        Object[] vars = new Object[verifisertKolonneNavn.length + 2];
+        vars[0] = matvare;
+        vars[1] = brukerId;
+
+        /* kan vel ikke være dynamisk? alt er jo strings, men skal være int */
+        for (int i = 0; i < verifisertKolonneNavn.length; i++) {
+            columnString += ",`" + verifisertKolonneNavn[i][0] + "`";
+            valueString += ",?";
+
+            /*mapData rader er type,navn,innhold og verdier(3)*/
+            vars[i + 2] = Double.parseDouble(mapData[3][i]);
+
+        }
+        columnString += ") ";
+        valueString += ");";
+        //return columnString+valueString;
+        return KostholdDatabase.singleUpdateQuery(columnString + valueString, vars, false);
     }
 }

@@ -14,8 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.database.KostholdDatabase;
 import util.http.StandardResponse;
-import util.insert.ParameterMapConverter;
-import util.sql.MultiLineSqlQuery;
 
 /**
  *

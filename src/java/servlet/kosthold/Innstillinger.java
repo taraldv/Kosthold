@@ -9,15 +9,13 @@ import crypto.ValidSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.database.KostholdDatabase;
 import util.http.StandardResponse;
-import util.insert.ParameterMapConverter;
-import util.sql.MultiLineSqlQuery;
-
 /**
  *
  * @author Tarald
@@ -41,11 +39,10 @@ public class Innstillinger extends HttpServlet {
             if (type.equals("endrePassord")) {
 
             } else if (type.equals("endreBenevningMål")) {
-                String[][] arr = ParameterMapConverter.dynamiskConverter(request.getParameterMap(), 1, 4);
+                //String[][] arr = ParameterMapConverter.dynamiskConverter(request.getParameterMap(), 1, 4);
 
                 //out.print(Arrays.deepToString(arr));
-
-                out.print(endreBenevningMål(arr, brukerId));
+                out.print(endreBenevningMål(request.getParameterMap(), brukerId));
             }
 
         } catch (Exception e) {
@@ -54,12 +51,14 @@ public class Innstillinger extends HttpServlet {
 
     }
 
-    private String endreBenevningMål(String[][] arr, int brukerId) throws Exception {
+    private int endreBenevningMål(Map<String, String[]> map, int brukerId) throws Exception {
+        String[][] arr = map.values().toArray(new String[0][0]);
+        /* arr: [[type][id,id...][øvre,øvre...][nedre,nedre...][aktiv,aktiv...]]*/
         String query = "UPDATE brukerBenevningMål SET"
                 + " aktiv = ?, øvreMål = ?, nedreMål = ?"
                 + " WHERE brukerId =" + brukerId + " AND benevningId = ?" + ";";
-        int k = KostholdDatabase.multiUpdateQuery(query, arr);
-        return Integer.toString(k);
+
+        return KostholdDatabase.innstillingerMultipleUpdateQueries(query, arr, 1);
     }
 
 }
