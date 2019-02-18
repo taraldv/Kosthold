@@ -42,7 +42,7 @@ public class Post extends HttpServlet {
 
             if (type.equals("logout")) {
                 vs.logOut();
-            }else if (type.equals("auth")) {
+            } else if (type.equals("auth")) {
                 out.print(1);
             } else if (type.equals("passordGen")) {
                 out.print(SessionLogin.generatePasswordHash(request.getParameter("passord")));
@@ -55,7 +55,7 @@ public class Post extends HttpServlet {
                 } else if (whichTable.equals("næringsinnhold")) {
                     autocompleteQuery = "SELECT næringsinnhold,benevning FROM benevninger WHERE næringsinnhold LIKE ? LIMIT 15;";
                 }
-                ResultSetContainer rsc = KostholdDatabase.oneStringQuery(autocompleteQuery, "%" + matchingParameter + "%");
+                ResultSetContainer rsc = KostholdDatabase.multiQuery(autocompleteQuery, new Object[]{"%" + matchingParameter + "%"});
                 String completeJson = rsc.getJSON();
                 if (completeJson.length() > 2) {
                     String jsonAddition = "\"search\":\"" + matchingParameter + "\",";

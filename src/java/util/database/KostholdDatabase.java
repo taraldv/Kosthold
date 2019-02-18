@@ -99,24 +99,6 @@ public class KostholdDatabase {
         return result;
     }
 
-    /* bør flyttes til  multiQuery*/
-    static public ResultSetContainer oneStringQuery(String query, String inputString) throws Exception {
-        PreparedStatement ps = getprepStatement(query, 0);
-        ps.setString(1, inputString);
-        ResultSetContainer rsc = new ResultSetContainer(ps.executeQuery());
-        ps.getConnection().close();
-        return rsc;
-    }
-
-    /* bør flyttes til  multiQuery*/
-    static public ResultSetContainer oneIntQuery(String query, int inputInt) throws Exception {
-        PreparedStatement ps = getprepStatement(query, 0);
-        ps.setInt(1, inputInt);
-        ResultSetContainer rsc = new ResultSetContainer(ps.executeQuery());
-        ps.getConnection().close();
-        return rsc;
-    }
-
     static public ResultSetContainer normalQuery(String query) throws Exception {
         ResultSetContainer rsc;
         try (Connection c = getDatabaseConnection()) {

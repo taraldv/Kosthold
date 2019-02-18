@@ -40,19 +40,33 @@ public class Måltider extends HttpServlet {
             if (type.equals("insertMåltider")) {
                 out.print(insertMåltider(brukerId, request.getParameter("navn"), ParameterMapConverter.twoParameterMap(request.getParameterMap(), 2)));
             } else if (type.equals("getMåltider")) {
-                ResultSetContainer rsc = KostholdDatabase.normalQuery("SELECT * FROM måltider WHERE brukerId = " + brukerId + ";");
-                out.print(rsc.getJSON());
+                out.print(KostholdDatabase.normalQuery("SELECT * FROM måltider WHERE brukerId = " + brukerId + ";").getJSON());
             } else if (type.equals("getMåltiderIngredienser")) {
-                String getMåltiderIngredienserQuery = "SELECT m.matvare,i.matvareId,mengde FROM ingredienser i"
-                        + " LEFT JOIN matvaretabellen m ON i.matvareId = m.matvareId"
-                        + " WHERE måltidId = ?;";
-                ResultSetContainer rsc = KostholdDatabase.oneIntQuery(getMåltiderIngredienserQuery, Integer.parseInt(request.getParameter("måltidId")));
-                out.print(rsc.getJSON());
+                out.print(getMåltiderIngredienser(Integer.parseInt(request.getParameter("måltidId"))));
+            } else if (type.equals("getMåltiderTabell")) {
+               // out.print(getMåltiderTabell(brukerId));
+            } else if (type.equals("deleteMåltider")) {
+
+            } else if (type.equals("updateMåltider")) {
+
             }
         } catch (Exception e) {
             e.printStackTrace(out);
         }
 
+    }
+
+    private String getMåltiderTabell(int brukerId) throws Exception {
+        String query = "SELECT måltidId,navn, FROM måltider m LEFT JOIN ingredienser i ON i.måltidId = m.måltidId "
+                + "LEFT JOIN matvaretabellen t ON t.matvareId = i.matvareId";
+        return KostholdDatabase.normalQuery(query).getJSON();
+    }
+
+    private String getMåltiderIngredienser(int måltidId) throws Exception {
+        String getMåltiderIngredienserQuery = "SELECT m.matvare,i.matvareId,mengde FROM ingredienser i"
+                + " LEFT JOIN matvaretabellen m ON i.matvareId = m.matvareId"
+                + " WHERE måltidId = ?;";
+        return KostholdDatabase.multiQuery(getMåltiderIngredienserQuery, new Object[]{måltidId}).getJSON();
     }
 
     private int insertMåltider(int brukerId, String navn, String[][] arr) throws Exception {

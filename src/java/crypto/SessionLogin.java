@@ -41,14 +41,12 @@ public class SessionLogin {
     public boolean validLogin() throws Exception {
         return checkPassword();
     }
-    
-
 
     private boolean checkPassword() throws Exception {
         /* sjeker om strings ikke er null, ikke vits med sql spørring med tom string */
         if (validReqestStrings()) {
             String query = "SELECT passord,brukerId FROM users WHERE brukernavn LIKE ?";
-            ResultSetContainer rsc = KostholdDatabase.oneStringQuery(query, brukernavn);
+            ResultSetContainer rsc = KostholdDatabase.multiQuery(query, new Object[]{brukernavn});
             String hashedPassword = rsc.getData()[0][0];
             int brukerId = Integer.parseInt(rsc.getData()[0][1]);
 
