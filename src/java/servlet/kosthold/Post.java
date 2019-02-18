@@ -11,7 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.database.KostholdDatabase;
+import util.database.Kosthold;
 import crypto.SessionLogin;
 import crypto.ValidSession;
 import util.http.StandardResponse;
@@ -55,7 +55,7 @@ public class Post extends HttpServlet {
                 } else if (whichTable.equals("næringsinnhold")) {
                     autocompleteQuery = "SELECT næringsinnhold,benevning FROM benevninger WHERE næringsinnhold LIKE ? LIMIT 15;";
                 }
-                ResultSetContainer rsc = KostholdDatabase.multiQuery(autocompleteQuery, new Object[]{"%" + matchingParameter + "%"});
+                ResultSetContainer rsc = Kosthold.multiQuery(autocompleteQuery, new Object[]{"%" + matchingParameter + "%"});
                 String completeJson = rsc.getJSON();
                 if (completeJson.length() > 2) {
                     String jsonAddition = "\"search\":\"" + matchingParameter + "\",";

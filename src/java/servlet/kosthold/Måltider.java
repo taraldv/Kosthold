@@ -14,7 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.database.KostholdDatabase;
+import util.database.Kosthold;
 import util.http.StandardResponse;
 
 /**
@@ -39,7 +39,7 @@ public class Måltider extends HttpServlet {
             if (type.equals("insertMåltider")) {
                 out.print(insertMåltider(brukerId, request.getParameter("navn"), request.getParameterMap()));
             } else if (type.equals("getMåltider")) {
-                out.print(KostholdDatabase.normalQuery("SELECT * FROM måltider WHERE brukerId = " + brukerId + ";").getJSON());
+                out.print(Kosthold.normalQuery("SELECT * FROM måltider WHERE brukerId = " + brukerId + ";").getJSON());
             } else if (type.equals("getMåltiderIngredienser")) {
                 out.print(getMåltiderIngredienser(Integer.parseInt(request.getParameter("måltidId"))));
             } else if (type.equals("getMåltiderTabell")) {
@@ -58,18 +58,18 @@ public class Måltider extends HttpServlet {
     private String getMåltiderTabell(int brukerId) throws Exception {
         String query = "SELECT måltidId,navn, FROM måltider m LEFT JOIN ingredienser i ON i.måltidId = m.måltidId "
                 + "LEFT JOIN matvaretabellen t ON t.matvareId = i.matvareId";
-        return KostholdDatabase.normalQuery(query).getJSON();
+        return Kosthold.normalQuery(query).getJSON();
     }
 
     private String getMåltiderIngredienser(int måltidId) throws Exception {
         String getMåltiderIngredienserQuery = "SELECT m.matvare,i.matvareId,mengde FROM ingredienser i"
                 + " LEFT JOIN matvaretabellen m ON i.matvareId = m.matvareId"
                 + " WHERE måltidId = ?;";
-        return KostholdDatabase.multiQuery(getMåltiderIngredienserQuery, new Object[]{måltidId}).getJSON();
+        return Kosthold.multiQuery(getMåltiderIngredienserQuery, new Object[]{måltidId}).getJSON();
     }
 
     private int insertMåltider(int brukerId, String navn, Map<String, String[]> map) throws Exception {
-        int lastInsertedId = KostholdDatabase.singleUpdateQuery("INSERT INTO måltider(navn,brukerId) VALUES (?," + brukerId + ");", new Object[]{navn}, true);
+        int lastInsertedId = Kosthold.singleUpdateQuery("INSERT INTO måltider(navn,brukerId) VALUES (?," + brukerId + ");", new Object[]{navn}, true);
         String[][] arr = map.values().toArray(new String[0][0]);
         /* arr inneholder [[type][navn][id,id,id....][verdi,verdi,verdi.....]] */
         Object[] vars = new Object[arr[2].length * 2];
@@ -83,6 +83,6 @@ public class Måltider extends HttpServlet {
             }
             row += "(" + lastInsertedId + ",?,?)";
         }
-        return KostholdDatabase.singleUpdateQuery(baseline + row, vars, false);
+        return Kosthold.singleUpdateQuery(baseline + row, vars, false);
     }
 }

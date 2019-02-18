@@ -16,17 +16,19 @@ import util.sql.ResultSetContainer;
  *
  * @author Tarald
  */
-public class KostholdDatabase {
+public class Database {
 
-    static private Connection getDatabaseConnection() throws Exception {
+    private static final String[] DATABASE = {"trening", "kosthold"};
+
+    static private Connection getDatabaseConnection(int index) throws Exception {
         Class.forName("com.mysql.jdbc.Driver");
         /* database , brukernavn, passord */
-        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/kosthold", "kosthold", "");
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/" + DATABASE[index], DATABASE[index], "");
         return connection;
     }
 
-    static private PreparedStatement getprepStatement(String query, int option) throws Exception {
-        Connection c = getDatabaseConnection();
+    static public PreparedStatement getprepStatement(String query, int option, int databaseNr) throws Exception {
+        Connection c = getDatabaseConnection(databaseNr);
         if (option > 0) {
             return c.prepareStatement(query, option);
         } else {
@@ -34,12 +36,12 @@ public class KostholdDatabase {
         }
     }
 
-    static public int singleUpdateQuery(String query, Object[] var, boolean returnAutoIncrement) throws Exception {
+    static public int singleUpdateQuery(String query, Object[] var, boolean returnAutoIncrement, int databaseNr) throws Exception {
         int options = 0;
         if (returnAutoIncrement) {
             options = Statement.RETURN_GENERATED_KEYS;
         }
-        PreparedStatement ps = getprepStatement(query, options);
+        PreparedStatement ps = getprepStatement(query, options, databaseNr);
 
         for (int i = 0; i < var.length; i++) {
             /* string,double eller int */
@@ -78,52 +80,19 @@ public class KostholdDatabase {
         }
     }
 
-    static public ResultSetContainer multiQuery(String query, Object[] vars) throws Exception {
-        PreparedStatement ps = getprepStatement(query, 0);
+    static public ResultSetContainer multiQuery(String query, Object[] vars, int databaseNr) throws Exception {
+        PreparedStatement ps = getprepStatement(query, 0, databaseNr);
         setPreparedStatementVariables(ps, vars);
         ResultSetContainer rsc = new ResultSetContainer(ps.executeQuery());
         ps.getConnection().close();
         return rsc;
     }
 
-    static public ResultSetContainer normalQuery(String query) throws Exception {
+    static public ResultSetContainer normalQuery(String query, int databaseNr) throws Exception {
         ResultSetContainer rsc;
-        try (Connection c = getDatabaseConnection()) {
+        try (Connection c = getDatabaseConnection(databaseNr)) {
             rsc = new ResultSetContainer(c.createStatement().executeQuery(query));
         }
         return rsc;
-    }
-
-    /* må gjøre det i flere steg pga hver rad har forskjellig WHERE clause */
-    static public int innstillingerMultipleUpdateQueries(String query, String[][] arr, int offset) throws Exception {
-        PreparedStatement ps = getprepStatement(query, 0);
-        int output = 0;
-        for (int i = 0; i < arr[offset - 1].length; i++) {
-            String øvre = arr[offset + 1][i];
-            String nedre = arr[offset + 2][i];
-            String id = arr[offset][i];
-            ps.setBoolean(1, Boolean.parseBoolean(arr[offset + 3][i]));
-
-            if (øvre == null || øvre.length() == 0) {
-                ps.setInt(2, 0);
-            } else {
-                ps.setInt(2, Integer.parseInt(øvre));
-            }
-
-            if (nedre == null || nedre.length() == 0) {
-                ps.setInt(3, 0);
-            } else {
-                ps.setInt(3, Integer.parseInt(nedre));
-            }
-
-            if (id == null || id.length() == 0) {
-                ps.setInt(4, 0);
-            } else {
-                ps.setInt(4, Integer.parseInt(id));
-            }
-
-            output += ps.executeUpdate();
-        }
-        return output;
     }
 }

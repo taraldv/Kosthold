@@ -14,7 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.database.KostholdDatabase;
+import util.database.Kosthold;
 import util.http.StandardResponse;
 
 /**
@@ -38,9 +38,7 @@ public class Logg extends HttpServlet {
         try {
             if (type.equals("getLoggTabell")) {
                 out.print(getLoggTabell(brukerId));
-            } else if (type.equals("getLogg")) {
-                out.print(getLogg(brukerId));
-            } else if (type.equals("insertLogg")) {
+            }else if (type.equals("insertLogg")) {
                 out.print(insertLogg(request.getParameterMap(), brukerId));
             } else if (type.equals("deleteLogg")) {
                 out.print(deleteLogg(brukerId, Integer.parseInt(request.getParameter("loggId"))));
@@ -60,18 +58,18 @@ public class Logg extends HttpServlet {
     private int updateLogg(int brukerId, int loggId, Double mengde, String dato) throws Exception {
         String updateQuery = "UPDATE logg SET mengde = ?, dato = ? WHERE loggId = ? AND brukerId = " + brukerId + ";";
         Object[] vars = {mengde, dato, loggId};
-        return KostholdDatabase.singleUpdateQuery(updateQuery, vars, false);
+        return Kosthold.singleUpdateQuery(updateQuery, vars, false);
     }
     
     private int deleteLogg(int brukerId, int loggId) throws Exception {
         String deleteQuery = "DELETE FROM logg WHERE loggId = ? AND brukerId = " + brukerId + ";";
-        return KostholdDatabase.singleUpdateQuery(deleteQuery, new Object[]{loggId}, false);
+        return Kosthold.singleUpdateQuery(deleteQuery, new Object[]{loggId}, false);
     }
     
     private String getLoggTabell(int brukerId) throws Exception {
         String query = "SELECT loggId,m.matvare,mengde,dato FROM logg "
                 + "LEFT JOIN matvaretabellen m ON m.matvareId = logg.matvareId WHERE logg.brukerId = " + brukerId + " ORDER BY loggId DESC;";
-        return KostholdDatabase.normalQuery(query).getJSON();
+        return Kosthold.normalQuery(query).getJSON();
     }
     
     private int insertLogg(Map<String, String[]> map, int brukerId) throws Exception {
@@ -89,20 +87,9 @@ public class Logg extends HttpServlet {
             row += "(CURDATE(),?,?," + brukerId + ")";
         }
         //return baseline + row + " , " + Arrays.toString(vars) + " , " + Arrays.deepToString(arr);
-        return KostholdDatabase.singleUpdateQuery(baseline + row, vars, false);
+        return Kosthold.singleUpdateQuery(baseline + row, vars, false);
     }
 
-    /*TODO henter 31 distinct(dato) rader*/
-    private String getLogg(int brukerId) throws Exception {
-        String brukerDefinertQuery = "SELECT b.næringsinnhold FROM benevninger b "
-                + "LEFT JOIN brukerBenevningMål bm ON b.benevningId = bm.benevningId WHERE bm.brukerId = " + brukerId + " AND bm.aktiv = true;";
-        String additionalStuff = KostholdDatabase.normalQuery(brukerDefinertQuery).getOneColumnToString("m.");
-        
-        String getLoggQuery = "SELECT m.matvare,mengde,dato" + additionalStuff + " FROM logg "
-                + "LEFT JOIN matvaretabellen m ON logg.matvareId = m.matvareId "
-                + "WHERE logg.brukerId = " + brukerId + ";";
-        return KostholdDatabase.normalQuery(getLoggQuery).getJSON();
-        
-    }
+
     
 }

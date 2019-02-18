@@ -1,0 +1,15 @@
+Java
+Måltider	Update/Delete 
+Stats		Grafer
+Stats		SQL henter 31 distinct(dato)
+Login		Glemt passord
+Trening		Refactor til samme standard som Kosthold
+
+Javascript
+hoved.js	validere input?
+
+Database
+matvaretabellen trigger, omgjør NULL til 0
+
+CSS
+Alle selectors må veri spesifikke (class eller id)
