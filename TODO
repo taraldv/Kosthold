@@ -1,7 +1,8 @@
 Java
 Kosthold/Matvaretabellen	Update navn
-Kosthold/Matvaretabellen	matvarenavn må bli URLENCODED
+Kosthold/Matvaretabellen	matvarenavn må bli URLENCODED (godtar ikke &)
 Kosthold/Måltider			Update/Delete 
+Kosthold/Logg				Implementere tastatur
 Kosthold/Stats				Grafer
 Kosthold/Stats				SQL henter 31 distinct(dato)
 Kosthold/Login				Glemt passord
