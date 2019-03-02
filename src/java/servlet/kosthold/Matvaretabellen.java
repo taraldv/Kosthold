@@ -64,21 +64,21 @@ public class Matvaretabellen extends HttpServlet {
         /* en slags måte å bruke preparedStatement på kolonneNavn, men tar 2 steg */
         String[][] verifisertKolonneNavn = Kosthold.multiQuery(verifyQuery, kolonneArray).getData();
         String[][] mapData = map.values().toArray(new String[0][0]);
-        String updateQuery = "UPDATE matvaretabellen SET ";
-        Object[] vars = new Object[verifisertKolonneNavn.length + 1];
-
+        String updateQuery = "UPDATE matvaretabellen SET matvare=?";
+        Object[] vars = new Object[verifisertKolonneNavn.length + 2];
+        vars[0] = mapData[2][0];
         /* kan vel ikke være dynamisk? alt er jo strings, men skal være int */
         for (int i = 0; i < verifisertKolonneNavn.length; i++) {
-            if (i != 0) {
+           // if (i != 0) {
                 updateQuery += ",";
-            }
+            //}
             updateQuery += "`" + verifisertKolonneNavn[i][0] + "`=?";
             try {
                 /* mapData offset pga type,matvareId og matvare */
-                vars[i] = Double.parseDouble(mapData[i + 3][0]);
+                vars[i+1] = Double.parseDouble(mapData[i + 3][0]);
             } catch (NumberFormatException e) {
                 /* fjerner NULL verdier */
-                vars[i] = new Double(0);
+                vars[i+1] = new Double(0);
             }
         }
         vars[vars.length - 1] = matvareId;

@@ -1,6 +1,5 @@
 Java
-Kosthold/Matvaretabellen	Update navn
-Kosthold/Matvaretabellen	matvarenavn må bli URLENCODED (godtar ikke &)
+Kosthold/Matvaretabellen	Kan ikke slette matvarer som er i bruk @ logg
 Kosthold/Måltider			Update/Delete 
 Kosthold/Logg				Implementere tastatur
 Kosthold/Stats				Grafer(BMI) 
