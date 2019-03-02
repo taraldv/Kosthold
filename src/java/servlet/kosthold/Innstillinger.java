@@ -59,6 +59,7 @@ public class Innstillinger extends HttpServlet {
                 + " WHERE brukerId =" + brukerId + " AND benevningId = ?" + ";";
 
         return Kosthold.innstillingerMultipleUpdateQueries(query, arr, 1);
+        //return Arrays.deepToString(arr);
     }
 
 }

@@ -32,7 +32,9 @@ public class Kosthold {
     static public int innstillingerMultipleUpdateQueries(String query, String[][] arr, int offset) throws Exception {
         PreparedStatement ps = Database.getprepStatement(query, 0, DATABASENR);
         int output = 0;
-        for (int i = 0; i < arr[offset - 1].length; i++) {
+        /* første array i 'arr' er 'type' og har lengde 1 */
+        /* de 4 andre skal ha samme lengde */
+        for (int i = 0; i < arr[offset].length; i++) {
             String øvre = arr[offset + 1][i];
             String nedre = arr[offset + 2][i];
             String id = arr[offset][i];

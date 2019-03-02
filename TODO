@@ -3,10 +3,11 @@ Kosthold/Matvaretabellen	Update navn
 Kosthold/Matvaretabellen	matvarenavn må bli URLENCODED (godtar ikke &)
 Kosthold/Måltider			Update/Delete 
 Kosthold/Logg				Implementere tastatur
-Kosthold/Stats				Grafer
+Kosthold/Stats				Grafer(BMI) 
 Kosthold/Stats				SQL henter 31 distinct(dato)
 Kosthold/Login				Glemt passord
 Kosthold/Vekt				Endre kosthold mål basert på vekt mål
+Kosthold/Stats				Piechart, over kcal og fra hvilken matvare (visualiserer kosthold variasjon)
 Trening/Kalender			TreningHistorikk gjennomgang / 4 sekunder er for mye
 	Trenger ikke hente all data i starten, henter 1 år om gangen
 Trening/Input			Refactor 
