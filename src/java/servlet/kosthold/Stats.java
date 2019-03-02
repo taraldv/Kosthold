@@ -58,9 +58,11 @@ public class Stats extends HttpServlet {
                 + "LEFT JOIN brukerBenevningMål bm ON b.benevningId = bm.benevningId WHERE bm.brukerId = " + brukerId + " AND bm.aktiv = true;";
         String additionalStuff = Kosthold.normalQuery(brukerDefinertQuery).getOneColumnToString("m.");
 
+        /*  */ 
+        
         String getLoggQuery = "SELECT m.matvare,mengde,dato" + additionalStuff + " FROM logg "
                 + "LEFT JOIN matvaretabellen m ON logg.matvareId = m.matvareId "
-                + "WHERE logg.brukerId = " + brukerId + ";";
+                + "WHERE logg.brukerId = " + brukerId + " AND dato <= curdate() AND dato > DATE_SUB(curdate(),INTERVAL 31 DAY);";
         return Kosthold.normalQuery(getLoggQuery).getJSON();
 
     }

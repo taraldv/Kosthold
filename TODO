@@ -3,7 +3,6 @@ Kosthold/Matvaretabellen	Kan ikke slette matvarer som er i bruk @ logg
 Kosthold/Måltider			Update/Delete 
 Kosthold/Logg				Implementere tastatur
 Kosthold/Stats				Grafer(BMI) 
-Kosthold/Stats				SQL henter 31 distinct(dato)
 Kosthold/Login				Glemt passord
 Kosthold/Vekt				Endre kosthold mål basert på vekt mål
 Kosthold/Stats				Piechart, over kcal og fra hvilken matvare (visualiserer kosthold variasjon)
@@ -15,7 +14,7 @@ Javascript
 hoved.js	validere input?
 
 Database
-matvaretabellen trigger, omgjør NULL til 0
+matvaretabellen trigger, omgjør NULL til 0 ? kan skjule det med JS
 
 CSS
 Alle selectors må veri spesifikke (class eller id)
