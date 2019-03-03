@@ -25,10 +25,15 @@ public class Login extends HttpServlet {
             throws ServletException, IOException {
         StandardResponse sr = new StandardResponse(response);
         PrintWriter out = sr.getWriter();
+        String url = request.getParameter("url");
         try {
             SessionLogin login = new SessionLogin(request.getParameter("brukernavn"), request.getParameter("passord"), request.getSession());
             if (login.validLogin()) {
-                sr.sendRedirect("https://www.tarves.no");
+                if (url != null) {
+                    sr.sendRedirect(url);
+                } else {
+                    sr.sendRedirect("https://www.tarves.no");
+                }
             } else {
                 login.invalidate();
                 out.print("feil passord eller brukernavn");

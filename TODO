@@ -6,7 +6,6 @@ Kosthold/Måltider			Update/Delete
 Kosthold/Logg				Implementere tastatur
 Kosthold/Stats				Grafer(BMI) 
 Kosthold/Login				Glemt passord
-Kosthold/Login				redirect til original URL
 Kosthold/Vekt				Endre kosthold mål basert på vekt mål
 Trening/Kalender			TreningHistorikk gjennomgang / 4 sekunder er for mye
 	Trenger ikke hente all data i starten, henter 1 år om gangen
