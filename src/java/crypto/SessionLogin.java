@@ -26,7 +26,7 @@ public class SessionLogin {
     }
 
     static public String generatePasswordHash(String password) {
-        String hashed = BCrypt.hashpw(password, BCrypt.gensalt(17));
+        String hashed = BCrypt.hashpw(password, BCrypt.gensalt(7));
         return hashed;
     }
 
@@ -55,12 +55,9 @@ public class SessionLogin {
                 setSession(brukerId);
                 session.setMaxInactiveInterval(0);
                 return true;
-            } else {
-                return false;
             }
-        } else {
-            return false;
         }
+        return false;
     }
 
     public void invalidate() {

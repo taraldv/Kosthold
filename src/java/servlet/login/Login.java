@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package servlet;
+package servlet.login;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -27,9 +27,9 @@ public class Login extends HttpServlet {
         PrintWriter out = sr.getWriter();
         String url = request.getParameter("url");
         try {
-            SessionLogin login = new SessionLogin(request.getParameter("brukernavn"), request.getParameter("passord"), request.getSession());
+            SessionLogin login = new SessionLogin(request.getParameter("epost"), request.getParameter("passord"), request.getSession());
             if (login.validLogin()) {
-                if (url != null) {
+                if (!url.equals("null")) {
                     sr.sendRedirect(url);
                 } else {
                     sr.sendRedirect("https://www.tarves.no");
