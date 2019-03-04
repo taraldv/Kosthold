@@ -67,7 +67,7 @@ public class ResetPassword extends HttpServlet {
 
     private int queueRemove(String token) throws Exception {
         ProcessBuilder processBuilder = new ProcessBuilder();
-        String command = "echo \"rm /home/tarves/login/glemt_passord/" + token + ".html\" | at today + 2 minutes";
+        String command = "echo \"rm /home/tarves/login/glemt_passord/" + token + ".html\" | at today + 4 hours";
         processBuilder.command("bash", "-c", command);
         Process process = processBuilder.start();
         return process.waitFor();
