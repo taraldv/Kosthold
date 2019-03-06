@@ -67,8 +67,9 @@ public class Logg extends HttpServlet {
     }
     
     private String getLoggTabell(int brukerId) throws Exception {
-        String query = "SELECT loggId,m.matvare,mengde,dato FROM logg "
-                + "LEFT JOIN matvaretabellen m ON m.matvareId = logg.matvareId WHERE logg.brukerId = " + brukerId + " ORDER BY loggId DESC;";
+        String query = "SELECT loggId,m.matvare,ROUND(mengde) as mengde,ROUND(m.Kilokalorier/100*mengde) as kcal,dato FROM logg "
+                + "LEFT JOIN matvaretabellen m ON m.matvareId = logg.matvareId"
+                + " WHERE logg.brukerId = " + brukerId + " ORDER BY loggId DESC;";
         return Kosthold.normalQuery(query).getJSON();
     }
     

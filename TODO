@@ -4,8 +4,9 @@ Fjerne referansen og lage en slett trigger/ny tabell med slettede matvarer, som 
 
 Kosthold/Måltider			Update/Delete 
 Kosthold/Logg				Implementere tastatur
-Kosthold/Stats				Grafer(BMI) 
-Kosthold/Login				Glemt passord
+Kosthold/Stats				BMI graf?
+
+
 Kosthold/Vekt				Endre kosthold mål basert på vekt mål
 Trening/Kalender			TreningHistorikk gjennomgang / 4 sekunder er for mye
 	Trenger ikke hente all data i starten, henter 1 år om gangen
@@ -13,9 +14,13 @@ Trening/Input			Refactor
 
 Javascript
 hoved.js	validere input?
+stats.js	bedre løsning på fargelegging av mål
+Alle forms, kan bruke this istedet for getElementById
 
 Database
 matvaretabellen trigger, omgjør NULL til 0 ? kan skjule det med JS
 
 CSS
+Dele CSS inn i seksjoner? vekt/stats...etc...
+Bedre forklaringer for CSS
 Alle selectors må veri spesifikke (class eller id)

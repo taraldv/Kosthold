@@ -45,7 +45,9 @@ public class Post extends HttpServlet {
         try {
             if (type.equals("history")) {
                 out.print(getHistory());
-            } 
+            } else if (type.equals("auth")) {
+                out.print(1);
+            }
         } catch (Exception e) {
             e.printStackTrace(out);
         }
@@ -55,7 +57,5 @@ public class Post extends HttpServlet {
         String historyQuery = "SELECT dato,excercise,avg_weight FROM trening WHERE dato >= (SELECT distinct(dato) FROM trening ORDER BY id desc limit 5,1);";
         return Database.normalQuery(historyQuery, 0).getJSON();
     }
-
-  
 
 }
