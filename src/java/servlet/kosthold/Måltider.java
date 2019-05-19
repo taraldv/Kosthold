@@ -80,9 +80,11 @@ public class Måltider extends HttpServlet {
     }
 
     private String getMåltiderTabell(int brukerId) throws Exception {
-        String query = "SELECT måltidId,navn, FROM måltider m LEFT JOIN ingredienser i ON i.måltidId = m.måltidId "
-                + "LEFT JOIN matvaretabellen t ON t.matvareId = i.matvareId";
-        return Kosthold.normalQuery(query).getJSON();
+        String query = "SELECT m.måltidId,m.navn,i.ingredienseId,t.matvare,i.mengde FROM måltider m "
+                + "RIGHT JOIN ingredienser i ON i.måltidId = m.måltidId "
+                + "LEFT JOIN matvaretabellen t ON t.matvareId = i.matvareId "
+                + "WHERE m.brukerId = ?;";
+        return Kosthold.multiQuery(query, new Object[]{brukerId}).getJSON();
     }
 
     private String getMåltiderIngredienser(int måltidId) throws Exception {
