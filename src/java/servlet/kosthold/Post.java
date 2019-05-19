@@ -51,7 +51,7 @@ public class Post extends HttpServlet {
                 String whichTable = request.getParameter("table");
                 String autocompleteQuery = "";
                 if (whichTable.equals("matvaretabellen")) {
-                    autocompleteQuery = "SELECT matvare,matvareId FROM matvaretabellen WHERE matvare LIKE ? LIMIT 15;";
+                    autocompleteQuery = "SELECT matvare,matvareId FROM matvaretabellen WHERE matvare LIKE ? LIMIT 30;";
                 } else if (whichTable.equals("næringsinnhold")) {
                     autocompleteQuery = "SELECT næringsinnhold,benevning FROM benevninger WHERE næringsinnhold LIKE ? LIMIT 15;";
                 }
