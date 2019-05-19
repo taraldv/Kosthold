@@ -8,7 +8,6 @@ package servlet.kosthold;
 import crypto.ValidSession;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -41,18 +40,43 @@ public class Måltider extends HttpServlet {
             } else if (type.equals("getMåltider")) {
                 out.print(Kosthold.normalQuery("SELECT * FROM måltider WHERE brukerId = " + brukerId + ";").getJSON());
             } else if (type.equals("getMåltiderIngredienser")) {
-                out.print(getMåltiderIngredienser(Integer.parseInt(request.getParameter("måltidId"))));
+                //erstattet av insert
+                //out.print(getMåltiderIngredienser(Integer.parseInt(request.getParameter("måltidId"))));
             } else if (type.equals("getMåltiderTabell")) {
-                // out.print(getMåltiderTabell(brukerId));
+                out.print(getMåltiderTabell(brukerId));
             } else if (type.equals("deleteMåltider")) {
 
             } else if (type.equals("updateMåltider")) {
 
+            } else if (type.equals("insertMåltiderIngredienser")) {
+                out.print(insertMåltiderIngredienser(brukerId, Integer.parseInt(request.getParameter("måltidId"))));
             }
         } catch (Exception e) {
             e.printStackTrace(out);
         }
 
+    }
+
+    private int insertMåltiderIngredienser(int brukerId, int måltidId) throws Exception {
+        String query = "SELECT matvareId,mengde FROM ingredienser WHERE måltidId = ?;";
+        //arr = [[id,mengde],[id,mengde]] etc...
+        String[][] arr = Kosthold.multiQuery(query, new Object[]{måltidId}).getData();
+
+        //vars bindes til ? en etter en, dvs. første vars obj bør være id, neste mengde etc....
+        Object[] vars = new Object[2 * arr.length];
+        String baseline = "INSERT INTO logg(dato,matvareId,mengde,brukerId) VALUES ";
+        String row = "";
+        for (int i = 0; i < arr.length; i++) {
+            //id på plass 0,2,4,6 etc
+            vars[2 * i] = Integer.parseInt(arr[i][0]);
+            //mengde på plass 1,3,5, etc
+            vars[(2 * i) + 1] = Double.parseDouble(arr[i][1]);
+            if (i != 0) {
+                row += ",";
+            }
+            row += "(CURDATE(),?,?," + brukerId + ")";
+        }
+        return Kosthold.singleUpdateQuery(baseline + row, vars, false);
     }
 
     private String getMåltiderTabell(int brukerId) throws Exception {
