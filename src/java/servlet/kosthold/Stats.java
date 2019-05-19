@@ -40,7 +40,7 @@ public class Stats extends HttpServlet {
                 out.print(getLogg(brukerId));
             } else if (type.equals("getGraf")) {
                 out.print(getGraf(brukerId));
-            }else if (type.equals("getPieChart")) {
+            } else if (type.equals("getPieChart")) {
                 out.print(getPieChart(brukerId));
             }
 
@@ -63,7 +63,7 @@ public class Stats extends HttpServlet {
                 + "GROUP BY dato ORDER BY dato;";
         return Kosthold.normalQuery(getLoggQuery).getJSON();
     }
-    
+
     private String getPieChart(int brukerId) throws Exception {
         String getLoggQuery = "SELECT DISTINCT m.matvare,SUM(ROUND(m.Kilokalorier/100*mengde,2)) as kcal FROM logg "
                 + "LEFT JOIN matvaretabellen m ON logg.matvareId = m.matvareId "
@@ -76,7 +76,7 @@ public class Stats extends HttpServlet {
         String brukerDefinertQuery = "SELECT b.næringsinnhold FROM benevninger b "
                 + "LEFT JOIN brukerBenevningMål bm ON b.benevningId = bm.benevningId WHERE bm.brukerId = " + brukerId + " AND bm.aktiv = true;";
         String additionalStuff = Kosthold.normalQuery(brukerDefinertQuery).getOneColumnToString("m.");
-
+        //String additionalStuff = ",m.Kilokalorier";
         String getLoggQuery = "SELECT m.matvare,mengde,dato" + additionalStuff + " FROM logg "
                 + "LEFT JOIN matvaretabellen m ON logg.matvareId = m.matvareId "
                 + "WHERE logg.brukerId = " + brukerId + " AND dato <= curdate() AND dato > DATE_SUB(curdate(),INTERVAL 31 DAY);";

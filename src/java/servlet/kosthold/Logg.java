@@ -66,10 +66,12 @@ public class Logg extends HttpServlet {
         return Kosthold.singleUpdateQuery(deleteQuery, new Object[]{loggId}, false);
     }
     
+    //henter logg fra de siste 31 dagene
     private String getLoggTabell(int brukerId) throws Exception {
         String query = "SELECT loggId,m.matvare,ROUND(mengde) as mengde,ROUND(m.Kilokalorier/100*mengde) as kcal,dato FROM logg "
                 + "LEFT JOIN matvaretabellen m ON m.matvareId = logg.matvareId"
-                + " WHERE logg.brukerId = " + brukerId + " ORDER BY loggId DESC;";
+                + " WHERE logg.brukerId = " + brukerId + " AND dato <= curdate() AND dato > DATE_SUB(curdate(),INTERVAL 31 DAY)"
+                + " ORDER BY loggId DESC;";
         return Kosthold.normalQuery(query).getJSON();
     }
     
