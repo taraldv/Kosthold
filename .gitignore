@@ -4,4 +4,5 @@
 /nbproject*
 /test*
 /src/conf*
+/src/java/temp/
 build.xml
