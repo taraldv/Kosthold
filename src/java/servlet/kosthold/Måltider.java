@@ -47,7 +47,10 @@ public class Måltider extends HttpServlet {
             } else if (type.equals("deleteMåltider")) {
 
             } else if (type.equals("updateMåltider")) {
-
+                out.print(updateMåltider(brukerId,
+                        Integer.parseInt(request.getParameter("matvareMengde")),
+                        Integer.parseInt(request.getParameter("matvareId")),
+                        Integer.parseInt(request.getParameter("måltidId"))));
             } else if (type.equals("insertMåltiderIngredienser")) {
                 out.print(insertMåltiderIngredienser(brukerId, Integer.parseInt(request.getParameter("måltidId"))));
             }
@@ -55,6 +58,19 @@ public class Måltider extends HttpServlet {
             e.printStackTrace(out);
         }
 
+    }
+
+    private int updateMåltider(int brukerId, int mengde, int matvareId, int måltidId) throws Exception {
+        //verifiserer at bruker eier valgt måltid
+        String måltidQuery = "SELECT 1 FROM måltider WHERE brukerId = ? AND måltidId = ?;";
+        //burde bli 1
+        int validMåltid = Integer.parseInt(Kosthold.multiQuery(måltidQuery, new Object[]{brukerId, måltidId}).getData()[0][0]);
+        if (validMåltid == 1) {
+            String query = "INSERT INTO ingredienser (matvareId,måltidId,mengde) VALUES (?,?,?)";
+            return Kosthold.singleUpdateQuery(query, new Object[]{matvareId, måltidId, mengde}, false);
+        } else {
+            return 0;
+        }
     }
 
     private int insertMåltiderIngredienser(int brukerId, int måltidId) throws Exception {
