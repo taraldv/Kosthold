@@ -136,6 +136,7 @@ public class Måltider extends HttpServlet {
         return Kosthold.singleUpdateQuery(baseline + row, vars, false);
     }
 
+    //git ikke måltider uten ingredienser, bør ikke være lov å lage måltid uten ingredienser
     private String getMåltiderTabell(int brukerId) throws Exception {
         String query = "SELECT m.måltidId,m.navn,i.ingredienseId,t.matvare,i.mengde FROM måltider m "
                 + "RIGHT JOIN ingredienser i ON i.måltidId = m.måltidId "

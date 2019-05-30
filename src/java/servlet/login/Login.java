@@ -32,7 +32,7 @@ public class Login extends HttpServlet {
                 if (!url.equals("null")) {
                     sr.sendRedirect(url);
                 } else {
-                    sr.sendRedirect("https://www.tarves.no");
+                    sr.sendRedirect("https://kosthold.tarves.no");
                 }
             } else {
                 login.invalidate();

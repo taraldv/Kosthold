@@ -2,23 +2,25 @@ Java
 Kosthold/Matvaretabellen	Kan ikke slette matvarer som er i bruk @ logg
 Fjerne referansen og lage en slett trigger/ny tabell med slettede matvarer, som har den gamle id
 
-Kosthold/Logg				dobbelklikk endring? hva med bekreft knappen?
-Kosthold/Logg				Implementere tastatur
-Kosthold/Logg				autocomplete farge avheng. av userId, matvaretabellen,crawler,andre og din
-Kosthold/Stats				BMI graf?
+Kosthold/Måltider			vise at måltid er gyldig
+Kosthold/Måltider			sletting av siste ingrediens ugyldig eller sletter hele måltid
+Kosthold/Måltider/Logg		forklar keyboard shortcuts
+Kosthold/Logg				autocomplete farge avheng. av userId,crawler,andre og din
+Statistikk					BMI graf?
 Kosthold/Innstillinger		form må omgjøres til tabell
+Kosthold/
 
-Kosthold/Vekt				Endre kosthold mål basert på vekt mål
-Trening/Kalender			TreningHistorikk gjennomgang / 4 sekunder er for mye
+Helse/Vekt					Endre kosthold mål basert på vekt mål
+Styrke/Kalender			TreningHistorikk gjennomgang / 4 sekunder er for mye
 	Trenger ikke hente all data i starten, henter 1 år om gangen
-Trening/Input			Refactor 
+Styrke/Logg			Refactor 
 
-Trening					Jogging, avstand i x,y + tid
+Kondisjon/Logg					Jogging, avstand i x,y + tid
 
 Javascript
 hoved.js	validere input?
-stats.js	bedre løsning på fargelegging av mål
-stats.js	flytte tid kalkulering til server/sql
+statistikk.js	bedre løsning på fargelegging av mål
+statistikk.js	flytte tid kalkulering til server/sql
 Alle forms, kan bruke this istedet for getElementById
 
 Database
