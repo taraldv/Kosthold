@@ -5,11 +5,13 @@
  */
 package util.database;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Types;
 import util.sql.ResultSetContainer;
 
 /**
@@ -34,6 +36,23 @@ public class Database {
         } else {
             return c.prepareStatement(query);
         }
+    }
+
+    static public int callProcedure(String query, Object[] vars, int databaseNr) throws Exception {
+        Connection c = getDatabaseConnection(databaseNr);
+        CallableStatement cstmt = c.prepareCall(query);
+
+        cstmt.setInt(1, (int) vars[0]);
+        cstmt.setInt(2, (int) vars[1]);
+
+        cstmt.registerOutParameter(3, Types.INTEGER);
+        cstmt.executeUpdate();
+        int rader = cstmt.getInt(3);
+        //ResultSetContainer rsc = new ResultSetContainer(c.createStatement().executeQuery("SELECT " + (String) vars[2]));
+        // int rader = Integer.parseInt(rsc.getData()[0][0]);
+        cstmt.close();
+        c.close();
+        return rader;
     }
 
     static public int singleUpdateQuery(String query, Object[] var, boolean returnAutoIncrement, int databaseNr) throws Exception {

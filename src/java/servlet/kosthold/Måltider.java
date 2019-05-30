@@ -45,7 +45,7 @@ public class Måltider extends HttpServlet {
             } else if (type.equals("getMåltiderTabell")) {
                 out.print(getMåltiderTabell(brukerId));
             } else if (type.equals("deleteMåltider")) {
-
+                out.print(deleteMåltider(brukerId, Integer.parseInt(request.getParameter("måltidId"))));
             } else if (type.equals("updateMåltider")) {
                 out.print(updateMåltider(brukerId,
                         Integer.parseInt(request.getParameter("matvareMengde")),
@@ -62,6 +62,13 @@ public class Måltider extends HttpServlet {
             e.printStackTrace(out);
         }
 
+    }
+
+    private int deleteMåltider(int brukerId, int måltidId) throws Exception {
+        //stored procedure som sjekker om gyldig bruker/måltid, sletter alle ingredienser til måltid og sletter selve måltid.
+        //returnerer antall slettet rader
+        String query = "CALL slettMåltid(?,?,?);";
+        return Kosthold.callProcedure(query, new Object[]{måltidId, brukerId, "@rader"});
     }
 
     private int deleteMåltidIngrediens(int brukerId, int måltidId, int ingredienseId) throws Exception {

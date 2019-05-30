@@ -24,6 +24,10 @@ public class Kosthold {
         return Database.multiQuery(query, vars, DATABASENR);
     }
 
+    static public int callProcedure(String query, Object[] vars) throws Exception{
+        return Database.callProcedure(query, vars, DATABASENR);
+    }
+    
     static public ResultSetContainer normalQuery(String query) throws Exception {
         return Database.normalQuery(query, DATABASENR);
     }
