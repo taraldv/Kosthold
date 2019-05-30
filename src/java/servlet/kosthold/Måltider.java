@@ -57,11 +57,28 @@ public class Måltider extends HttpServlet {
                 out.print(deleteMåltidIngrediens(brukerId,
                         Integer.parseInt(request.getParameter("måltidId")),
                         Integer.parseInt(request.getParameter("ingredienseId"))));
+            } else if (type.equals("updateIngrediensMengde")) {
+                out.print(updateIngrediensMengde(brukerId,
+                        Integer.parseInt(request.getParameter("måltidId")),
+                        Integer.parseInt(request.getParameter("ingredienseId")),
+                        Integer.parseInt(request.getParameter("mengde"))));
             }
         } catch (Exception e) {
             e.printStackTrace(out);
         }
 
+    }
+
+    private int updateIngrediensMengde(int brukerId, int måltidId, int ingredienseId, int mengde) throws Exception {
+        String måltidQuery = "SELECT 1 FROM måltider WHERE brukerId = ? AND måltidId = ?;";
+        //burde bli 1
+        int validMåltid = Integer.parseInt(Kosthold.multiQuery(måltidQuery, new Object[]{brukerId, måltidId}).getData()[0][0]);
+        if (validMåltid == 1) {
+            String query = "UPDATE ingredienser SET mengde = ? WHERE ingredienseId = ? AND måltidId = ?";
+            return Kosthold.singleUpdateQuery(query, new Object[]{mengde, ingredienseId, måltidId}, false);
+        } else {
+            return 0;
+        }
     }
 
     private int deleteMåltider(int brukerId, int måltidId) throws Exception {

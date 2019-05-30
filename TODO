@@ -2,7 +2,6 @@ Java
 Kosthold/Matvaretabellen	Kan ikke slette matvarer som er i bruk @ logg
 Fjerne referansen og lage en slett trigger/ny tabell med slettede matvarer, som har den gamle id
 
-Kosthold/Måltider			Update/Delete 
 Kosthold/Logg				dobbelklikk endring? hva med bekreft knappen?
 Kosthold/Logg				Implementere tastatur
 Kosthold/Logg				autocomplete farge avheng. av userId, matvaretabellen,crawler,andre og din
