@@ -1861,7 +1861,7 @@ INSERT INTO matvaretabellen VALUES
 
 CREATE TABLE users(
 	brukerId INTEGER AUTO_INCREMENT,
-	brukernavn varchar(150) NOT NULL,
+	brukernavn varchar(150) NOT NULL UNIQUE,
 	passord varchar(150) NOT NULL,
 	admin boolean NOT NULL,
 	PRIMARY KEY(brukerId)
@@ -1927,6 +1927,9 @@ SET brukerId = 1;
 ALTER TABLE matvaretabellen
 ADD FOREIGN KEY (brukerId) REFERENCES users(brukerId); 
 
+ALTER TABLE users
+ADD resetToken varchar(140) UNIQUE;
+
 DELIMITER ::
 
 CREATE TRIGGER userBenevning
@@ -1945,6 +1948,26 @@ BEGIN
 		END IF;
 		INSERT INTO brukerBenevningMål(benevningId,brukerId,aktiv) VALUES(b_Id,NEW.brukerId,false);
 	END LOOP;
+END::
+
+CREATE PROCEDURE slettMåltid
+(
+	IN p_måltidId INTEGER,
+	IN p_brukerId INTEGER,
+	OUT p_affectedRows INTEGER
+)
+
+BEGIN
+	DECLARE valid INTEGER;
+	SELECT 1 into valid FROM måltider WHERE brukerId = p_brukerId AND måltidId = p_måltidId;
+	IF valid = 1 THEN
+		DELETE FROM ingredienser WHERE måltidId = p_måltidId;
+		SET p_affectedRows = ROW_COUNT();
+		DELETE FROM måltider WHERE brukerId = p_brukerId AND måltidId = p_måltidId;
+		SET p_affectedRows = p_affectedRows + ROW_COUNT();
+	ELSE
+		SET p_affectedRows = 0;
+	END IF;	
 END::
 
 DELIMITER ;
