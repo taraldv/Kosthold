@@ -12,7 +12,7 @@ import util.sql.ResultSetContainer;
  *
  * @author Tarald
  */
-public class Kosthold {
+public class FjernDenne {
 
     static final int DATABASENR = 1;
 

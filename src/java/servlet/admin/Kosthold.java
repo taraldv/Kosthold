@@ -3,24 +3,23 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package servlet.kosthold;
+package servlet.admin;
 
 import crypto.ValidSession;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.database.Kosthold;
+import util.database.FjernDenne;
 import util.http.StandardResponse;
 /**
  *
  * @author Tarald
  */
-public class Innstillinger extends HttpServlet {
+public class Kosthold extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -58,7 +57,7 @@ public class Innstillinger extends HttpServlet {
                 + " aktiv = ?, øvreMål = ?, nedreMål = ?"
                 + " WHERE brukerId =" + brukerId + " AND benevningId = ?" + ";";
 
-        return Kosthold.innstillingerMultipleUpdateQueries(query, arr, 1);
+        return FjernDenne.innstillingerMultipleUpdateQueries(query, arr, 1);
         //return Arrays.deepToString(arr);
     }
 

@@ -13,7 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.database.Kosthold;
+import util.database.FjernDenne;
 import util.http.StandardResponse;
 import util.sql.ResultSetContainer;
 
@@ -50,13 +50,13 @@ public class EndrePassord extends HttpServlet {
         String query = "UPDATE users SET passord = ? WHERE brukerId = ?;";
         String newPasswordHash = crypto.SessionLogin.generatePasswordHash(newPassword);
         Object[] vars = {newPasswordHash, brukerId};
-        return Kosthold.singleUpdateQuery(query, vars, false);
+        return FjernDenne.singleUpdateQuery(query, vars, false);
     }
 
     private boolean checkOldPassword(int brukerId, String oldPassword) throws Exception {
 
         String query = "SELECT passord FROM users WHERE brukerId = ?";
-        ResultSetContainer rsc = Kosthold.multiQuery(query, new Object[]{brukerId});
+        ResultSetContainer rsc = FjernDenne.multiQuery(query, new Object[]{brukerId});
         String hashedPassword = rsc.getData()[0][0];
 
         return crypto.BCrypt.checkpw(oldPassword, hashedPassword);

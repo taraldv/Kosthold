@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package servlet.kosthold;
+package servlet.index;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,7 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.database.Kosthold;
+import util.database.FjernDenne;
 import crypto.SessionLogin;
 import crypto.ValidSession;
 import util.http.StandardResponse;
@@ -55,7 +55,7 @@ public class Post extends HttpServlet {
                 } else if (whichTable.equals("næringsinnhold")) {
                     autocompleteQuery = "SELECT næringsinnhold,benevning FROM benevninger WHERE næringsinnhold LIKE ? LIMIT 15;";
                 }
-                ResultSetContainer rsc = Kosthold.multiQuery(autocompleteQuery, new Object[]{"%" + matchingParameter + "%"});
+                ResultSetContainer rsc = FjernDenne.multiQuery(autocompleteQuery, new Object[]{"%" + matchingParameter + "%"});
                 String completeJson = rsc.getJSON();
                 if (completeJson.length() > 2) {
                     String jsonAddition = "\"search\":\"" + matchingParameter + "\",";

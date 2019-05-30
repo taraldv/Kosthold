@@ -13,7 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.database.Kosthold;
+import util.database.FjernDenne;
 import util.http.StandardResponse;
 
 /**
@@ -62,7 +62,7 @@ public class Matvaretabellen extends HttpServlet {
             verifyQuery += " næringsinnhold LIKE ?";
         }
         /* en slags måte å bruke preparedStatement på kolonneNavn, men tar 2 steg */
-        String[][] verifisertKolonneNavn = Kosthold.multiQuery(verifyQuery, kolonneArray).getData();
+        String[][] verifisertKolonneNavn = FjernDenne.multiQuery(verifyQuery, kolonneArray).getData();
         String[][] mapData = map.values().toArray(new String[0][0]);
         String updateQuery = "UPDATE matvaretabellen SET matvare=?";
         Object[] vars = new Object[verifisertKolonneNavn.length + 2];
@@ -84,22 +84,22 @@ public class Matvaretabellen extends HttpServlet {
         vars[vars.length - 1] = matvareId;
         updateQuery += " WHERE matvareId = ? AND brukerId=" + brukerId;
 
-        return Kosthold.singleUpdateQuery(updateQuery, vars, false);
+        return FjernDenne.singleUpdateQuery(updateQuery, vars, false);
     }
 
     private int deleteMatvare(int brukerId, int matvareId) throws Exception {
         String deleteQuery = "DELETE FROM matvaretabellen WHERE matvareId = ? AND brukerId = " + brukerId + ";";
         Object[] vars = {matvareId};
-        return Kosthold.singleUpdateQuery(deleteQuery, vars, false);
+        return FjernDenne.singleUpdateQuery(deleteQuery, vars, false);
     }
 
     private String getMatvaretabellTabell(int brukerId) throws Exception {
         String brukerDefinertQuery = "SELECT b.næringsinnhold FROM benevninger b "
                 + "LEFT JOIN brukerBenevningMål bm ON b.benevningId = bm.benevningId WHERE bm.brukerId = " + brukerId + " AND bm.aktiv = true;";
-        String additionalStuff = Kosthold.normalQuery(brukerDefinertQuery).getOneColumnToString("");
+        String additionalStuff = FjernDenne.normalQuery(brukerDefinertQuery).getOneColumnToString("");
 
         String getLoggQuery = "SELECT matvareId,matvare" + additionalStuff + " FROM matvaretabellen WHERE brukerId = " + brukerId + ";";
-        return Kosthold.normalQuery(getLoggQuery).getJSON();
+        return FjernDenne.normalQuery(getLoggQuery).getJSON();
     }
 
     private int matvaretabellInsert(Map<String, String[]> map, int brukerId, String matvare) throws Exception {
@@ -112,7 +112,7 @@ public class Matvaretabellen extends HttpServlet {
             verifyQuery += " næringsinnhold LIKE ?";
         }
         /* en slags måte å bruke preparedStatement på kolonneNavn, men tar 2 steg */
-        String[][] verifisertKolonneNavn = Kosthold.multiQuery(verifyQuery, kolonneArray).getData();
+        String[][] verifisertKolonneNavn = FjernDenne.multiQuery(verifyQuery, kolonneArray).getData();
 
         String[][] mapData = map.values().toArray(new String[0][0]);
 
@@ -134,6 +134,6 @@ public class Matvaretabellen extends HttpServlet {
         columnString += ") ";
         valueString += ");";
         //return columnString+valueString;
-        return Kosthold.singleUpdateQuery(columnString + valueString, vars, false);
+        return FjernDenne.singleUpdateQuery(columnString + valueString, vars, false);
     }
 }

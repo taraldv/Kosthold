@@ -14,7 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.database.Kosthold;
+import util.database.FjernDenne;
 import util.http.StandardResponse;
 import util.sql.ResultSetContainer;
 
@@ -53,14 +53,14 @@ public class ResetPassword extends HttpServlet {
 
     private int setResetToken(String token, int brukerId) throws Exception {
         String query = "UPDATE users SET resetToken = ? WHERE brukerId = " + brukerId + ";";
-        return Kosthold.singleUpdateQuery(query, new Object[]{token}, false);
+        return FjernDenne.singleUpdateQuery(query, new Object[]{token}, false);
     }
 
     /* kan denne hoppes over? epost er jo unik */
     private int getBrukerId(String epost) throws Exception {
         String query = "SELECT brukerId FROM users WHERE brukernavn = ?;";
         Object[] vars = {epost};
-        ResultSetContainer rsc = Kosthold.multiQuery(query, vars);
+        ResultSetContainer rsc = FjernDenne.multiQuery(query, vars);
         int id = Integer.parseInt(rsc.getData()[0][0]);
         return id;
     }
