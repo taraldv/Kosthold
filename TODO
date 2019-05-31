@@ -6,14 +6,11 @@ Kosthold/Måltider			vise at måltid er gyldig
 Kosthold/Måltider			sletting av siste ingrediens ugyldig eller sletter hele måltid
 Kosthold/Måltider/Logg		forklar keyboard shortcuts
 Kosthold/Logg				autocomplete farge avheng. av userId,crawler,andre og din
+
 Statistikk					BMI graf?
-Kosthold/Innstillinger		form må omgjøres til tabell
-Kosthold/
+Admin/Kosthold		form må omgjøres til tabell
 
 Helse/Vekt					Endre kosthold mål basert på vekt mål
-Styrke/Kalender			TreningHistorikk gjennomgang / 4 sekunder er for mye
-	Trenger ikke hente all data i starten, henter 1 år om gangen
-Styrke/Logg			Refactor 
 
 Kondisjon/Logg					Jogging, avstand i x,y + tid
 
@@ -21,7 +18,6 @@ Javascript
 hoved.js	validere input?
 statistikk.js	bedre løsning på fargelegging av mål
 statistikk.js	flytte tid kalkulering til server/sql
-Alle forms, kan bruke this istedet for getElementById
 
 Database
 matvaretabellen trigger, omgjør NULL til 0 ? kan skjule det med JS
