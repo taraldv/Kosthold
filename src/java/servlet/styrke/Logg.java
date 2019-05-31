@@ -20,10 +20,6 @@ import util.sql.Database;
 import util.http.StandardResponse;
 import util.sql.ResultSetContainer;
 
-/**
- *
- * @author Your Name <your.name at your.org>
- */
 public class Logg extends HttpServlet {
 
     @Override

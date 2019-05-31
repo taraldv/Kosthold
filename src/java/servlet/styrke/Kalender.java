@@ -17,10 +17,7 @@ import util.sql.Database;
 import util.http.StandardResponse;
 import util.sql.ResultSetContainer;
 
-/**
- *
- * @author Your Name <your.name at your.org>
- */
+
 public class Kalender extends HttpServlet  {
    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

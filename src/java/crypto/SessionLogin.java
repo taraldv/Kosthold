@@ -45,13 +45,14 @@ public class SessionLogin {
     private boolean checkPassword() throws Exception {
         /* sjeker om strings ikke er null, ikke vits med sql spørring med tom string */
         if (validReqestStrings()) {
-            String query = "SELECT passord,brukerId FROM users WHERE brukernavn LIKE ?";
+            String query = "SELECT passord,brukerId,epostAktivert FROM users WHERE brukernavn LIKE ?";
             ResultSetContainer rsc = Database.multiQuery(query, new Object[]{brukernavn});
             String hashedPassword = rsc.getData()[0][0];
             int brukerId = Integer.parseInt(rsc.getData()[0][1]);
+            boolean aktivert = Boolean.parseBoolean(rsc.getData()[0][2]);
 
-            /* hvis gyldig passord, set attributes */
-            if (crypto.BCrypt.checkpw(passord, hashedPassword)) {
+            /* hvis epost aktivert & gyldig passord, set attributes */
+            if (aktivert && crypto.BCrypt.checkpw(passord, hashedPassword)) {
                 setSession(brukerId);
                 session.setMaxInactiveInterval(0);
                 return true;

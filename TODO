@@ -5,7 +5,7 @@ Fjerne referansen og lage en slett trigger/ny tabell med slettede matvarer, som 
 Kosthold/Måltider			vise at måltid er gyldig
 Kosthold/Måltider			sletting av siste ingrediens ugyldig eller sletter hele måltid
 Kosthold/Måltider/Logg		forklar keyboard shortcuts
-Kosthold/Logg				autocomplete farge avheng. av userId,crawler,andre og din
+Kosthold/Logg				autocomplete farge bytte til userId istedet for matvareId
 
 Statistikk					BMI graf?
 Admin/Kosthold		form må omgjøres til tabell
