@@ -13,7 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.database.FjernDenne;
+import util.sql.Database;
 import util.http.StandardResponse;
 
 /**
@@ -38,7 +38,7 @@ public class Måltider extends HttpServlet {
             if (type.equals("insertMåltider")) {
                 out.print(insertMåltider(brukerId, request.getParameter("navn"), request.getParameterMap()));
             } else if (type.equals("getMåltider")) {
-                out.print(FjernDenne.normalQuery("SELECT * FROM måltider WHERE brukerId = " + brukerId + ";").getJSON());
+                out.print(Database.normalQuery("SELECT * FROM måltider WHERE brukerId = " + brukerId + ";").getJSON());
             } else if (type.equals("getMåltiderIngredienser")) {
                 //erstattet av insert
                 //out.print(getMåltiderIngredienser(Integer.parseInt(request.getParameter("måltidId"))));
@@ -72,10 +72,10 @@ public class Måltider extends HttpServlet {
     private int updateIngrediensMengde(int brukerId, int måltidId, int ingredienseId, int mengde) throws Exception {
         String måltidQuery = "SELECT 1 FROM måltider WHERE brukerId = ? AND måltidId = ?;";
         //burde bli 1
-        int validMåltid = Integer.parseInt(FjernDenne.multiQuery(måltidQuery, new Object[]{brukerId, måltidId}).getData()[0][0]);
+        int validMåltid = Integer.parseInt(Database.multiQuery(måltidQuery, new Object[]{brukerId, måltidId}).getData()[0][0]);
         if (validMåltid == 1) {
             String query = "UPDATE ingredienser SET mengde = ? WHERE ingredienseId = ? AND måltidId = ?";
-            return FjernDenne.singleUpdateQuery(query, new Object[]{mengde, ingredienseId, måltidId}, false);
+            return Database.singleUpdateQuery(query, new Object[]{mengde, ingredienseId, måltidId}, false);
         } else {
             return 0;
         }
@@ -85,17 +85,17 @@ public class Måltider extends HttpServlet {
         //stored procedure som sjekker om gyldig bruker/måltid, sletter alle ingredienser til måltid og sletter selve måltid.
         //returnerer antall slettet rader
         String query = "CALL slettMåltid(?,?,?);";
-        return FjernDenne.callProcedure(query, new Object[]{måltidId, brukerId, "@rader"});
+        return Database.callProcedure(query, new Object[]{måltidId, brukerId, "@rader"});
     }
 
     private int deleteMåltidIngrediens(int brukerId, int måltidId, int ingredienseId) throws Exception {
         //verifiserer at bruker eier valgt måltid
         String måltidQuery = "SELECT 1 FROM måltider WHERE brukerId = ? AND måltidId = ?;";
         //burde bli 1
-        int validMåltid = Integer.parseInt(FjernDenne.multiQuery(måltidQuery, new Object[]{brukerId, måltidId}).getData()[0][0]);
+        int validMåltid = Integer.parseInt(Database.multiQuery(måltidQuery, new Object[]{brukerId, måltidId}).getData()[0][0]);
         if (validMåltid == 1) {
             String query = "DELETE FROM ingredienser WHERE ingredienseId = ? AND måltidId = ?";
-            return FjernDenne.singleUpdateQuery(query, new Object[]{ingredienseId, måltidId}, false);
+            return Database.singleUpdateQuery(query, new Object[]{ingredienseId, måltidId}, false);
         } else {
             return 0;
         }
@@ -105,10 +105,10 @@ public class Måltider extends HttpServlet {
         //verifiserer at bruker eier valgt måltid
         String måltidQuery = "SELECT 1 FROM måltider WHERE brukerId = ? AND måltidId = ?;";
         //burde bli 1
-        int validMåltid = Integer.parseInt(FjernDenne.multiQuery(måltidQuery, new Object[]{brukerId, måltidId}).getData()[0][0]);
+        int validMåltid = Integer.parseInt(Database.multiQuery(måltidQuery, new Object[]{brukerId, måltidId}).getData()[0][0]);
         if (validMåltid == 1) {
             String query = "INSERT INTO ingredienser (matvareId,måltidId,mengde) VALUES (?,?,?)";
-            return FjernDenne.singleUpdateQuery(query, new Object[]{matvareId, måltidId, mengde}, false);
+            return Database.singleUpdateQuery(query, new Object[]{matvareId, måltidId, mengde}, false);
         } else {
             return 0;
         }
@@ -117,7 +117,7 @@ public class Måltider extends HttpServlet {
     private int insertMåltiderIngredienser(int brukerId, int måltidId) throws Exception {
         String query = "SELECT matvareId,mengde FROM ingredienser WHERE måltidId = ?;";
         //arr = [[id,mengde],[id,mengde]] etc...
-        String[][] arr = FjernDenne.multiQuery(query, new Object[]{måltidId}).getData();
+        String[][] arr = Database.multiQuery(query, new Object[]{måltidId}).getData();
 
         //vars bindes til ? en etter en, dvs. første vars obj bør være id, neste mengde etc....
         Object[] vars = new Object[2 * arr.length];
@@ -133,7 +133,7 @@ public class Måltider extends HttpServlet {
             }
             row += "(CURDATE(),?,?," + brukerId + ")";
         }
-        return FjernDenne.singleUpdateQuery(baseline + row, vars, false);
+        return Database.singleUpdateQuery(baseline + row, vars, false);
     }
 
     //git ikke måltider uten ingredienser, bør ikke være lov å lage måltid uten ingredienser
@@ -142,18 +142,18 @@ public class Måltider extends HttpServlet {
                 + "RIGHT JOIN ingredienser i ON i.måltidId = m.måltidId "
                 + "LEFT JOIN matvaretabellen t ON t.matvareId = i.matvareId "
                 + "WHERE m.brukerId = ?;";
-        return FjernDenne.multiQuery(query, new Object[]{brukerId}).getJSON();
+        return Database.multiQuery(query, new Object[]{brukerId}).getJSON();
     }
 
     private String getMåltiderIngredienser(int måltidId) throws Exception {
         String getMåltiderIngredienserQuery = "SELECT m.matvare,i.matvareId,mengde FROM ingredienser i"
                 + " LEFT JOIN matvaretabellen m ON i.matvareId = m.matvareId"
                 + " WHERE måltidId = ?;";
-        return FjernDenne.multiQuery(getMåltiderIngredienserQuery, new Object[]{måltidId}).getJSON();
+        return Database.multiQuery(getMåltiderIngredienserQuery, new Object[]{måltidId}).getJSON();
     }
 
     private int insertMåltider(int brukerId, String navn, Map<String, String[]> map) throws Exception {
-        int lastInsertedId = FjernDenne.singleUpdateQuery("INSERT INTO måltider(navn,brukerId) VALUES (?," + brukerId + ");", new Object[]{navn}, true);
+        int lastInsertedId = Database.singleUpdateQuery("INSERT INTO måltider(navn,brukerId) VALUES (?," + brukerId + ");", new Object[]{navn}, true);
         String[][] arr = map.values().toArray(new String[0][0]);
         /* arr inneholder [[type][navn][id,id,id....][verdi,verdi,verdi.....]] */
         Object[] vars = new Object[arr[2].length * 2];
@@ -167,6 +167,6 @@ public class Måltider extends HttpServlet {
             }
             row += "(" + lastInsertedId + ",?,?)";
         }
-        return FjernDenne.singleUpdateQuery(baseline + row, vars, false);
+        return Database.singleUpdateQuery(baseline + row, vars, false);
     }
 }

@@ -14,7 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.database.FjernDenne;
+import util.sql.Database;
 import util.http.StandardResponse;
 
 /**
@@ -58,12 +58,12 @@ public class Logg extends HttpServlet {
     private int updateLogg(int brukerId, int loggId, Double mengde, String dato) throws Exception {
         String updateQuery = "UPDATE logg SET mengde = ?, dato = ? WHERE loggId = ? AND brukerId = " + brukerId + ";";
         Object[] vars = {mengde, dato, loggId};
-        return FjernDenne.singleUpdateQuery(updateQuery, vars, false);
+        return Database.singleUpdateQuery(updateQuery, vars, false);
     }
     
     private int deleteLogg(int brukerId, int loggId) throws Exception {
         String deleteQuery = "DELETE FROM logg WHERE loggId = ? AND brukerId = " + brukerId + ";";
-        return FjernDenne.singleUpdateQuery(deleteQuery, new Object[]{loggId}, false);
+        return Database.singleUpdateQuery(deleteQuery, new Object[]{loggId}, false);
     }
     
     //henter logg fra de siste 31 dagene
@@ -72,7 +72,7 @@ public class Logg extends HttpServlet {
                 + "LEFT JOIN matvaretabellen m ON m.matvareId = logg.matvareId"
                 + " WHERE logg.brukerId = " + brukerId + " AND dato <= curdate() AND dato > DATE_SUB(curdate(),INTERVAL 31 DAY)"
                 + " ORDER BY loggId DESC;";
-        return FjernDenne.normalQuery(query).getJSON();
+        return Database.normalQuery(query).getJSON();
     }
     
     private int insertLogg(Map<String, String[]> map, int brukerId) throws Exception {
@@ -90,7 +90,7 @@ public class Logg extends HttpServlet {
             row += "(CURDATE(),?,?," + brukerId + ")";
         }
         //return baseline + row + " , " + Arrays.toString(vars) + " , " + Arrays.deepToString(arr);
-        return FjernDenne.singleUpdateQuery(baseline + row, vars, false);
+        return Database.singleUpdateQuery(baseline + row, vars, false);
     }
 
 

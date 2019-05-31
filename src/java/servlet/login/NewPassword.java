@@ -12,7 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.database.FjernDenne;
+import util.sql.Database;
 import util.http.StandardResponse;
 
 /**
@@ -78,7 +78,7 @@ public class NewPassword extends HttpServlet {
         String hashedPassword = generatePasswordHash(nyttPassord);
         String query = "UPDATE users SET passord = ?, resetToken = NULL WHERE resetToken = ?;";
         Object[] vars = {hashedPassword, token};
-        return FjernDenne.singleUpdateQuery(query, vars, false);
+        return Database.singleUpdateQuery(query, vars, false);
     }
 
 }

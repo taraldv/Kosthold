@@ -6,7 +6,7 @@
 package crypto;
 
 import javax.servlet.http.HttpSession;
-import util.database.FjernDenne;
+import util.sql.Database;
 import util.sql.ResultSetContainer;
 
 /**
@@ -46,7 +46,7 @@ public class SessionLogin {
         /* sjeker om strings ikke er null, ikke vits med sql spørring med tom string */
         if (validReqestStrings()) {
             String query = "SELECT passord,brukerId FROM users WHERE brukernavn LIKE ?";
-            ResultSetContainer rsc = FjernDenne.multiQuery(query, new Object[]{brukernavn});
+            ResultSetContainer rsc = Database.multiQuery(query, new Object[]{brukernavn});
             String hashedPassword = rsc.getData()[0][0];
             int brukerId = Integer.parseInt(rsc.getData()[0][1]);
 

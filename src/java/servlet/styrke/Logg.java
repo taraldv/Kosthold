@@ -16,7 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.database.FjernDenne;
+import util.sql.Database;
 import util.http.StandardResponse;
 import util.sql.ResultSetContainer;
 
@@ -56,7 +56,7 @@ public class Logg extends HttpServlet {
 
     private int deleteStyrkeLogg(int brukerId, int styrkeLoggId) throws Exception {
         String query = "DELETE FROM styrkeLogg WHERE brukerId = ? AND styrkeLoggId = ?;";
-        return FjernDenne.singleUpdateQuery(query, new Object[]{brukerId, styrkeLoggId}, false);
+        return Database.singleUpdateQuery(query, new Object[]{brukerId, styrkeLoggId}, false);
     }
 
     private String getLogg(int brukerId, int interval) throws Exception {
@@ -64,12 +64,12 @@ public class Logg extends HttpServlet {
                 + "LEFT JOIN styrkeØvelse s ON s.styrkeId = styrkeLogg.styrkeId"
                 + " WHERE s.brukerId = " + brukerId + " AND dato <= curdate() AND dato > DATE_SUB(curdate(),INTERVAL ? DAY)"
                 + " ORDER BY dato DESC;";
-        return FjernDenne.multiQuery(query, new Object[]{interval}).getJSON();
+        return Database.multiQuery(query, new Object[]{interval}).getJSON();
     }
 
     private String getØvelser(int brukerId) throws Exception {
         String query = "SELECT navn,styrkeId FROM styrkeØvelse WHERE brukerId = ?;";
-        return FjernDenne.multiQuery(query, new Object[]{brukerId}).getJSON();
+        return Database.multiQuery(query, new Object[]{brukerId}).getJSON();
     }
 
     //kopiert fra forrige trening.java
@@ -112,6 +112,6 @@ public class Logg extends HttpServlet {
             row += "(CURDATE(),?,?,?," + brukerId + ")";
         }
         //return baseline + row + " , " + Arrays.toString(vars) + " , " + Arrays.deepToString(arr);
-        return FjernDenne.singleUpdateQuery(baseline + row, vars, false);
+        return Database.singleUpdateQuery(baseline + row, vars, false);
     }
 }

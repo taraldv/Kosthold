@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package util.database;
+package util.sql;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -20,17 +20,15 @@ import util.sql.ResultSetContainer;
  */
 public class Database {
 
-    private static final String[] DATABASE = {"trening", "kosthold"};
-
-    static private Connection getDatabaseConnection(int index) throws Exception {
+    static private Connection getDatabaseConnection() throws Exception {
         Class.forName("com.mysql.jdbc.Driver");
         /* database , brukernavn, passord */
-        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/" + DATABASE[index], DATABASE[index], "");
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/kosthold", "kosthold", "");
         return connection;
     }
 
-    static public PreparedStatement getprepStatement(String query, int option, int databaseNr) throws Exception {
-        Connection c = getDatabaseConnection(databaseNr);
+    static public PreparedStatement getprepStatement(String query, int option) throws Exception {
+        Connection c = getDatabaseConnection();
         if (option > 0) {
             return c.prepareStatement(query, option);
         } else {
@@ -38,8 +36,8 @@ public class Database {
         }
     }
 
-    static public int callProcedure(String query, Object[] vars, int databaseNr) throws Exception {
-        Connection c = getDatabaseConnection(databaseNr);
+    static public int callProcedure(String query, Object[] vars) throws Exception {
+        Connection c = getDatabaseConnection();
         CallableStatement cstmt = c.prepareCall(query);
 
         cstmt.setInt(1, (int) vars[0]);
@@ -55,12 +53,12 @@ public class Database {
         return rader;
     }
 
-    static public int singleUpdateQuery(String query, Object[] var, boolean returnAutoIncrement, int databaseNr) throws Exception {
+    static public int singleUpdateQuery(String query, Object[] var, boolean returnAutoIncrement) throws Exception {
         int options = 0;
         if (returnAutoIncrement) {
             options = Statement.RETURN_GENERATED_KEYS;
         }
-        PreparedStatement ps = getprepStatement(query, options, databaseNr);
+        PreparedStatement ps = getprepStatement(query, options);
 
         for (int i = 0; i < var.length; i++) {
             /* string,double eller int */
@@ -99,19 +97,53 @@ public class Database {
         }
     }
 
-    static public ResultSetContainer multiQuery(String query, Object[] vars, int databaseNr) throws Exception {
-        PreparedStatement ps = getprepStatement(query, 0, databaseNr);
+    static public ResultSetContainer multiQuery(String query, Object[] vars) throws Exception {
+        PreparedStatement ps = getprepStatement(query, 0);
         setPreparedStatementVariables(ps, vars);
         ResultSetContainer rsc = new ResultSetContainer(ps.executeQuery());
         ps.getConnection().close();
         return rsc;
     }
 
-    static public ResultSetContainer normalQuery(String query, int databaseNr) throws Exception {
+    static public ResultSetContainer normalQuery(String query) throws Exception {
         ResultSetContainer rsc;
-        try (Connection c = getDatabaseConnection(databaseNr)) {
+        try (Connection c = getDatabaseConnection()) {
             rsc = new ResultSetContainer(c.createStatement().executeQuery(query));
         }
         return rsc;
+    }
+    
+        static public int innstillingerMultipleUpdateQueries(String query, String[][] arr, int offset) throws Exception {
+        PreparedStatement ps = Database.getprepStatement(query, 0);
+        int output = 0;
+        /* første array i 'arr' er 'type' og har lengde 1 */
+        /* de 4 andre skal ha samme lengde */
+        for (int i = 0; i < arr[offset].length; i++) {
+            String øvre = arr[offset + 1][i];
+            String nedre = arr[offset + 2][i];
+            String id = arr[offset][i];
+            ps.setBoolean(1, Boolean.parseBoolean(arr[offset + 3][i]));
+
+            if (øvre == null || øvre.length() == 0) {
+                ps.setInt(2, 0);
+            } else {
+                ps.setInt(2, Integer.parseInt(øvre));
+            }
+
+            if (nedre == null || nedre.length() == 0) {
+                ps.setInt(3, 0);
+            } else {
+                ps.setInt(3, Integer.parseInt(nedre));
+            }
+
+            if (id == null || id.length() == 0) {
+                ps.setInt(4, 0);
+            } else {
+                ps.setInt(4, Integer.parseInt(id));
+            }
+
+            output += ps.executeUpdate();
+        }
+        return output;
     }
 }

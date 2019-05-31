@@ -12,7 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.database.FjernDenne;
+import util.sql.Database;
 import util.http.StandardResponse;
 
 /**
@@ -53,7 +53,7 @@ public class Stats extends HttpServlet {
     private String getStatsMål(int brukerId) throws Exception {
         String målQuery = "SELECT øvreMål,nedreMål,b.næringsinnhold,aktiv,b.benevning,b.benevningId FROM brukerBenevningMål "
                 + "LEFT JOIN benevninger b ON b.benevningId = brukerBenevningMål.benevningId WHERE brukerId =" + brukerId + ";";
-        return FjernDenne.normalQuery(målQuery).getJSON();
+        return Database.normalQuery(målQuery).getJSON();
     }
 
     private String getGraf(int brukerId) throws Exception {
@@ -61,7 +61,7 @@ public class Stats extends HttpServlet {
                 + "LEFT JOIN matvaretabellen m ON logg.matvareId = m.matvareId "
                 + "WHERE logg.brukerId = " + brukerId + " AND dato <= curdate() AND dato > DATE_SUB(curdate(),INTERVAL 31 DAY) "
                 + "GROUP BY dato ORDER BY dato;";
-        return FjernDenne.normalQuery(getLoggQuery).getJSON();
+        return Database.normalQuery(getLoggQuery).getJSON();
     }
 
     private String getPieChart(int brukerId) throws Exception {
@@ -69,18 +69,18 @@ public class Stats extends HttpServlet {
                 + "LEFT JOIN matvaretabellen m ON logg.matvareId = m.matvareId "
                 + "WHERE logg.brukerId = " + brukerId + " AND dato <= curdate() AND dato > DATE_SUB(curdate(),INTERVAL 31 DAY) "
                 + "GROUP BY m.matvare ORDER BY kcal;";
-        return FjernDenne.normalQuery(getLoggQuery).getJSON();
+        return Database.normalQuery(getLoggQuery).getJSON();
     }
 
     private String getLogg(int brukerId) throws Exception {
         String brukerDefinertQuery = "SELECT b.næringsinnhold FROM benevninger b "
                 + "LEFT JOIN brukerBenevningMål bm ON b.benevningId = bm.benevningId WHERE bm.brukerId = " + brukerId + " AND bm.aktiv = true;";
-        String additionalStuff = FjernDenne.normalQuery(brukerDefinertQuery).getOneColumnToString("m.");
+        String additionalStuff = Database.normalQuery(brukerDefinertQuery).getOneColumnToString("m.");
         //String additionalStuff = ",m.Kilokalorier";
         String getLoggQuery = "SELECT m.matvare,mengde,dato" + additionalStuff + " FROM logg "
                 + "LEFT JOIN matvaretabellen m ON logg.matvareId = m.matvareId "
                 + "WHERE logg.brukerId = " + brukerId + " AND dato <= curdate() AND dato > DATE_SUB(curdate(),INTERVAL 31 DAY);";
-        return FjernDenne.normalQuery(getLoggQuery).getJSON();
+        return Database.normalQuery(getLoggQuery).getJSON();
 
     }
 

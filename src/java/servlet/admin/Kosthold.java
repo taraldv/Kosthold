@@ -13,7 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.database.FjernDenne;
+import util.sql.Database;
 import util.http.StandardResponse;
 /**
  *
@@ -57,7 +57,7 @@ public class Kosthold extends HttpServlet {
                 + " aktiv = ?, øvreMål = ?, nedreMål = ?"
                 + " WHERE brukerId =" + brukerId + " AND benevningId = ?" + ";";
 
-        return FjernDenne.innstillingerMultipleUpdateQueries(query, arr, 1);
+        return Database.innstillingerMultipleUpdateQueries(query, arr, 1);
         //return Arrays.deepToString(arr);
     }
 
