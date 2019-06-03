@@ -28,14 +28,9 @@ public class EndrePassord extends HttpServlet {
             throws ServletException, IOException {
         StandardResponse sr = new StandardResponse(response);
         PrintWriter out = sr.getWriter();
-        ValidSession vs = new ValidSession(out, request.getSession());
-
-        /* stopper request hvis ugylid session */
-        if (!vs.validateSession()) {
-            return;
-        }
-        int brukerId = vs.getId();
         try {
+            ValidSession vs = new ValidSession(request, response);
+            int brukerId = vs.getBrukerId();
             if (checkOldPassword(brukerId, request.getParameter("oldPassword"))) {
                 out.print(updatePassword(brukerId, request.getParameter("newPassword")));
             } else {

@@ -19,28 +19,5 @@ import util.sql.ResultSetContainer;
 
 
 public class Kalender extends HttpServlet  {
-   @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        StandardResponse sr = new StandardResponse(response);
-        PrintWriter out = sr.getWriter();
-        ValidSession vs = new ValidSession(out, request.getSession());
-        String type = request.getParameter("type");
-        /* stopper request hvis ugylid session */
-        if (!vs.validateSession()) {
-            return;
-        }
-        int brukerId = vs.getId();
-        try {
-            if (type.equals("getVektLogg")) {
 
-            } else if (type.equals("insertVekt")) {
-
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace(out);
-        }
-
-    }
 }

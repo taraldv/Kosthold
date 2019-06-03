@@ -30,21 +30,7 @@ public class Kalender extends HttpServlet {
         response.setHeader("Access-Control-Allow-Origin", "https://trening.tarves.no");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         PrintWriter out = response.getWriter();
-        ValidSession vs = new ValidSession(out, request.getSession());
-
-        String type = request.getParameter("type");
-        /* stopper request hvis ugylid session */
-        if (!vs.validateSession()) {
-            return;
-        }
-
-        try {
-            if (type.equals("kalender")) {
-                out.print(util.TreningHistorikk.getJSON());
-            }
-        } catch (Exception e) {
-            e.printStackTrace(out);
-        }
+       
     }
 
  

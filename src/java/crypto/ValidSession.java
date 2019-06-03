@@ -5,8 +5,9 @@
  */
 package crypto;
 
-import java.io.PrintWriter;
-import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  *
@@ -14,31 +15,32 @@ import javax.servlet.http.HttpSession;
  */
 public class ValidSession {
 
-    private final PrintWriter out;
-    private final HttpSession session;
+    private final HttpServletRequest req;
+    private final HttpServletResponse resp;
     private int id;
 
-    public ValidSession(PrintWriter out, HttpSession session) {
-        this.out = out;
-        this.session = session;
-    }
-
-    public boolean validateSession() {
+    public ValidSession(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        this.req = req;
+        this.resp = resp;
         try {
-            id = (int) session.getAttribute("brukerId");
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace(out);
-            return false;
+            id = (int) req.getSession().getAttribute("brukerId");
+        } catch (NullPointerException e) {
+            req.getSession().setAttribute("url", req.getServletPath());
+            resp.setHeader("Access-Control-Allow-Credentials", "true");
+            resp.sendRedirect("/");
         }
     }
 
-    public void logOut() {
-        session.invalidate();
+    public int getBrukerId() {
+        return (int) req.getSession().getAttribute("brukerId");
     }
 
-    public int getId() {
-        return id;
+    public static void isValid(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        if (!(req.getSession().getAttribute("brukerId") instanceof Integer)) {
+            req.getSession().setAttribute("url", req.getServletPath());
+            resp.setHeader("Access-Control-Allow-Credentials", "true");
+            resp.sendRedirect("/");
+        }
     }
 
 }

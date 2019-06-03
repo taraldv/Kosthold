@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import util.HTML;
 import util.sql.Database;
 import util.http.StandardResponse;
 
@@ -22,19 +23,26 @@ import util.http.StandardResponse;
  */
 public class Måltider extends HttpServlet {
 
+        @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        
+        ValidSession.isValid(req, resp);
+        HTML html = new HTML("Kosthold Måltider");
+        html.addStandard();
+        resp.getWriter().print(html.toString());
+        
+    }
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         StandardResponse sr = new StandardResponse(response);
         PrintWriter out = sr.getWriter();
-        ValidSession vs = new ValidSession(out, request.getSession());
         String type = request.getParameter("type");
         /* stopper request hvis ugylid session */
-        if (!vs.validateSession()) {
-            return;
-        }
-        int brukerId = vs.getId();
         try {
+            ValidSession vs = new ValidSession(request, response);
+            int brukerId = vs.getBrukerId();
             if (type.equals("insertMåltider")) {
                 out.print(insertMåltider(brukerId, request.getParameter("navn"), request.getParameterMap()));
             } else if (type.equals("getMåltider")) {

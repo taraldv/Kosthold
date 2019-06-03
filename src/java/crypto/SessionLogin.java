@@ -49,20 +49,16 @@ public class SessionLogin {
             ResultSetContainer rsc = Database.multiQuery(query, new Object[]{brukernavn});
             String hashedPassword = rsc.getData()[0][0];
             int brukerId = Integer.parseInt(rsc.getData()[0][1]);
-            boolean aktivert = Boolean.parseBoolean(rsc.getData()[0][2]);
+            int aktivert = Integer.parseInt(rsc.getData()[0][2]);
 
             /* hvis epost aktivert & gyldig passord, set attributes */
-            if (aktivert && crypto.BCrypt.checkpw(passord, hashedPassword)) {
+            if (aktivert==1 && crypto.BCrypt.checkpw(passord, hashedPassword)) {
                 setSession(brukerId);
                 session.setMaxInactiveInterval(0);
                 return true;
             }
         }
         return false;
-    }
-
-    public void invalidate() {
-        session.invalidate();
     }
 
     private void setSession(int brukerId) {

@@ -24,8 +24,8 @@ public class StandardResponse {
 
     private void applyHeaders() {
         response.setContentType("application/json;charset=UTF-8");
-        response.setHeader("Access-Control-Allow-Origin", "https://kosthold.tarves.no");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
+        //response.setHeader("Access-Control-Allow-Origin", "https://logglogg.no");
+        
     }
 
     public PrintWriter getWriter() throws IOException {

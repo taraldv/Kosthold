@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import util.HTML;
 import util.sql.Database;
 import util.http.StandardResponse;
 
@@ -23,18 +24,25 @@ import util.http.StandardResponse;
 public class Matvaretabellen extends HttpServlet {
 
     @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        ValidSession.isValid(req, resp);
+        HTML html = new HTML("Kosthold Logg");
+        html.addStandard();
+        resp.getWriter().print(html.toString());
+
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         StandardResponse sr = new StandardResponse(response);
         PrintWriter out = sr.getWriter();
-        ValidSession vs = new ValidSession(out, request.getSession());
         String type = request.getParameter("type");
-        /* stopper request hvis ugylid session */
-        if (!vs.validateSession()) {
-            return;
-        }
-        int brukerId = vs.getId();
+ 
         try {
+            ValidSession vs = new ValidSession(request, response);
+            int brukerId = vs.getBrukerId();
             if (type.equals("insertMatvaretabell")) {
                 out.print(matvaretabellInsert(request.getParameterMap(), brukerId, request.getParameter("navn")));
             } else if (type.equals("getBrukerMatvaretabell")) {
@@ -69,16 +77,16 @@ public class Matvaretabellen extends HttpServlet {
         vars[0] = mapData[2][0];
         /* kan vel ikke være dynamisk? alt er jo strings, men skal være int */
         for (int i = 0; i < verifisertKolonneNavn.length; i++) {
-           // if (i != 0) {
-                updateQuery += ",";
+            // if (i != 0) {
+            updateQuery += ",";
             //}
             updateQuery += "`" + verifisertKolonneNavn[i][0] + "`=?";
             try {
                 /* mapData offset pga type,matvareId og matvare */
-                vars[i+1] = Double.parseDouble(mapData[i + 3][0]);
+                vars[i + 1] = Double.parseDouble(mapData[i + 3][0]);
             } catch (NumberFormatException e) {
                 /* fjerner NULL verdier */
-                vars[i+1] = new Double(0);
+                vars[i + 1] = new Double(0);
             }
         }
         vars[vars.length - 1] = matvareId;

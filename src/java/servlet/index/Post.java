@@ -30,19 +30,12 @@ public class Post extends HttpServlet {
         StandardResponse sr = new StandardResponse(response);
         PrintWriter out = sr.getWriter();
         String type = request.getParameter("type");
-        ValidSession vs = new ValidSession(out, request.getSession());
-
-        /* stopper request hvis ugylid session */
-        if (!vs.validateSession()) {
-            return;
-        }
-
+  
         /* nullPointerException hvis type ikke er en del av request */
         try {
-
-            if (type.equals("logout")) {
-                vs.logOut();
-            } else if (type.equals("auth")) {
+            ValidSession vs = new ValidSession(request, response);
+            int brukerId = vs.getBrukerId();
+            if (type.equals("auth")) {
                 out.print(1);
             } else if (type.equals("passordGen")) {
                 out.print(SessionLogin.generatePasswordHash(request.getParameter("passord")));
