@@ -28,7 +28,7 @@ public class GlemtPassord extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Headers.GET(resp);
-        String path = req.getContextPath();
+        PrintWriter out = resp.getWriter();
         String error = req.getParameter("error");
         String msg = req.getParameter("msg");
         String beskjed = "";
@@ -43,13 +43,14 @@ public class GlemtPassord extends HttpServlet {
         if (error != null) {
             //error = 1, sql
             //error = 2, epost sending eller bash queue
+            //error = 3, nytt passord token ugyldig
+            //error = 4, noe gikk galt under nytt passord sql
             beskjed = "Noe gikk galt, prøv igjen";
         } else if (msg != null) {
             beskjed = "Epost sendt, sjekk innboks eller spam";
         }
         html.addBody("<div>" + beskjed + "</div>");
-        html.addBody("<div>" + path + "</div>");
-        PrintWriter out = resp.getWriter();
+
         out.print(html.toString());
     }
 
@@ -116,34 +117,10 @@ public class GlemtPassord extends HttpServlet {
         return process.waitFor();
     }*/
 
- /* TODO FLYTTE TIL TOMCAT */
- /*private void makeTempHTMLFile(String token) throws Exception {
-        BufferedWriter bw = new BufferedWriter(new FileWriter("/home/tarves/login/glemt_passord/" + token + ".html"));
-        bw.write("<!DOCTYPE html>");
-        bw.write("<html>");
-        bw.write("<head>");
-        bw.write("<meta charset='UTF-8'");
-        bw.write("</head>");
-        bw.write("<body>");
-        bw.write("<form method='POST' action='https://tomcat.tarves.no/TomcatServlet/NewPassword'>");
-        bw.write("<div>");
-        bw.write("<div>");
-        bw.write("nytt passord");
-        bw.write("</div>");
-        bw.write("<input name='nyttPassord' type='text'>");
-        bw.write("<input name='token' type='text' value=" + token + " hidden=''>");
-        bw.write("</div>");
-        bw.write("<input type='submit' value='Send nytt passord'>");
-        bw.write("</form>");
-        bw.write("</body>");
-        bw.write("</html>");
-        bw.flush();
-        bw.close();
-    }*/
     private int send(String epost, String token) throws Exception {
         ProcessBuilder processBuilder = new ProcessBuilder();
 
-        String link = "https://logglogg.no/logginn/glemt_passord/";
+        String link = "https://logglogg.no/logginn/nytt_passord/";
 
         String subject = "\"Få nytt passord på tarves.no\"";
         String sender = "noreply@logglogg.no";
