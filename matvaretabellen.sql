@@ -1929,6 +1929,8 @@ ADD FOREIGN KEY (brukerId) REFERENCES users(brukerId);
 
 ALTER TABLE users
 ADD resetToken varchar(140) UNIQUE;
+ALTER TABLE users
+ADD epostAktivert BOOLEAN DEFAULT false;
 
 DELIMITER ::
 

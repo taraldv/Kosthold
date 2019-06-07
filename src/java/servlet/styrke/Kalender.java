@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.sql.Database;
-import util.http.StandardResponse;
+import util.http.Headers;
 import util.sql.ResultSetContainer;
 
 

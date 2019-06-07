@@ -14,38 +14,72 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import util.HTML;
 import util.sql.Database;
-import util.http.StandardResponse;
+import util.http.Headers;
 import util.sql.ResultSetContainer;
 
 /**
  *
  * @author Tarald
  */
-public class ResetPassword extends HttpServlet {
+public class GlemtPassord extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Headers.GET(resp);
+        String path = req.getContextPath();
+        String error = req.getParameter("error");
+        String msg = req.getParameter("msg");
+        String beskjed = "";
+        HTML html = new HTML("LoggLogg Glemt passord");
+        html.addBody("<form method='POST' action=''>"
+                + "<div>"
+                + "<div>epost</div>"
+                + "<input name='epost' id='brukernavnInput' type='text'>"
+                + "</div>"
+                + "<input type='submit' value='Send link'>"
+                + "</form>");
+        if (error != null) {
+            //error = 1, sql
+            //error = 2, epost sending eller bash queue
+            beskjed = "Noe gikk galt, prøv igjen";
+        } else if (msg != null) {
+            beskjed = "Epost sendt, sjekk innboks eller spam";
+        }
+        html.addBody("<div>" + beskjed + "</div>");
+        html.addBody("<div>" + path + "</div>");
+        PrintWriter out = resp.getWriter();
+        out.print(html.toString());
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        StandardResponse sr = new StandardResponse(response);
-        PrintWriter out = sr.getWriter();
+        Headers.POST(response);
+        PrintWriter out = response.getWriter();
         try {
             String epost = request.getParameter("epost");
             int brukerId = getBrukerId(epost);
             String token = ResetToken.generateToken();
 
             int exitStatus = send(epost, token);
-            int queueRM = queueRemove(token);
+            int queueRM = queueRemove(brukerId, 1);
+            String msg = "/logginn/glemt_passord/?";
 
             /* 0 betyr bash ble utført */
             if (exitStatus == 0 && queueRM == 0) {
-                makeTempHTMLFile(token);
+                // makeTempHTMLFile(token);
                 int sql = setResetToken(token, brukerId);
                 if (sql > 0) {
-                    sr.sendRedirect("https://login.tarves.no/glemt_passord/");
+                    msg += "msg=sendt";
+                } else {
+                    msg += "error=1";
                 }
+            } else {
+                msg += "error=2";
             }
-            out.print("noe gikk galt, prøv igjen");
+            response.sendRedirect(msg);
         } catch (Exception e) {
             e.printStackTrace(out);
         }
@@ -65,15 +99,25 @@ public class ResetPassword extends HttpServlet {
         return id;
     }
 
-    private int queueRemove(String token) throws Exception {
+    private int queueRemove(int id, int hours) throws Exception {
         ProcessBuilder processBuilder = new ProcessBuilder();
-        String command = "echo \"rm /home/tarves/login/glemt_passord/" + token + ".html\" | at today + 4 hours";
+        String query = "'UPDATE users SET resetToken = '' WHERE brukerId = " + id + ";'";
+        String command = "echo \"mysql -u kosthold -D kosthold -e " + query + "\" | at today + " + hours + " hours";
         processBuilder.command("bash", "-c", command);
         Process process = processBuilder.start();
         return process.waitFor();
     }
 
-    private void makeTempHTMLFile(String token) throws Exception {
+    /* private int queueRemove(String token) throws Exception {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        String command = "echo \"rm /home/tarves/login/glemt_passord/" + token + ".html\" | at today + 4 hours";
+        processBuilder.command("bash", "-c", command);
+        Process process = processBuilder.start();
+        return process.waitFor();
+    }*/
+
+ /* TODO FLYTTE TIL TOMCAT */
+ /*private void makeTempHTMLFile(String token) throws Exception {
         BufferedWriter bw = new BufferedWriter(new FileWriter("/home/tarves/login/glemt_passord/" + token + ".html"));
         bw.write("<!DOCTYPE html>");
         bw.write("<html>");
@@ -95,15 +139,14 @@ public class ResetPassword extends HttpServlet {
         bw.write("</html>");
         bw.flush();
         bw.close();
-    }
-
+    }*/
     private int send(String epost, String token) throws Exception {
         ProcessBuilder processBuilder = new ProcessBuilder();
 
-        String link = "https://login.tarves.no/glemt_passord/";
+        String link = "https://logglogg.no/logginn/glemt_passord/";
 
         String subject = "\"Få nytt passord på tarves.no\"";
-        String sender = "noreply@tarves.no";
+        String sender = "noreply@logglogg.no";
         String body = getMailBody(link, token);
         String command = "mail -a \"Content-Type: text/html\" -s " + subject + " -r "
                 + sender + " " + epost + " <<< " + body;

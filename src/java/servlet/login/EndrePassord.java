@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.sql.Database;
-import util.http.StandardResponse;
+import util.http.Headers;
 import util.sql.ResultSetContainer;
 
 /**
@@ -26,11 +26,11 @@ public class EndrePassord extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        StandardResponse sr = new StandardResponse(response);
-        PrintWriter out = sr.getWriter();
+        Headers.POST(response);
+        ValidSession.isValid(request, response);
+        PrintWriter out = response.getWriter();
         try {
-            ValidSession vs = new ValidSession(request, response);
-            int brukerId = vs.getBrukerId();
+            int brukerId = (int) request.getSession().getAttribute("brukerId");
             if (checkOldPassword(brukerId, request.getParameter("oldPassword"))) {
                 out.print(updatePassword(brukerId, request.getParameter("newPassword")));
             } else {

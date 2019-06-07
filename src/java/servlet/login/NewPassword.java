@@ -6,6 +6,7 @@
 package servlet.login;
 
 import static crypto.SessionLogin.generatePasswordHash;
+import crypto.ValidSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -13,7 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.sql.Database;
-import util.http.StandardResponse;
+import util.http.Headers;
 
 /**
  *
@@ -21,10 +22,13 @@ import util.http.StandardResponse;
  */
 public class NewPassword extends HttpServlet {
 
+    
+    /* Testing? */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        Headers.GET(response);
+        //ValidSession.isValid(request, response);
         PrintWriter out = response.getWriter();
 
         try {
@@ -50,15 +54,15 @@ public class NewPassword extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        StandardResponse sr = new StandardResponse(response);
-        PrintWriter out = sr.getWriter();
+        Headers.POST(response);
+        PrintWriter out = response.getWriter();
         try {
             String token = request.getParameter("token");
             deleteFile(token);
             String nyttPassord = request.getParameter("nyttPassord");
             int passordEndring = endrePassord(token, nyttPassord);
             if (passordEndring > 0) {
-                sr.sendRedirect("https://login.tarves.no/");
+                response.sendRedirect("https://logglogg.no/");
             }
         } catch (Exception e) {
             e.printStackTrace(out);

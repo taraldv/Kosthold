@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.HTML;
 import util.sql.Database;
-import util.http.StandardResponse;
+import util.http.Headers;
 import util.sql.ResultSetContainer;
 
 public class Logg extends HttpServlet {
@@ -26,9 +26,11 @@ public class Logg extends HttpServlet {
         @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         
+        Headers.GET(resp);
         ValidSession.isValid(req, resp);
         HTML html = new HTML("Kosthold Logg");
         html.addStandard();
+        html.addJS("../../js/styrkeLogg.js");
         resp.getWriter().print(html.toString());
         
     }
@@ -36,13 +38,12 @@ public class Logg extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        StandardResponse sr = new StandardResponse(response);
-        PrintWriter out = sr.getWriter();
+        Headers.POST(response);
+        PrintWriter out = response.getWriter();
         String type = request.getParameter("type");
         /* stopper request hvis ugylid session */
         try {
-            ValidSession vs = new ValidSession(request, response);
-            int brukerId = vs.getBrukerId();
+            int brukerId = (int) request.getSession().getAttribute("brukerId");
             if (type.equals("getStyrkeLogg")) {
                 out.print(getLogg(brukerId, Integer.parseInt(request.getParameter("interval"))));
             } else if (type.equals("insertStyrkeLogg")) {

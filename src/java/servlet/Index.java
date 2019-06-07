@@ -6,15 +6,15 @@
 package servlet;
 
 import crypto.SessionLogin;
-import crypto.ValidSession;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.HTML;
-import util.http.StandardResponse;
+import util.http.Headers;
 
 /**
  *
@@ -67,11 +67,24 @@ public class Index extends HttpServlet {
         out.print(html.toString());
     }
 
+    private String encodeString(String url) {
+        String output = "";
+        String[] split = url.split("/");
+        for (String string : split) {
+            try {
+                output += URLEncoder.encode(string, "UTF-8") + "/";
+            } catch (Exception e) {
+                output += string + "/";
+            }
+        }
+        return output;
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        StandardResponse sr = new StandardResponse(response);
-        PrintWriter out = sr.getWriter();
+        Headers.POST(response);
+        PrintWriter out = response.getWriter();
         try {
             SessionLogin login = new SessionLogin(request.getParameter("epost"), request.getParameter("passord"), request.getSession());
             if (login.validLogin()) {
@@ -79,9 +92,12 @@ public class Index extends HttpServlet {
                 if (url == null) {
                     url = "";
                 }
-                sr.sendRedirect("https://logglogg.no" + url);
+                //out.println(url);
+                //out.println(URLDecoder.decode(url, "UTF-8"));
+
+                response.sendRedirect("https://logglogg.no" + encodeString(url));
             } else {
-                sr.sendRedirect("https://logglogg.no?feil=1");
+                response.sendRedirect("https://logglogg.no?feil=1");
             }
         } catch (Exception e) {
             e.printStackTrace(out);

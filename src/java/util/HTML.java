@@ -16,7 +16,7 @@ public class HTML {
     private final String title;
     private final ArrayList<String> css = new ArrayList<>();
     private final ArrayList<String> js = new ArrayList<>();
-    private String body = "";
+    private final ArrayList<String> body = new ArrayList<>();
 
     public HTML(String title) {
         this.title = title;
@@ -35,7 +35,7 @@ public class HTML {
     }
 
     public void addBody(String body) {
-        this.body = body;
+        this.body.add(body);
     }
 
     public void addStandard() {
@@ -50,15 +50,19 @@ public class HTML {
                 + "<html>"
                 + "<head>"
                 + "<title>" + title + "</title>"
-                + "<meta charset='UTF-8'>";
+                + "<meta charset='UTF-8'>"
+                + "<meta name='viewport' content='width=device-width' />";
 
         for (int i = 0; i < css.size(); i++) {
             output += css.get(i);
         }
 
         output += "</head>"
-                + "<body>"
-                + body;
+                + "<body>";
+
+        for (int x = 0; x < body.size(); x++) {
+            output += body.get(x);
+        }
 
         for (int j = 0; j < js.size(); j++) {
             output += js.get(j);

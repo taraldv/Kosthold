@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.HTML;
 import util.sql.Database;
-import util.http.StandardResponse;
+import util.http.Headers;
 
 /**
  *
@@ -24,10 +24,11 @@ public class Vekt extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+        Headers.GET(resp);
         ValidSession.isValid(req, resp);
-        HTML html = new HTML("Kosthold Logg");
+        HTML html = new HTML("Helse Vekt");
         html.addStandard();
+        html.addJS("../../js/helseVekt.js");
         resp.getWriter().print(html.toString());
 
     }
@@ -35,13 +36,13 @@ public class Vekt extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        StandardResponse sr = new StandardResponse(response);
-        PrintWriter out = sr.getWriter();
+        Headers.POST(response);
+        ValidSession.isValid(request, response);
+        PrintWriter out = response.getWriter();
         String type = request.getParameter("type");
 
         try {
-            ValidSession vs = new ValidSession(request, response);
-            int brukerId = vs.getBrukerId();
+            int brukerId = (int) request.getSession().getAttribute("brukerId");
             if (type.equals("getVektLogg")) {
                 out.print(getVektLogg(brukerId));
             } else if (type.equals("insertVekt")) {

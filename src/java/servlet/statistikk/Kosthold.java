@@ -14,21 +14,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.HTML;
 import util.sql.Database;
-import util.http.StandardResponse;
+import util.http.Headers;
 
 /**
  *
  * @author Tarald
  */
-public class Stats extends HttpServlet {
+public class Kosthold extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+        Headers.GET(resp);
         ValidSession.isValid(req, resp);
-        HTML html = new HTML("Kosthold Logg");
+        HTML html = new HTML("Statistikk Kosthold");
         html.addStandard();
         html.addJS("../../js/statistikk.js");
+        html.addJS("../../js/statistikkKosthold.js");
         resp.getWriter().print(html.toString());
 
     }
@@ -36,12 +38,12 @@ public class Stats extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        StandardResponse sr = new StandardResponse(response);
-        PrintWriter out = sr.getWriter();
+        Headers.POST(response);
+        ValidSession.isValid(request, response);
+        PrintWriter out = response.getWriter();
         String type = request.getParameter("type");
         try {
-            ValidSession vs = new ValidSession(request, response);
-            int brukerId = vs.getBrukerId();
+            int brukerId = (int) request.getSession().getAttribute("brukerId");
             if (type.equals("getStatsMål")) {
                 out.print(getStatsMål(brukerId));
             } else if (type.equals("getLogg")) {

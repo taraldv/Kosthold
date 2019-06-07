@@ -15,7 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.HTML;
 import util.sql.Database;
-import util.http.StandardResponse;
+import util.http.Headers;
+import util.sql.ResultSetContainer;
 
 /**
  *
@@ -26,9 +27,12 @@ public class Matvaretabellen extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+        Headers.GET(resp);
         ValidSession.isValid(req, resp);
         HTML html = new HTML("Kosthold Logg");
         html.addStandard();
+        html.addJS("../../js/kosthold.js");
+        html.addJS("../../js/kostholdMatvaretabellen.js");
         resp.getWriter().print(html.toString());
 
     }
@@ -36,13 +40,13 @@ public class Matvaretabellen extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        StandardResponse sr = new StandardResponse(response);
-        PrintWriter out = sr.getWriter();
+        Headers.POST(response);
+        ValidSession.isValid(request, response);
+        PrintWriter out =response.getWriter();
         String type = request.getParameter("type");
- 
+
         try {
-            ValidSession vs = new ValidSession(request, response);
-            int brukerId = vs.getBrukerId();
+            int brukerId = (int) request.getSession().getAttribute("brukerId");
             if (type.equals("insertMatvaretabell")) {
                 out.print(matvaretabellInsert(request.getParameterMap(), brukerId, request.getParameter("navn")));
             } else if (type.equals("getBrukerMatvaretabell")) {
@@ -54,10 +58,28 @@ public class Matvaretabellen extends HttpServlet {
 
                 out.print(updateMatvare(paras, brukerId, Integer.parseInt(request.getParameter("rowId"))));
                 //out.print(request.getParameter("rowData"));
+            } else if (type.equals("autocomplete")) {
+                out.print(autocomplete(brukerId, request.getParameter("string"), request.getParameter("table")));
             }
         } catch (Exception e) {
             e.printStackTrace(out);
         }
+    }
+
+    private String autocomplete(int brukerId, String matchingParameter, String whichTable) throws Exception {
+        String autocompleteQuery = "";
+        if (whichTable.equals("matvaretabellen")) {
+            autocompleteQuery = "SELECT matvare,matvareId FROM matvaretabellen WHERE matvare LIKE ? LIMIT 30;";
+        } else if (whichTable.equals("næringsinnhold")) {
+            autocompleteQuery = "SELECT næringsinnhold,benevning FROM benevninger WHERE næringsinnhold LIKE ? LIMIT 15;";
+        }
+        ResultSetContainer rsc = Database.multiQuery(autocompleteQuery, new Object[]{"%" + matchingParameter + "%"});
+        String completeJson = rsc.getJSON();
+        if (completeJson.length() > 2) {
+            String jsonAddition = "\"search\":\"" + matchingParameter + "\",";
+            completeJson = new StringBuffer(completeJson).insert(1, jsonAddition).toString();
+        }
+        return completeJson;
     }
 
     private int updateMatvare(Map<String, String[]> map, int brukerId, int matvareId) throws Exception {

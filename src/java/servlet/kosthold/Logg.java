@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.HTML;
 import util.sql.Database;
-import util.http.StandardResponse;
+import util.http.Headers;
 
 /**
  *
@@ -26,10 +26,12 @@ public class Logg extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("text/html;charset=UTF-8");
+
+        Headers.GET(resp);
         ValidSession.isValid(req, resp);
         HTML html = new HTML("Kosthold Logg");
         html.addStandard();
+        html.addJS("../../js/kosthold.js");
         html.addJS("../../js/kostholdLogg.js");
         resp.getWriter().print(html.toString());
 
@@ -38,16 +40,18 @@ public class Logg extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        StandardResponse sr = new StandardResponse(response);
-        PrintWriter out = sr.getWriter();
+        Headers.POST(response);
+        ValidSession.isValid(request, response);
+        PrintWriter out = response.getWriter();
         String type = request.getParameter("type");
         try {
-            ValidSession vs = new ValidSession(request, response);
-            int brukerId = vs.getBrukerId();
+            int brukerId = (int) request.getSession().getAttribute("brukerId");
             if (type.equals("getLoggTabell")) {
-                out.print(getLoggTabell(brukerId, 2));
+                out.print(getLoggTabell(brukerId, Integer.parseInt(request.getParameter("interval"))));
             } else if (type.equals("insertLogg")) {
                 out.print(insertLogg(request.getParameterMap(), brukerId));
+            } else if (type.equals("getMåltider")) {
+                out.print(Database.normalQuery("SELECT * FROM måltider WHERE brukerId = " + brukerId + ";").getJSON());
             } else if (type.equals("deleteLogg")) {
                 out.print(deleteLogg(brukerId, Integer.parseInt(request.getParameter("loggId"))));
             } else if (type.equals("updateLogg")) {
@@ -74,13 +78,13 @@ public class Logg extends HttpServlet {
         return Database.singleUpdateQuery(deleteQuery, new Object[]{loggId}, false);
     }
 
-    //henter logg fra de siste 31 dagene
+    //henter logg fra de siste x dagene
     private String getLoggTabell(int brukerId, int interval) throws Exception {
         String query = "SELECT loggId,m.matvare,ROUND(mengde) as mengde,ROUND(m.Kilokalorier/100*mengde) as kcal,dato FROM logg "
                 + "LEFT JOIN matvaretabellen m ON m.matvareId = logg.matvareId"
-                + " WHERE logg.brukerId = " + brukerId + " AND dato <= curdate() AND dato > DATE_SUB(curdate(),INTERVAL " + interval + " DAY)"
+                + " WHERE logg.brukerId = " + brukerId + " AND dato <= curdate() AND dato > DATE_SUB(curdate(),INTERVAL ? DAY)"
                 + " ORDER BY loggId DESC;";
-        return Database.normalQuery(query).getJSON();
+        return Database.multiQuery(query, new Object[]{interval}).getJSON();
     }
 
     private int insertLogg(Map<String, String[]> map, int brukerId) throws Exception {

@@ -54,7 +54,7 @@ public class SessionLogin {
             /* hvis epost aktivert & gyldig passord, set attributes */
             if (aktivert==1 && crypto.BCrypt.checkpw(passord, hashedPassword)) {
                 setSession(brukerId);
-                session.setMaxInactiveInterval(0);
+                //session.setMaxInactiveInterval(60);
                 return true;
             }
         }

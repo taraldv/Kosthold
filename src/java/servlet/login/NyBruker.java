@@ -12,7 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.http.StandardResponse;
+import util.http.Headers;
 
 /**
  *
@@ -23,11 +23,11 @@ public class NyBruker extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        StandardResponse sr = new StandardResponse(response);
-        PrintWriter out = sr.getWriter();
+        Headers.POST(response);
+        PrintWriter out = response.getWriter();
         try {
             if (false) {
-                sr.sendRedirect("https://kosthold.tarves.no/logginn/");
+                response.sendRedirect("https://logglogg.no/");
             } else {
                 out.print("epost i bruk eller ugyldig");
             }
