@@ -70,8 +70,8 @@ public class Turer extends HttpServlet {
     }
 
     private String getKondisjonTur(int brukerId) throws Exception {
-        String query = "SELECT * FROM kondisjonTurer "
-                + " WHERE s.brukerId = " + brukerId + ";";
+        String query = "SELECT kondisjonTurerId,navn FROM kondisjonTurer "
+                + " WHERE brukerId = " + brukerId + ";";
         return Database.normalQuery(query).getJSON();
     }
 

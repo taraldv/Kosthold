@@ -49,11 +49,16 @@ public class Logg extends HttpServlet {
             if (type.equals("getKondisjonLogg")) {
                 out.print(getKondisjonLogg(brukerId));
             } else if (type.equals("insertKondisjonLogg")) {
-                out.print(insertKondisjonLogg(brukerId, request.getParameterMap()));
-            } else if (type.equals("getKondisjonTur")) {
-                out.print(getKondisjonTur(brukerId));
+                out.print(insertKondisjonLogg(brukerId,
+                        Integer.parseInt(request.getParameter("tidSekunder")),
+                        Integer.parseInt(request.getParameter("kondisjonTurerId"))));
             } else if (type.equals("deleteKondisjonLogg")) {
                 out.print(deleteKondisjonLogg(brukerId, Integer.parseInt(request.getParameter("kondisjonLoggId"))));
+            } else if (type.equals("updateKondisjonLogg")) {
+                int loggId = Integer.parseInt(request.getParameter("rowId"));
+                int tidSekunder = Integer.parseInt(request.getParameter("tidSekunder"));
+                String dato = request.getParameter("dato");
+                out.print(updateKondisjonLogg(brukerId, loggId, tidSekunder, dato));
             }
         } catch (Exception e) {
             e.printStackTrace(out);
@@ -61,38 +66,28 @@ public class Logg extends HttpServlet {
 
     }
 
+    private int updateKondisjonLogg(int brukerId, int kondisjonLoggId, int tidSekunder, String dato) throws Exception {
+        String updateQuery = "UPDATE kondisjonLogg SET tidSekunder = ?, dato = ? WHERE kondisjonLoggId = ? AND brukerId = " + brukerId + ";";
+        Object[] vars = {tidSekunder, dato, kondisjonLoggId};
+        return Database.singleUpdateQuery(updateQuery, vars, false);
+    }
+
     private int deleteKondisjonLogg(int brukerId, int kondisjonLoggId) throws Exception {
         String query = "DELETE FROM kondisjonLogg WHERE brukerId = ? AND kondisjonLoggId = ?;";
         return Database.singleUpdateQuery(query, new Object[]{brukerId, kondisjonLoggId}, false);
     }
 
-    private String getKondisjonTur(int brukerId) throws Exception {
-        String query = "SELECT * FROM kondisjonLogg "
-                + " WHERE s.brukerId = " + brukerId + ";";
-        return Database.normalQuery(query).getJSON();
-    }
-
     private String getKondisjonLogg(int brukerId) throws Exception {
-        String query = "SELECT * FROM kondisjonLogg "
-                + " WHERE s.brukerId = " + brukerId + ";";
+        String query = "SELECT l.kondisjonLoggId,t.navn,l.dato,l.tidSekunder FROM kondisjonLogg l "
+                + "LEFT JOIN kondisjonTurer t ON t.kondisjonTurerId = l.kondisjonTurerId"
+                + " WHERE l.brukerId = " + brukerId
+                + " ORDER BY l.dato DESC;";
         return Database.normalQuery(query).getJSON();
     }
 
-    private String insertKondisjonLogg(int brukerId, Map<String, String[]> map) throws Exception {
-        //inneholder: [[type][øvelseId,øvelseId...][kg,kg...][reps,reps...]]
-        String[][] arr = map.values().toArray(new String[0][0]);
-
-        return Arrays.deepToString(arr);
-
-        /* String baseline = "INSERT INTO styrkeLogg(dato,styrkeId,vekt,reps,brukerId) VALUES ";
-        String row = "";
-        for (int i = 0; i < vars.length / 3; i++) {
-            if (i != 0) {
-                row += ",";
-            }
-            row += "(CURDATE(),?,?,?," + brukerId + ")";
-        }
-        //return baseline + row + " , " + Arrays.toString(vars) + " , " + Arrays.deepToString(arr);
-        return Database.singleUpdateQuery(baseline + row, vars, false);*/
+    private int insertKondisjonLogg(int brukerId, int tidSekunder, int kondisjonTurerId) throws Exception {
+        Object[] vars = {kondisjonTurerId, tidSekunder};
+        String query = "INSERT INTO kondisjonLogg(dato,kondisjonTurerId,tidSekunder,brukerId) VALUES (CURDATE(),?,?," + brukerId + ")";
+        return Database.singleUpdateQuery(query, vars, false);
     }
 }
