@@ -6,3 +6,6 @@
 /src/conf*
 /src/java/temp/
 build.xml
+*.css
+*.js
+*.sql

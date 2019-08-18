@@ -116,17 +116,19 @@ public class GlemtPassord extends HttpServlet {
         Process process = processBuilder.start();
         return process.waitFor();
     }*/
-
     private int send(String epost, String token) throws Exception {
         ProcessBuilder processBuilder = new ProcessBuilder();
 
         String link = "https://logglogg.no/logginn/nytt_passord/";
-
-        String subject = "\"Få nytt passord på tarves.no\"";
+        String user = "noreply";
+        String subject = "\"Få nytt passord på logglogg.no\"";
         String sender = "noreply@logglogg.no";
         String body = getMailBody(link, token);
-        String command = "mail -a \"Content-Type: text/html\" -s " + subject + " -r "
-                + sender + " " + epost + " <<< " + body;
+        String command = "mail -a \"Content-Type: text/html\""
+                + " -s " + subject
+                + " -r " + sender
+                //+ " -u " + user
+                + " " + epost + " <<< " + body;
 
         processBuilder.command("bash", "-c", command);
         Process process = processBuilder.start();

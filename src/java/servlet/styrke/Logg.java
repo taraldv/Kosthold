@@ -23,18 +23,18 @@ import util.sql.ResultSetContainer;
 
 public class Logg extends HttpServlet {
 
-        @Override
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        
+
         Headers.GET(resp);
         ValidSession.isValid(req, resp);
         HTML html = new HTML("Kosthold Logg");
         html.addStandard();
         html.addJS("../../js/styrkeLogg.js");
         resp.getWriter().print(html.toString());
-        
+
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
