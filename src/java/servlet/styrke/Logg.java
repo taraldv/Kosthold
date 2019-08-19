@@ -73,7 +73,8 @@ public class Logg extends HttpServlet {
     }
 
     private String getØvelser(int brukerId) throws Exception {
-        String query = "SELECT navn,styrkeId FROM styrkeØvelse WHERE brukerId = ?;";
+        String query = "SELECT styrkeId,navn FROM styrkeØvelse WHERE brukerId = ?"
+                + " ORDER BY navn;";
         return Database.multiQuery(query, new Object[]{brukerId}).getJSON();
     }
 
