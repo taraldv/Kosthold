@@ -56,11 +56,23 @@ public class Turer extends HttpServlet {
                         Integer.parseInt(request.getParameter("mohSlutt"))));
             } else if (type.equals("deleteKondisjonTur")) {
                 out.print(deleteKondisjonTur(brukerId, Integer.parseInt(request.getParameter("kondisjonTurerId"))));
+            } else if (type.equals("updateKondisjonTur")) {
+                out.print(updateKondisjonTur(brukerId,
+                        Integer.parseInt(request.getParameter("rowId")),
+                        Double.parseDouble(request.getParameter("km")),
+                        Integer.parseInt(request.getParameter("mohStart")),
+                        Integer.parseInt(request.getParameter("mohSlutt")),
+                        request.getParameter("navn")));
             }
         } catch (Exception e) {
             e.printStackTrace(out);
         }
 
+    }
+
+    private int updateKondisjonTur(int brukerId, int kondisjonTurerId, double km, int mohStart, int mohSlutt, String navn) throws Exception {
+        String query = "UPDATE kondisjonTurer SET navn = ?, km = ?, mohStart = ?, mohSlutt = ? WHERE kondisjonTurerId = ? AND brukerId = " + brukerId + ";";
+        return Database.singleUpdateQuery(query, new Object[]{navn, km, mohStart, mohSlutt, kondisjonTurerId}, false);
     }
 
     //brukerId brukt på annen måte her? må bli mer konsistens
@@ -70,7 +82,7 @@ public class Turer extends HttpServlet {
     }
 
     private String getKondisjonTur(int brukerId) throws Exception {
-        String query = "SELECT kondisjonTurerId,navn FROM kondisjonTurer "
+        String query = "SELECT kondisjonTurerId,navn,km,mohStart,mohSlutt FROM kondisjonTurer "
                 + " WHERE brukerId = " + brukerId + ";";
         return Database.normalQuery(query).getJSON();
     }
