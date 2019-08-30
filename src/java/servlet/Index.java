@@ -6,9 +6,15 @@
 package servlet;
 
 import crypto.SessionLogin;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
+import java.util.Calendar;
+import java.util.Enumeration;
+import java.util.GregorianCalendar;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -97,6 +103,27 @@ public class Index extends HttpServlet {
 
                 response.sendRedirect("https://logglogg.no" + encodeString(url));
             } else {
+                Calendar date = new GregorianCalendar();
+                File log = new File("/home/tarves/passwordFail.log");
+                String userAgent = request.getHeader("user-agent");
+                String epost = request.getParameter("epost");
+                String time = Long.toString(date.getTimeInMillis());
+                String remoteHost = request.getRemoteHost();
+                String remotePort = Integer.toString(request.getRemotePort());
+                BufferedWriter bw = new BufferedWriter(new FileWriter(log, false));
+                bw.write("epost: "+epost);
+                bw.newLine();
+                bw.write("remoteHost: "+remoteHost);
+                bw.newLine();
+                bw.write("remotePort: "+remotePort);
+                bw.newLine();
+                 bw.write("userAgent: "+userAgent);
+                bw.newLine();
+                 bw.write("time: "+time);
+                bw.newLine();
+               
+                
+                bw.close();
                 response.sendRedirect("https://logglogg.no?feil=1");
             }
         } catch (Exception e) {
