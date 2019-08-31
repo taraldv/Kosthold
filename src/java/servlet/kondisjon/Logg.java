@@ -6,16 +6,17 @@
 package servlet.kondisjon;
 
 import crypto.ValidSession;
+import html.Div;
+import html.Form;
+import html.Input;
+import html.Select;
+import html.StandardHtml;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.HTML;
 import util.http.Headers;
 import util.sql.Database;
 
@@ -25,16 +26,32 @@ import util.sql.Database;
  */
 public class Logg extends HttpServlet {
 
+    // private final String 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         Headers.GET(resp);
         ValidSession.isValid(req, resp);
-        HTML html = new HTML("Kondisjon Logg");
-        html.addStandard();
-        html.addJS("../../js/kondisjonLogg.js");
-        resp.getWriter().print(html.toString());
+        PrintWriter out = resp.getWriter();
+        try {
+            int brukerId = (int) req.getSession().getAttribute("brukerId");
+            StandardHtml html = new StandardHtml("Kondisjon Logg");
+            Form form = getKondisjonLoggForm(brukerId);
+            html.addBodyContent(form.toString());
+            //Form.get(brukerId));
+            out.print(html.toString());
+        } catch (Exception e) {
+            e.printStackTrace(out);
+        }
+    }
 
+    private Form getKondisjonLoggForm(int brukerId) throws Exception {
+        Form form = new Form("kondisjonLoggForm", "form");
+        form.addElement(new Select("kondisjonTurerId", "kondisjonTurer", brukerId, "kondisjonLoggSelect", "select"));
+        form.addElement(new Input("minutter", "minutter", "number", "kondisjonLoggInputMinutter", "input integer"));
+        form.addElement(new Input("sekunder", "sekunder", "number", "kondisjonLoggInputSekunder", "input integer"));
+        form.addElement(new Div("submit", "kondisjonLoggSubmit", "submit"));
+        return form;
     }
 
     @Override

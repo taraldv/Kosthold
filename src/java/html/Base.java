@@ -16,15 +16,19 @@ public abstract class Base {
     private final String viewport = "<meta name='viewport' content='width=device-width'/>";
     private final String mobileCSS;
     private final String normalCSS;
-    private final String body;
+    private String body;
     private final String js;
 
-    public Base(String title, String mobileCSS, String normalCSS, String js, String body) {
+    public Base(String title, String mobileCSS, String normalCSS, String js) {
         this.title = "<title>" + title + "</title>";
         this.mobileCSS = "<link rel='stylesheet' media='(max-width:600px)' type='text/css' href='" + mobileCSS + "'>";
         this.normalCSS = "<link rel='stylesheet' media='(min-width:600px)' type='text/css' href='" + normalCSS + "'>";
         this.js = "<script type='text/javascript' src='" + js + "'></script>";
-        this.body = body;
+        body = new LeftNavigation().toString();
+    }
+
+    public void addBodyContent(String content) {
+        body += content;
     }
 
     @Override
