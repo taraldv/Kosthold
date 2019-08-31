@@ -6,13 +6,16 @@
 package servlet.styrke;
 
 import crypto.ValidSession;
+import html.Div;
+import html.Form;
+import html.Input;
+import html.StandardHtml;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.HTML;
 import util.sql.Database;
 import util.http.Headers;
 
@@ -23,11 +26,31 @@ public class Øvelser extends HttpServlet {
 
         Headers.GET(resp);
         ValidSession.isValid(req, resp);
-        HTML html = new HTML("Styrke Øvelser");
-        html.addStandard();
-        html.addJS("../../js/styrkeØvelser.js");
-        resp.getWriter().print(html.toString());
+        PrintWriter out = resp.getWriter();
+        try {
+            StandardHtml html = new StandardHtml("Styrke Øvelser");
+            Form form = getStyrkeØvelserForm();
+            Div div = new Div("", "styrkeØvelserTabell", "div-table");
+            Div containerDiv = new Div(form.toString() + div.toString(), "div-container");
+            html.addBodyContent(containerDiv.toString());
+            String tableArr = "['getØvelser','styrkeØvelserTabell','/styrke/øvelser/']";
+            String deleteArr = "['deleteStyrkeØvelser','styrkeId','/styrke/øvelser/']";
+            html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + ");");
+            String paramArray = "['navn']";
+            html.addBodyJS("insertRequest('styrkeØvelseSubmit','insertStyrkeØvelser','/styrke/øvelser/'," + paramArray + "," + tableArr + "," + deleteArr + ");");
+            //Form.get(brukerId));
+            out.print(html.toString());
+        } catch (Exception e) {
+            e.printStackTrace(out);
+        }
 
+    }
+
+    private Form getStyrkeØvelserForm() {
+        Form form = new Form("styrkeØvelseForm", "div-form");
+        form.addElement(new Input("øvelse navn", "øvelse navn", "text", "styrkeØvelseInputNavn", "input"));
+        form.addElement(new Div("submit", "styrkeØvelseSubmit", "submit"));
+        return form;
     }
 
     @Override
@@ -45,6 +68,8 @@ public class Øvelser extends HttpServlet {
                 out.print(updateStyrkeØvelser(brukerId, Integer.parseInt(request.getParameter("rowId")), request.getParameter("navn")));
             } else if (type.equals("deleteStyrkeØvelser")) {
                 out.print(deleteStyrkeØvelser(brukerId, Integer.parseInt(request.getParameter("styrkeId"))));
+            } else if (type.equals("getØvelser")) {
+                out.print(getØvelser(brukerId));
             }
         } catch (Exception e) {
             e.printStackTrace(out);
@@ -64,5 +89,10 @@ public class Øvelser extends HttpServlet {
     private int insertStyrkeØvelser(int brukerId, String navn) throws Exception {
         String query = "INSERT INTO styrkeØvelse (brukerId,navn) VALUES (" + brukerId + ",?);";
         return Database.singleUpdateQuery(query, new Object[]{navn}, false);
+    }
+
+    private String getØvelser(int brukerId) throws Exception {
+        String query = "SELECT styrkeId,navn FROM styrkeØvelse WHERE brukerId = " + brukerId + " ORDER BY navn;";
+        return Database.normalQuery(query).getJSON();
     }
 }

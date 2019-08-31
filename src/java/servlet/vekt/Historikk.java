@@ -28,7 +28,7 @@ public class Historikk extends HttpServlet {
         ValidSession.isValid(req, resp);
         PrintWriter out = resp.getWriter();
         try {
-            StandardHtml html = new StandardHtml("Kondisjon Logg");
+            StandardHtml html = new StandardHtml("Vekt Historikk");
             Div div = new Div("", "vektLoggTabell", "div-table");
             Div containerDiv = new Div(div.toString(), "div-container");
             html.addBodyContent(containerDiv.toString());

@@ -7,9 +7,6 @@ package servlet.kondisjon;
 
 import crypto.ValidSession;
 import html.Div;
-import html.Form;
-import html.Input;
-import html.Select;
 import html.StandardHtml;
 import java.io.IOException;
 import java.io.PrintWriter;

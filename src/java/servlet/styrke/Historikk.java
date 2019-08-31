@@ -6,12 +6,14 @@
 package servlet.styrke;
 
 import crypto.ValidSession;
+import html.Div;
+import html.StandardHtml;
 import java.io.IOException;
+import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.HTML;
 import util.http.Headers;
 
 /**
@@ -19,15 +21,25 @@ import util.http.Headers;
  * @author
  */
 public class Historikk extends HttpServlet {
-           @Override
+
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        
+
         Headers.GET(resp);
         ValidSession.isValid(req, resp);
-        HTML html = new HTML("Kosthold Logg");
-        html.addStandard();
-        html.addJS("../../js/styrkeHistorikk.js");
-        resp.getWriter().print(html.toString());
-        
+        PrintWriter out = resp.getWriter();
+        try {
+            StandardHtml html = new StandardHtml("Styrke Historikk");
+            Div div = new Div("", "styrkeHistorikkTabell", "div-table");
+            Div containerDiv = new Div(div.toString(), "div-container");
+            html.addBodyContent(containerDiv.toString());
+            String tableArr = "['getStyrkeLogg','styrkeHistorikkTabell','/styrke/logg/']";
+            String deleteArr = "['deleteStyrkeLogg','styrkeLoggId','/styrke/logg/']";
+            html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + ",31);");
+            out.print(html.toString());
+        } catch (Exception e) {
+            e.printStackTrace(out);
+        }
+
     }
 }

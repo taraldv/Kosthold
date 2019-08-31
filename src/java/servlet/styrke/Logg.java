@@ -5,21 +5,20 @@
  */
 package servlet.styrke;
 
-import crypto.SessionLogin;
 import crypto.ValidSession;
+import html.Div;
+import html.Form;
+import html.Input;
+import html.Select;
+import html.StandardHtml;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.HTML;
 import util.sql.Database;
 import util.http.Headers;
-import util.sql.ResultSetContainer;
 
 public class Logg extends HttpServlet {
 
@@ -28,11 +27,34 @@ public class Logg extends HttpServlet {
 
         Headers.GET(resp);
         ValidSession.isValid(req, resp);
-        HTML html = new HTML("Kosthold Logg");
-        html.addStandard();
-        html.addJS("../../js/styrkeLogg.js");
-        resp.getWriter().print(html.toString());
+        PrintWriter out = resp.getWriter();
+        try {
+            int brukerId = (int) req.getSession().getAttribute("brukerId");
+            StandardHtml html = new StandardHtml("Styrke Logg");
+            Form form = getKondisjonLoggForm(brukerId);
+            Div div = new Div("", "styrkeLoggTabell", "div-table");
+            Div containerDiv = new Div(form.toString() + div.toString(), "div-container");
+            html.addBodyContent(containerDiv.toString());
+            String tableArr = "['getStyrkeLogg','styrkeLoggTabell','/styrke/logg/']";
+            String deleteArr = "['deleteStyrkeLogg','styrkeLoggId','/styrke/logg/']";
+            html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + ",2);");
+            String paramArray = "['styrkeId','vekt','reps']";
+            html.addBodyJS("insertRequest('styrkeLoggSubmit','insertStyrkeLogg','/styrke/logg/'," + paramArray + "," + tableArr + "," + deleteArr + ",7);");
+            //Form.get(brukerId));
+            out.print(html.toString());
+        } catch (Exception e) {
+            e.printStackTrace(out);
+        }
 
+    }
+
+    private Form getKondisjonLoggForm(int brukerId) throws Exception {
+        Form form = new Form("styrkeLoggForm", "div-form");
+        form.addElement(new Select("styrkeId", "styrkeØvelse", brukerId, "styrkeLoggSelect", "select"));
+        form.addElement(new Input("kilo", "kilo", "number", "styrkeLoggInputKilo", "input"));
+        form.addElement(new Input("reps", "reps", "number", "styrkeLoggInputReps", "input"));
+        form.addElement(new Div("submit", "styrkeLoggSubmit", "submit"));
+        return form;
     }
 
     @Override
@@ -47,10 +69,12 @@ public class Logg extends HttpServlet {
             if (type.equals("getStyrkeLogg")) {
                 out.print(getLogg(brukerId, Integer.parseInt(request.getParameter("interval"))));
             } else if (type.equals("insertStyrkeLogg")) {
-                out.print(insertStyrkeLogg(brukerId, request.getParameterMap()));
-            } else if (type.equals("getØvelser")) {
-                out.print(getØvelser(brukerId));
-            } else if (type.equals("deleteStyrkeLogg")) {
+                out.print(insertStyrkeLogg(brukerId,
+                        Integer.parseInt(request.getParameter("styrkeId")),
+                        Double.parseDouble(request.getParameter("vekt")),
+                        Integer.parseInt(request.getParameter("reps"))
+                ));
+            }  else if (type.equals("deleteStyrkeLogg")) {
                 out.print(deleteStyrkeLogg(brukerId, Integer.parseInt(request.getParameter("styrkeLoggId"))));
             }
         } catch (Exception e) {
@@ -72,52 +96,13 @@ public class Logg extends HttpServlet {
         return Database.multiQuery(query, new Object[]{interval}).getJSON();
     }
 
-    private String getØvelser(int brukerId) throws Exception {
-        String query = "SELECT styrkeId,navn FROM styrkeØvelse WHERE brukerId = ?"
-                + " ORDER BY navn;";
-        return Database.multiQuery(query, new Object[]{brukerId}).getJSON();
+ 
+
+
+    private int insertStyrkeLogg(int brukerId, int styrkeId, double vekt, int reps) throws Exception {
+        Object[] vars = {styrkeId, vekt, reps};
+        String query = "INSERT INTO styrkeLogg(dato,styrkeId,vekt,reps,brukerId) VALUES (CURDATE(),?,?,?," + brukerId + ")";
+        return Database.singleUpdateQuery(query, vars, false);
     }
 
-    //kopiert fra forrige trening.java
-    private Object[] merge(String[][] arr) {
-        HashSet<String> hash = new HashSet<>();
-        hash.addAll(Arrays.asList(arr[1]));
-        Object[] vars = new Object[hash.size() * 3];
-        int x = 0;
-        for (String string : hash) {
-            int reps = 0;
-            double kg = 0;
-            int id = Integer.parseInt(string);
-            for (int i = 0; i < arr[1].length; i++) {
-                if (id == Integer.parseInt(arr[1][i])) {
-                    int tempReps = Integer.parseInt(arr[3][i]);
-                    double tempKg = Double.parseDouble(arr[2][i]);
-                    reps += tempReps;
-                    kg += (tempKg * tempReps);
-                }
-            }
-            vars[x * 3] = id;
-            vars[(x * 3) + 1] = kg / reps;
-            vars[(x * 3) + 2] = reps;
-            x++;
-        }
-        return vars;
-    }
-
-    private int insertStyrkeLogg(int brukerId, Map<String, String[]> map) throws Exception {
-        //inneholder: [[type][øvelseId,øvelseId...][kg,kg...][reps,reps...]]
-        String[][] arr = map.values().toArray(new String[0][0]);
-        Object[] vars = merge(arr);
-
-        String baseline = "INSERT INTO styrkeLogg(dato,styrkeId,vekt,reps,brukerId) VALUES ";
-        String row = "";
-        for (int i = 0; i < vars.length / 3; i++) {
-            if (i != 0) {
-                row += ",";
-            }
-            row += "(CURDATE(),?,?,?," + brukerId + ")";
-        }
-        //return baseline + row + " , " + Arrays.toString(vars) + " , " + Arrays.deepToString(arr);
-        return Database.singleUpdateQuery(baseline + row, vars, false);
-    }
 }
