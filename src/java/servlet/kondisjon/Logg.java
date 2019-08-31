@@ -48,8 +48,8 @@ public class Logg extends HttpServlet {
     private Form getKondisjonLoggForm(int brukerId) throws Exception {
         Form form = new Form("kondisjonLoggForm", "form");
         form.addElement(new Select("kondisjonTurerId", "kondisjonTurer", brukerId, "kondisjonLoggSelect", "select"));
-        form.addElement(new Input("minutter", "minutter", "number", "kondisjonLoggInputMinutter", "input integer"));
-        form.addElement(new Input("sekunder", "sekunder", "number", "kondisjonLoggInputSekunder", "input integer"));
+        form.addElement(new Input("minutter", "minutter", "number", "kondisjonLoggInputMinutter", "input"));
+        form.addElement(new Input("sekunder", "sekunder", "number", "kondisjonLoggInputSekunder", "input"));
         form.addElement(new Div("submit", "kondisjonLoggSubmit", "submit"));
         return form;
     }
