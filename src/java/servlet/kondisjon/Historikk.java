@@ -44,5 +44,7 @@ public class Historikk extends HttpServlet {
             e.printStackTrace(out);
         }
     }
+    
+   
 
 }

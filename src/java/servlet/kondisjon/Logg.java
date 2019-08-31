@@ -38,13 +38,13 @@ public class Logg extends HttpServlet {
             StandardHtml html = new StandardHtml("Kondisjon Logg");
             Form form = getKondisjonLoggForm(brukerId);
             Div div = new Div("", "kondisjonLoggTabell", "div-table");
-            Div containerDiv = new Div(form.toString()+div.toString(), "div-container");
+            Div containerDiv = new Div(form.toString() + div.toString(), "div-container");
             html.addBodyContent(containerDiv.toString());
             String tableArr = "['getKondisjonLogg','kondisjonLoggTabell','/kondisjon/logg/']";
             String deleteArr = "['deleteKondisjonLogg','kondisjonLoggId','/kondisjon/logg/']";
             html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + ",7);");
             String paramArray = "['kondisjonTurerId','tidMinutter','tidSekunder']";
-            html.addBodyJS("insertRequest('kondisjonLoggSubmit','insertKondisjonLogg','/kondisjon/logg/'," + paramArray + ");");
+            html.addBodyJS("insertRequest('kondisjonLoggSubmit','insertKondisjonLogg','/kondisjon/logg/'," + paramArray + "," + tableArr + "," + deleteArr + ",7);");
             //Form.get(brukerId));
             out.print(html.toString());
         } catch (Exception e) {

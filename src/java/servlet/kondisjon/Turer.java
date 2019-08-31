@@ -6,6 +6,11 @@
 package servlet.kondisjon;
 
 import crypto.ValidSession;
+import html.Div;
+import html.Form;
+import html.Input;
+import html.Select;
+import html.StandardHtml;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
@@ -30,11 +35,35 @@ public class Turer extends HttpServlet {
 
         Headers.GET(resp);
         ValidSession.isValid(req, resp);
-        HTML html = new HTML("Kondisjon Turer");
-        html.addStandard();
-        html.addJS("../../js/kondisjonTurer.js");
-        resp.getWriter().print(html.toString());
+        PrintWriter out = resp.getWriter();
+        try {
+            StandardHtml html = new StandardHtml("Kondisjon Turer");
+            Form form = getKondisjonTurForm();
+            Div div = new Div("", "kondisjonTurTabell", "div-table");
+            Div containerDiv = new Div(form.toString() + div.toString(), "div-container");
+            html.addBodyContent(containerDiv.toString());
+            String tableArr = "['getKondisjonTur','kondisjonTurTabell','/kondisjon/turer/']";
+            String deleteArr = "['deleteKondisjonTur','kondisjonTurerId','/kondisjon/turer/']";
+            html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + ");");
+            String paramArray = "['navn','km','mohStart','mohSlutt']";
+            html.addBodyJS("insertRequest('kondisjonTurSubmit','insertKondisjonTur','/kondisjon/turer/'," + paramArray + "," + tableArr + "," + deleteArr + ");");
+            //Form.get(brukerId));
+            out.print(html.toString());
+        } catch (Exception e) {
+            e.printStackTrace(out);
+        }
 
+    }
+
+    private Form getKondisjonTurForm() {
+        Form form = new Form("kondisjonTurForm", "div-form");
+        // new Input(placeholder, label, inputType, elementId, elementClass)
+        form.addElement(new Input("tur navn", "tur navn", "text", "kondisjonTurInputNavn", "input"));
+        form.addElement(new Input("kilometer", "kilometer", "number", "kondisjonTurInputKm", "input"));
+        form.addElement(new Input("moh start", "moh start", "number", "kondisjonTurInputMohStart", "input"));
+        form.addElement(new Input("moh slutt", "moh slutt", "number", "kondisjonTurInputMohSlutt", "input"));
+        form.addElement(new Div("submit", "kondisjonTurSubmit", "submit"));
+        return form;
     }
 
     @Override

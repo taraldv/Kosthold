@@ -6,6 +6,11 @@
 package servlet.vekt;
 
 import crypto.ValidSession;
+import html.Div;
+import html.Form;
+import html.Input;
+import html.Select;
+import html.StandardHtml;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -26,11 +31,31 @@ public class Logg extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Headers.GET(resp);
         ValidSession.isValid(req, resp);
-        HTML html = new HTML("Vekt Logg");
-        html.addStandard();
-        html.addJS("../../js/helseVekt.js");
-        resp.getWriter().print(html.toString());
+        PrintWriter out = resp.getWriter();
+        try {
+            StandardHtml html = new StandardHtml("Kondisjon Logg");
+            Form form = getKondisjonLoggForm();
+            Div div = new Div("", "vektLoggTabell", "div-table");
+            Div containerDiv = new Div(form.toString() + div.toString(), "div-container");
+            html.addBodyContent(containerDiv.toString());
+            String tableArr = "['getVektLogg','vektLoggTabell','/vekt/logg/']";
+            String deleteArr = "['deleteVekt','vektId','/vekt/logg/']";
+            html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + ",31);");
+            String paramArray = "['kilo']";
+            html.addBodyJS("insertRequest('vektLoggSubmit','insertVekt','/vekt/logg/'," + paramArray + "," + tableArr + "," + deleteArr + ",7);");
+            //Form.get(brukerId));
+            out.print(html.toString());
+        } catch (Exception e) {
+            e.printStackTrace(out);
+        }
 
+    }
+    
+      private Form getKondisjonLoggForm()  {
+        Form form = new Form("kondisjonLoggForm", "div-form");
+        form.addElement(new Input("kilo", "kilo", "number", "vektLoggInputKilo", "input"));
+        form.addElement(new Div("submit", "vektLoggSubmit", "submit"));
+        return form;
     }
 
     @Override
@@ -44,7 +69,7 @@ public class Logg extends HttpServlet {
         try {
             int brukerId = (int) request.getSession().getAttribute("brukerId");
             if (type.equals("getVektLogg")) {
-                out.print(getVektLogg(brukerId));
+                out.print(getVektLogg(brukerId, Integer.parseInt(request.getParameter("interval"))));
             } else if (type.equals("insertVekt")) {
                 Double kiloVekt = Double.parseDouble(request.getParameter("kilo"));
                 out.print(insertVektLogg(kiloVekt, brukerId));
@@ -76,9 +101,11 @@ public class Logg extends HttpServlet {
         return Database.singleUpdateQuery(deleteQuery, vars, false);
     }
 
-    private String getVektLogg(int brukerId) throws Exception {
-        String målQuery = "SELECT vektId,dato,kilo FROM vekt WHERE brukerId =" + brukerId + ";";
-        return Database.normalQuery(målQuery).getJSON();
+    private String getVektLogg(int brukerId, int interval) throws Exception {
+        String query = "SELECT vektId,DATE_FORMAT(v.dato,'%d.%m.%y') as dato,kilo FROM vekt v "
+                + " WHERE brukerId = " + brukerId + " AND v.dato <= curdate() AND v.dato > DATE_SUB(curdate(),INTERVAL ? DAY)"
+                + " ORDER BY v.dato DESC;";
+        return Database.multiQuery(query, new Object[]{interval}).getJSON();
     }
 
     private int insertVektLogg(Double kiloVekt, int brukerId) throws Exception {
