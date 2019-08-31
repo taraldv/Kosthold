@@ -20,12 +20,12 @@ public abstract class Base {
     private final String js;
     private String pureJS = "<script type='text/javascript'>";
 
-    public Base(String title, String mobileCSS, String normalCSS, String js) {
+    public Base(String title, String mobileCSS, String normalCSS, String js, String body) {
         this.title = "<title>" + title + "</title>";
         this.mobileCSS = "<link rel='stylesheet' media='(max-width:600px)' type='text/css' href='" + mobileCSS + "'>";
         this.normalCSS = "<link rel='stylesheet' media='(min-width:600px)' type='text/css' href='" + normalCSS + "'>";
         this.js = "<script type='text/javascript' src='" + js + "'></script>";
-        body = new LeftNavigation().toString();
+        this.body = body;
     }
 
     public void addBodyContent(String content) {

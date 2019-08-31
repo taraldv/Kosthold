@@ -9,14 +9,13 @@ package html;
  *
  * @author
  */
-public class StandardHtml extends Base {
+public class IndexHtml extends Base {
 
-    public StandardHtml(String title) {
+    public IndexHtml(String title) {
         super(title,
                 "../../css/newMobile.css",
                 "../../css/new.css",
                 "../../js/LoggLogg.js",
-                new LeftNavigation().toString());
+                "");
     }
-
 }

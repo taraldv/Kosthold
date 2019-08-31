@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package servlet.login;
+package servlet;
 
 import crypto.ResetToken;
 import java.io.BufferedWriter;
