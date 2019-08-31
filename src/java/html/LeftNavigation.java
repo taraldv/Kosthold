@@ -63,7 +63,7 @@ public class LeftNavigation extends Element {
 
     @Override
     public String toString() {
-        String output = "<div>";
+        String output = "<div " + getInfoString() + ">";
 
         for (Element element : elements) {
             if (element instanceof Text) {
