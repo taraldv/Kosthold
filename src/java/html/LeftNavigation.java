@@ -20,12 +20,7 @@ public class LeftNavigation extends Element {
 
     public LeftNavigation() {
         super("nav-left");
-
-        List helseList = new List(listClass);
-        helseList.addElement(new Anchor("Vekt", "/helse/vekt/", anchorClass));
-        elements.add(new Text("h2", "Helse", textClass));
-        elements.add(helseList);
-
+        
         List statistikkList = new List(listClass);
         statistikkList.addElement(new Anchor("Kosthold", "/statistikk/kosthold/", anchorClass));
         elements.add(new Text("h2", "Statistikk", textClass));
@@ -53,6 +48,12 @@ public class LeftNavigation extends Element {
         elements.add(new Text("h2", "Kondisjon", textClass));
         elements.add(kondisjonList);
 
+        List helseList = new List(listClass);
+        helseList.addElement(new Anchor("Logg", "/vekt/logg/", anchorClass));
+        helseList.addElement(new Anchor("Historikk", "/vekt/historikk/", anchorClass));
+        elements.add(new Text("h2", "Vekt", textClass));
+        elements.add(helseList);
+        
         List adminList = new List(listClass);
         adminList.addElement(new Anchor("Profil", "/admin/profil/", anchorClass));
         adminList.addElement(new Anchor("Logg ut", "/admin/loggut/", anchorClass));

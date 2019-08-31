@@ -18,7 +18,7 @@ public abstract class Base {
     private final String normalCSS;
     private String body;
     private final String js;
-    private String pureJS;
+    private String pureJS = "<script type='text/javascript'>";
 
     public Base(String title, String mobileCSS, String normalCSS, String js) {
         this.title = "<title>" + title + "</title>";
@@ -33,12 +33,12 @@ public abstract class Base {
     }
 
     public void addBodyJS(String bodyJS) {
-        pureJS = "<script type='text/javascript'>" + bodyJS + "</script>";
+        pureJS += bodyJS;
     }
 
     @Override
     public String toString() {
-        return doctype + "<head>" + mobileCSS + normalCSS + viewport + title + "</head><body>" + body + js + pureJS + "</body></html>";
+        return doctype + "<head>" + mobileCSS + normalCSS + viewport + title + "</head><body>" + body + js + pureJS + "</script>" + "</body></html>";
     }
 
 }

@@ -34,8 +34,11 @@ public class Historikk extends HttpServlet {
         try {
             StandardHtml html = new StandardHtml("Kondisjon Historikk");
             Div div = new Div("", "kondisjonHistorikkTabell", "div-table");
-            html.addBodyContent(div.toString());
-            html.addBodyJS("buildTable('kondisjonHistorikkTabell','/kondisjon/logg/','getKondisjonLogg',[1]);");
+            Div containerDiv = new Div(div.toString(), "div-container");
+            html.addBodyContent(containerDiv.toString());
+            String tableArr = "['getKondisjonLogg','kondisjonHistorikkTabell','/kondisjon/logg/']";
+            String deleteArr = "['deleteKondisjonLogg','kondisjonLoggId','/kondisjon/logg/']";
+            html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + ",100);");
             out.print(html.toString());
         } catch (Exception e) {
             e.printStackTrace(out);

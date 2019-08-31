@@ -37,7 +37,14 @@ public class Logg extends HttpServlet {
             int brukerId = (int) req.getSession().getAttribute("brukerId");
             StandardHtml html = new StandardHtml("Kondisjon Logg");
             Form form = getKondisjonLoggForm(brukerId);
-            html.addBodyContent(form.toString());
+            Div div = new Div("", "kondisjonLoggTabell", "div-table");
+            Div containerDiv = new Div(form.toString()+div.toString(), "div-container");
+            html.addBodyContent(containerDiv.toString());
+            String tableArr = "['getKondisjonLogg','kondisjonLoggTabell','/kondisjon/logg/']";
+            String deleteArr = "['deleteKondisjonLogg','kondisjonLoggId','/kondisjon/logg/']";
+            html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + ",7);");
+            String paramArray = "['kondisjonTurerId','tidMinutter','tidSekunder']";
+            html.addBodyJS("insertRequest('kondisjonLoggSubmit','insertKondisjonLogg','/kondisjon/logg/'," + paramArray + ");");
             //Form.get(brukerId));
             out.print(html.toString());
         } catch (Exception e) {
@@ -46,7 +53,7 @@ public class Logg extends HttpServlet {
     }
 
     private Form getKondisjonLoggForm(int brukerId) throws Exception {
-        Form form = new Form("kondisjonLoggForm", "form");
+        Form form = new Form("kondisjonLoggForm", "div-form");
         form.addElement(new Select("kondisjonTurerId", "kondisjonTurer", brukerId, "kondisjonLoggSelect", "select"));
         form.addElement(new Input("minutter", "minutter", "number", "kondisjonLoggInputMinutter", "input"));
         form.addElement(new Input("sekunder", "sekunder", "number", "kondisjonLoggInputSekunder", "input"));
@@ -64,18 +71,21 @@ public class Logg extends HttpServlet {
         try {
             int brukerId = (int) request.getSession().getAttribute("brukerId");
             if (type.equals("getKondisjonLogg")) {
-                out.print(getKondisjonLogg(brukerId));
+                out.print(getKondisjonLogg(brukerId, Integer.parseInt(request.getParameter("interval"))));
             } else if (type.equals("insertKondisjonLogg")) {
+                int tidSekunder = Integer.parseInt(request.getParameter("tidSekunder"));
+                int tidMinutter = Integer.parseInt(request.getParameter("tidMinutter"));
                 out.print(insertKondisjonLogg(brukerId,
-                        Integer.parseInt(request.getParameter("tidSekunder")),
+                        tidSekunder + (tidMinutter * 60),
                         Integer.parseInt(request.getParameter("kondisjonTurerId"))));
             } else if (type.equals("deleteKondisjonLogg")) {
                 out.print(deleteKondisjonLogg(brukerId, Integer.parseInt(request.getParameter("kondisjonLoggId"))));
             } else if (type.equals("updateKondisjonLogg")) {
                 int loggId = Integer.parseInt(request.getParameter("rowId"));
                 int tidSekunder = Integer.parseInt(request.getParameter("tidSekunder"));
+                int tidMinutter = Integer.parseInt(request.getParameter("tidMinutter"));
                 String dato = request.getParameter("dato");
-                out.print(updateKondisjonLogg(brukerId, loggId, tidSekunder, dato));
+                out.print(updateKondisjonLogg(brukerId, loggId, tidSekunder + (tidMinutter * 60), dato));
             }
         } catch (Exception e) {
             e.printStackTrace(out);
@@ -94,12 +104,15 @@ public class Logg extends HttpServlet {
         return Database.singleUpdateQuery(query, new Object[]{brukerId, kondisjonLoggId}, false);
     }
 
-    private String getKondisjonLogg(int brukerId) throws Exception {
-        String query = "SELECT l.kondisjonLoggId,t.navn,l.dato,l.tidSekunder FROM kondisjonLogg l "
+    private String getKondisjonLogg(int brukerId, int interval) throws Exception {
+        String query = "SELECT l.kondisjonLoggId,t.navn,DATE_FORMAT(l.dato,'%d.%m.%y') as dato,"
+                + "l.tidSekunder DIV 60 as minutter,"
+                + "l.tidSekunder%60 as sekunder "
+                + "FROM kondisjonLogg l "
                 + "LEFT JOIN kondisjonTurer t ON t.kondisjonTurerId = l.kondisjonTurerId"
-                + " WHERE l.brukerId = " + brukerId
+                + " WHERE l.brukerId = " + brukerId + " AND l.dato <= curdate() AND l.dato > DATE_SUB(curdate(),INTERVAL ? DAY)"
                 + " ORDER BY l.dato DESC;";
-        return Database.normalQuery(query).getJSON();
+        return Database.multiQuery(query, new Object[]{interval}).getJSON();
     }
 
     private int insertKondisjonLogg(int brukerId, int tidSekunder, int kondisjonTurerId) throws Exception {

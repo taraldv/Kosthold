@@ -13,7 +13,7 @@ public class StandardHtml extends Base {
 
     public StandardHtml(String title) {
         super(title,
-                "../../css/mobile.css",
+                "../../css/newMobile.css",
                 "../../css/new.css",
                 "../../js/LoggLogg.js");
     }

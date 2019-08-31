@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package servlet.helse;
+package servlet.vekt;
 
 import crypto.ValidSession;
 import java.io.IOException;
@@ -20,13 +20,13 @@ import util.http.Headers;
  *
  * @author Tarald
  */
-public class Vekt extends HttpServlet {
+public class Logg extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Headers.GET(resp);
         ValidSession.isValid(req, resp);
-        HTML html = new HTML("Helse Vekt");
+        HTML html = new HTML("Vekt Logg");
         html.addStandard();
         html.addJS("../../js/helseVekt.js");
         resp.getWriter().print(html.toString());

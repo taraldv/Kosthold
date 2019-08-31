@@ -18,11 +18,14 @@ public class Div extends Element {
         this.content = content;
     }
 
-    
+    public Div(String content, String elementClass) {
+        super(elementClass);
+        this.content = content;
+    }
 
     @Override
     public String toString() {
-        return "<div "+getInfoString()+">" + content + "</div>";
+        return "<div " + getInfoString() + ">" + content + "</div>";
     }
 
 }
