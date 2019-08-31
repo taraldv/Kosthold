@@ -27,9 +27,9 @@ public class Input extends Element {
     @Override
     public String toString() {
         return "<label class='" + labelClass + "'>" + label + "<input " + getInfoString() + " "
-                + "' placeholder='" + placeholder
-                + "' type='" + inputType
-                + "' autocomplete='off'></label>";
+                + "placeholder='" + placeholder + "' "
+                + "type='" + inputType + "' "
+                + "autocomplete='off'></label>";
     }
 
 }
