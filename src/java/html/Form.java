@@ -26,7 +26,7 @@ public class Form extends Element {
 
     @Override
     public String toString() {
-        String output = "<div>";
+        String output = "<div "+getInfoString()+">";
 
         //enten div, select eller input
         for (Element element : elements) {
