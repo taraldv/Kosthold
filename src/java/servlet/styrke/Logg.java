@@ -89,7 +89,7 @@ public class Logg extends HttpServlet {
     }
 
     private String getLogg(int brukerId, int interval) throws Exception {
-        String query = "SELECT styrkeLoggId,s.navn,reps,vekt,DATE_FORMAT(dato,'%d.%m.%y') FROM styrkeLogg "
+        String query = "SELECT styrkeLoggId,s.navn,reps,vekt,DATE_FORMAT(dato,'%d.%m.%y') as dato FROM styrkeLogg "
                 + "LEFT JOIN styrkeØvelse s ON s.styrkeId = styrkeLogg.styrkeId"
                 + " WHERE s.brukerId = " + brukerId + " AND dato <= curdate() AND dato > DATE_SUB(curdate(),INTERVAL ? DAY)"
                 + " ORDER BY s.styrkeId DESC;";
