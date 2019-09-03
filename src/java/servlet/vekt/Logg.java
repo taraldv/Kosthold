@@ -50,10 +50,10 @@ public class Logg extends HttpServlet {
         }
 
     }
-    
-      private Form getKondisjonLoggForm()  {
+
+    private Form getKondisjonLoggForm() {
         Form form = new Form("kondisjonLoggForm", "div-form");
-        form.addElement(new Input("kilo", "kilo", "number", "vektLoggInputKilo", "input"));
+        form.addElement(new Input("kilo", "kilo", "number", "vektLoggInputKilo", "input", "0.1"));
         form.addElement(new Div("submit", "vektLoggSubmit", "submit"));
         return form;
     }
@@ -71,7 +71,8 @@ public class Logg extends HttpServlet {
             if (type.equals("getVektLogg")) {
                 out.print(getVektLogg(brukerId, Integer.parseInt(request.getParameter("interval"))));
             } else if (type.equals("insertVekt")) {
-                Double kiloVekt = Double.parseDouble(request.getParameter("kilo"));
+                String kilo = request.getParameter("kilo");
+                Double kiloVekt = Double.parseDouble(kilo.replace(",", "."));
                 out.print(insertVektLogg(kiloVekt, brukerId));
             } else if (type.equals("deleteVekt")) {
                 int vektId = Integer.parseInt(request.getParameter("vektId"));

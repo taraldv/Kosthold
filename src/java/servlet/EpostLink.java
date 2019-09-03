@@ -21,7 +21,7 @@ import util.http.Headers;
  *
  * @author Tarald
  */
-public class NyttPassord extends HttpServlet {
+public class EpostLink extends HttpServlet {
 
     /* Testing? */
     @Override
@@ -35,7 +35,7 @@ public class NyttPassord extends HttpServlet {
             if (validToken(token) == 1) {
                 out.print(finishedHTML(token).toString());
             } else {
-                resp.sendRedirect("/logginn/glemt_passord/?error=3");
+                resp.sendRedirect("/glemtpassord/?error=3");
             }
         } catch (Exception e) {
             e.printStackTrace(out);
@@ -54,7 +54,7 @@ public class NyttPassord extends HttpServlet {
             if (passordEndring > 0) {
                 response.sendRedirect("https://logglogg.no/");
             } else {
-                response.sendRedirect("/logginn/glemt_passord/?error=4");
+                response.sendRedirect("/glemtpassord/?error=4");
             }
         } catch (Exception e) {
             e.printStackTrace(out);

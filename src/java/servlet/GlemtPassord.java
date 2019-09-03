@@ -66,7 +66,7 @@ public class GlemtPassord extends HttpServlet {
 
             int exitStatus = send(epost, token);
             int queueRM = queueRemove(brukerId, 1);
-            String msg = "/logginn/glemt_passord/?";
+            String msg = "/glemtpassord/?";
 
             /* 0 betyr bash ble utført */
             if (exitStatus == 0 && queueRM == 0) {
@@ -119,7 +119,7 @@ public class GlemtPassord extends HttpServlet {
     private int send(String epost, String token) throws Exception {
         ProcessBuilder processBuilder = new ProcessBuilder();
 
-        String link = "https://logglogg.no/logginn/nytt_passord/";
+        String link = "https://logglogg.no/epostlink/";
         String user = "noreply";
         String subject = "\"Få nytt passord på logglogg.no\"";
         String sender = "noreply@logglogg.no";

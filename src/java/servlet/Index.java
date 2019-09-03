@@ -6,6 +6,7 @@
 package servlet;
 
 import crypto.SessionLogin;
+import html.Anchor;
 import html.IndexHtml;
 import html.Input;
 import java.io.BufferedWriter;
@@ -37,16 +38,16 @@ public class Index extends HttpServlet {
 
         IndexHtml html = new IndexHtml("LoggLogg");
 
-        Input navn = new Input("epost", "epost", "text", "brukernavnInput", "input-login", "epost");
-        Input passord = new Input("passord", "passord", "text", "passordInput", "input-login", "passord");
-        String properSubmit = "<input id='submitInput' class='input-login' type='submit' value='logg inn'>";
+        Input navn = new Input("skriv inn epost her", "epost", "text", "brukernavnInput", "input-login", "epost", "on");
+        Input passord = new Input("skriv inn passord her", "passord", "password", "passordInput", "input-login", "passord", "on");
+        String properSubmit = "<input id='loginSubmitInput' class='input-login' type='submit' value='logg inn'>";
         String properForm = "<form id='loginForm' class='form-login' method='POST' action=''>"
                 + navn.toString()
                 + passord.toString()
                 + properSubmit
                 + "</form>";
-        
-        html.addBodyContent(properForm);
+        Anchor glemtPassord = new Anchor("Glemt Passord", "/glemtpassord", "anchor-login");
+        html.addBodyContent(properForm + glemtPassord.toString());
 
         out.print(html.toString());
     }
