@@ -5,10 +5,12 @@
  */
 package servlet;
 
+import javax.servlet.http.HttpServlet;
+
 /**
  *
  * @author
  */
-public class AktiverEpost {
+public class AktiverEpost extends HttpServlet{
     
 }

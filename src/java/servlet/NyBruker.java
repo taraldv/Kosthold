@@ -6,6 +6,7 @@
 package servlet;
 
 import crypto.SessionLogin;
+import html.IndexHtml;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -19,7 +20,20 @@ import util.http.Headers;
  * @author
  */
 public class NyBruker extends HttpServlet {
-
+    
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        Headers.GET(response);
+        PrintWriter out = response.getWriter();
+        try {
+            IndexHtml html = new IndexHtml("LoggLogg Ny Bruker");
+            out.print(html);
+        } catch (Exception e) {
+            e.printStackTrace(out);
+        }
+    }
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -35,5 +49,5 @@ public class NyBruker extends HttpServlet {
             e.printStackTrace(out);
         }
     }
-
+    
 }

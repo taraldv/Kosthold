@@ -35,7 +35,7 @@ public class EpostLink extends HttpServlet {
             if (validToken(token) == 1) {
                 out.print(finishedHTML(token).toString());
             } else {
-                resp.sendRedirect("/glemtpassord/?error=3");
+                resp.sendRedirect("/glemtpassord/?error=invalidToken");
             }
         } catch (Exception e) {
             e.printStackTrace(out);
@@ -54,7 +54,7 @@ public class EpostLink extends HttpServlet {
             if (passordEndring > 0) {
                 response.sendRedirect("https://logglogg.no/");
             } else {
-                response.sendRedirect("/glemtpassord/?error=4");
+                response.sendRedirect("/glemtpassord/?error=databasePasswordUpdate");
             }
         } catch (Exception e) {
             e.printStackTrace(out);
