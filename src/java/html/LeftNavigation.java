@@ -56,6 +56,7 @@ public class LeftNavigation extends Element {
         
         List adminList = new List(listClass);
         adminList.addElement(new Anchor("Profil", "/admin/profil/", anchorClass));
+        adminList.addElement(new Anchor("Kosthold", "/admin/kosthold/", anchorClass));
         adminList.addElement(new Anchor("Logg ut", "/admin/loggut/", anchorClass));
         elements.add(new Text("h2", "Admin", textClass));
         elements.add(adminList);

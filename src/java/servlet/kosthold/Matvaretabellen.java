@@ -71,7 +71,7 @@ public class Matvaretabellen extends HttpServlet {
         if (whichTable.equals("matvaretabellen")) {
             autocompleteQuery = "SELECT matvare,matvareId FROM matvaretabellen WHERE matvare LIKE ? LIMIT 30;";
         } else if (whichTable.equals("næringsinnhold")) {
-            autocompleteQuery = "SELECT næringsinnhold,benevning FROM benevninger WHERE næringsinnhold LIKE ? LIMIT 15;";
+            autocompleteQuery = "SELECT navn,benevning FROM benevninger WHERE navn LIKE ? LIMIT 15;";
         }
         ResultSetContainer rsc = Database.multiQuery(autocompleteQuery, new Object[]{"%" + matchingParameter + "%"});
         String completeJson = rsc.getJSON();
@@ -83,13 +83,13 @@ public class Matvaretabellen extends HttpServlet {
     }
 
     private int updateMatvare(Map<String, String[]> map, int brukerId, int matvareId) throws Exception {
-        String verifyQuery = "SELECT næringsinnhold FROM benevninger WHERE";
+        String verifyQuery = "SELECT navn FROM benevninger WHERE";
         Object[] kolonneArray = map.keySet().toArray();
         for (int x = 0; x < kolonneArray.length; x++) {
             if (x != 0) {
                 verifyQuery += " OR";
             }
-            verifyQuery += " næringsinnhold LIKE ?";
+            verifyQuery += " navn LIKE ?";
         }
         /* en slags måte å bruke preparedStatement på kolonneNavn, men tar 2 steg */
         String[][] verifisertKolonneNavn = Database.multiQuery(verifyQuery, kolonneArray).getData();
@@ -124,7 +124,7 @@ public class Matvaretabellen extends HttpServlet {
     }
 
     private String getMatvaretabellTabell(int brukerId) throws Exception {
-        String brukerDefinertQuery = "SELECT b.næringsinnhold FROM benevninger b "
+        String brukerDefinertQuery = "SELECT b.navn FROM benevninger b "
                 + "LEFT JOIN brukerBenevningMål bm ON b.benevningId = bm.benevningId WHERE bm.brukerId = " + brukerId + " AND bm.aktiv = true;";
         String additionalStuff = Database.normalQuery(brukerDefinertQuery).getOneColumnToString("");
 
@@ -133,13 +133,13 @@ public class Matvaretabellen extends HttpServlet {
     }
 
     private int matvaretabellInsert(Map<String, String[]> map, int brukerId, String matvare) throws Exception {
-        String verifyQuery = "SELECT næringsinnhold FROM benevninger WHERE";
+        String verifyQuery = "SELECT navn FROM benevninger WHERE";
         Object[] kolonneArray = map.get("innhold");
         for (int x = 0; x < kolonneArray.length; x++) {
             if (x != 0) {
                 verifyQuery += " OR";
             }
-            verifyQuery += " næringsinnhold LIKE ?";
+            verifyQuery += " navn LIKE ?";
         }
         /* en slags måte å bruke preparedStatement på kolonneNavn, men tar 2 steg */
         String[][] verifisertKolonneNavn = Database.multiQuery(verifyQuery, kolonneArray).getData();

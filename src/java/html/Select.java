@@ -17,7 +17,7 @@ public class Select extends Element {
     private final String kolonneId;
     private final String tableName;
     private final String optionClass;
-    private final int brukerId;
+    private int brukerId;
 
     public Select(String kolonneId, String tableName, int brukerId, String elementId, String elementClass) throws Exception {
         super(elementId, elementClass);
@@ -25,11 +25,20 @@ public class Select extends Element {
         this.tableName = tableName;
         this.brukerId = brukerId;
         optionClass = elementClass + "-option";
-        getOptions();
+        String query = "SELECT " + kolonneId + ",navn FROM " + tableName + " WHERE brukerId = " + brukerId + " ORDER BY navn;";
+        getOptions(query);
     }
 
-    private void getOptions() throws Exception {
-        String query = "SELECT " + kolonneId + ",navn FROM " + tableName + " WHERE brukerId = " + brukerId + " ORDER BY navn;";
+    public Select(String kolonneId, String tableName, String elementId, String elementClass) throws Exception {
+        super(elementId, elementClass);
+        this.kolonneId = kolonneId;
+        this.tableName = tableName;
+        optionClass = elementClass + "-option";
+        String query = "SELECT " + kolonneId + ",navn FROM " + tableName + ";";
+        getOptions(query);
+    }
+
+    private void getOptions(String query) throws Exception {
         String[][] data = Database.normalQuery(query).getData();
         //[[id,navn],[id,navn]] etc
         options = "";

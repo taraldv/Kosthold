@@ -6,19 +6,22 @@ DROP TABLE IF EXISTS måltider;
 DROP TABLE IF EXISTS benevninger;
 DROP TABLE IF EXISTS matvaretabellen;
 DROP TABLE IF EXISTS users;
-DROP TRIGGER IF EXISTS userBenevning;
+/*DROP TRIGGER IF EXISTS userBenevning;*/
 
+
+	ALTER TABLE "table_name"
+Change "column 1" "column 2" ["Data Type"];
 
 CREATE TABLE benevninger(
 	benevningId INTEGER AUTO_INCREMENT,
-	næringsinnhold varchar(30),
+	navn varchar(30),
 	benevning varchar(10),
 	PRIMARY KEY(benevningId)
 );
 
 
 /* TODO fjerne spiselig del */
-INSERT INTO benevninger(næringsinnhold,benevning) VALUES('Spiselig del','%'),
+INSERT INTO benevninger(navn,benevning) VALUES('Spiselig del','%'),
 ('Vann','g'),
 ('Kilojoule','kJ'),
 ('Kilokalorier','kcal'),
@@ -1932,7 +1935,7 @@ ADD resetToken varchar(140) UNIQUE;
 ALTER TABLE users
 ADD epostAktivert BOOLEAN DEFAULT false;
 
-DELIMITER ::
+/*DELIMITER ::
 
 CREATE TRIGGER userBenevning
 AFTER INSERT ON users
@@ -1951,6 +1954,10 @@ BEGIN
 		INSERT INTO brukerBenevningMål(benevningId,brukerId,aktiv) VALUES(b_Id,NEW.brukerId,false);
 	END LOOP;
 END::
+
+DELIMITER ;
+*/
+DELIMITER ::
 
 CREATE PROCEDURE slettMåltid
 (

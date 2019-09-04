@@ -68,6 +68,8 @@ public class Database {
                 ps.setDouble(i + 1, (double) var[i]);
             } else if (var[i] instanceof String) {
                 ps.setString(i + 1, (String) var[i]);
+            } else if (var[i] instanceof Boolean) {
+                ps.setBoolean(i + 1, (Boolean) var[i]);
             }
         }
 
@@ -112,12 +114,12 @@ public class Database {
         }
         return rsc;
     }
-    
-        static public int innstillingerMultipleUpdateQueries(String query, String[][] arr, int offset) throws Exception {
+
+    static public int innstillingerMultipleUpdateQueries(String query, String[][] arr, int offset) throws Exception {
         PreparedStatement ps = Database.getprepStatement(query, 0);
         int output = 0;
         /* første array i 'arr' er 'type' og har lengde 1 */
-        /* de 4 andre skal ha samme lengde */
+ /* de 4 andre skal ha samme lengde */
         for (int i = 0; i < arr[offset].length; i++) {
             String øvre = arr[offset + 1][i];
             String nedre = arr[offset + 2][i];

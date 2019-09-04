@@ -61,7 +61,7 @@ public class Kosthold extends HttpServlet {
     }
 
     private String getStatsMål(int brukerId) throws Exception {
-        String målQuery = "SELECT øvreMål,nedreMål,b.næringsinnhold,aktiv,b.benevning,b.benevningId FROM brukerBenevningMål "
+        String målQuery = "SELECT øvreMål,nedreMål,b.navn,aktiv,b.benevning,b.benevningId FROM brukerBenevningMål "
                 + "LEFT JOIN benevninger b ON b.benevningId = brukerBenevningMål.benevningId WHERE brukerId =" + brukerId + ";";
         return Database.normalQuery(målQuery).getJSON();
     }
@@ -83,7 +83,7 @@ public class Kosthold extends HttpServlet {
     }
 
     private String getLogg(int brukerId) throws Exception {
-        String brukerDefinertQuery = "SELECT b.næringsinnhold FROM benevninger b "
+        String brukerDefinertQuery = "SELECT b.navn FROM benevninger b "
                 + "LEFT JOIN brukerBenevningMål bm ON b.benevningId = bm.benevningId WHERE bm.brukerId = " + brukerId + " AND bm.aktiv = true;";
         String additionalStuff = Database.normalQuery(brukerDefinertQuery).getOneColumnToString("m.");
         //String additionalStuff = ",m.Kilokalorier";
