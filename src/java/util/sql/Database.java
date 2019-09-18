@@ -95,6 +95,8 @@ public class Database {
                 ps.setDouble(i + 1, (double) vars[i]);
             } else if (vars[i] instanceof String) {
                 ps.setString(i + 1, (String) vars[i]);
+            } else if (vars[i] instanceof Boolean) {
+                ps.setBoolean(i + 1, (Boolean) vars[i]);
             }
         }
     }
