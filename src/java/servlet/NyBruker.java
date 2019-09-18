@@ -64,7 +64,7 @@ public class NyBruker extends HttpServlet {
                     "Hei, din epost har blitt brukt til å lage en konto på logglogg.no",
                     "https://logglogg.no/aktiverepost/");
             sm.send();
-            response.sendRedirect("/glemtpassord/?msg=sendt");
+            response.sendRedirect("/aktiverepost/?msg=sendt");
 
         } catch (Exception e) {
             response.sendRedirect("https://logglogg.no/nybruker?error=1");
