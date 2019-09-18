@@ -47,7 +47,8 @@ public class Index extends HttpServlet {
                 + properSubmit
                 + "</form>";
         Anchor glemtPassord = new Anchor("Glemt Passord", "/glemtpassord", "anchor-login");
-        html.addBodyContent(properForm + glemtPassord.toString());
+        Anchor nyBruker = new Anchor("Ny Bruker", "/nybruker", "anchor-login");
+        html.addBodyContent(properForm + glemtPassord.toString() + nyBruker.toString());
 
         out.print(html.toString());
     }
