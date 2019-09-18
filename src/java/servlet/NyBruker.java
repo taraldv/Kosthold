@@ -29,10 +29,10 @@ public class NyBruker extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
             IndexHtml html = new IndexHtml("LoggLogg Ny Bruker");
-            Input navn = new Input("skriv inn epost her", "epost", "text", "brukernavnInput", "input-login", "epost", "on");
-            Input passord = new Input("skriv inn passord her", "passord", "password", "passordInput", "input-login", "passord", "on");
-            String properSubmit = "<input id='loginSubmitInput' class='input-login' type='submit' value='logg inn'>";
-            String properForm = "<form id='loginForm' class='form-login' method='POST' action=''>"
+            Input navn = new Input("skriv inn epost her", "epost", "text", "brukernavnInput", "input-registrer", "epost", "on");
+            Input passord = new Input("skriv inn passord her", "passord", "password", "passordInput", "input-registrer", "passord", "on");
+            String properSubmit = "<input id='registrerSubmitInput' class='input-registrer' type='submit' value='registrer'>";
+            String properForm = "<form id='registrerForm' class='form-login' method='POST' action=''>"
                     + navn.toString()
                     + passord.toString()
                     + properSubmit
