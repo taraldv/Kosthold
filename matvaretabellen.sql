@@ -1866,7 +1866,7 @@ CREATE TABLE users(
 	brukerId INTEGER AUTO_INCREMENT,
 	brukernavn varchar(150) NOT NULL UNIQUE,
 	passord varchar(150) NOT NULL,
-	admin boolean NOT NULL,
+	admin boolean NOT NULL DEFAULT 0,
 	PRIMARY KEY(brukerId)
 );
 
