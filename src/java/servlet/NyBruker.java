@@ -5,8 +5,6 @@
  */
 package servlet;
 
-import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
-import crypto.BCrypt;
 import crypto.SessionLogin;
 import html.IndexHtml;
 import html.Input;
