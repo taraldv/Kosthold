@@ -48,7 +48,8 @@ public class AktiverEpost extends HttpServlet {
         String[][] rsc = Database.multiQuery(query, new Object[]{token}).getData();
         int exists = Integer.parseInt(rsc[0][0]);
         if (exists == 1) {
-            int deleteToken = Database.singleUpdateQuery("UPDATE users SET resetToken = NULL WHERE resetToken = ?;", new Object[]{token}, false);
+            String validQuery = "UPDATE users SET resetToken = NULL, SET epostAktivert = 1 WHERE resetToken = ?;";
+            int deleteToken = Database.singleUpdateQuery(validQuery, new Object[]{token}, false);
             return deleteToken == 1;
 
         }
