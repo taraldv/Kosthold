@@ -48,7 +48,7 @@ public class Input extends Element {
 
     @Override
     public String toString() {
-        return "<label class='" + labelClass + "'>" + label + "<input " + getInfoString() + " "
+        return "<label class='" + labelClass + "'><div class='mobile-hide'>" + label + "</div><input " + getInfoString() + " "
                 + "placeholder='" + placeholder + "' "
                 + "type='" + inputType + "' "
                 + "name='" + name + "' "
