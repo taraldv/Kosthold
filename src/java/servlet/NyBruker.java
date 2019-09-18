@@ -5,6 +5,8 @@
  */
 package servlet;
 
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
+import crypto.BCrypt;
 import crypto.SessionLogin;
 import html.IndexHtml;
 import html.Input;
@@ -15,6 +17,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.http.Headers;
+import util.mail.SendMail;
 import util.sql.Database;
 
 /**
@@ -53,15 +56,24 @@ public class NyBruker extends HttpServlet {
         try {
             String epost = request.getParameter("epost");
             String pw = request.getParameter("passord");
-            out.println(nyBruker(epost, pw));
+            //tror ikke nyBruker kan bli noe annet en 1 eller exception
+            int brukerId = nyBruker(epost, pw);
+            SendMail sm = new SendMail(4, epost, brukerId,
+                    "Aktiver din bruker på logglogg.no",
+                    "Klikk her for å aktivere din bruker",
+                    "Hei, din epost har blitt brukt til å lage en konto på logglogg.no");
+            sm.send();
+            response.sendRedirect("/glemtpassord/?msg=sendt");
+
         } catch (Exception e) {
-            e.printStackTrace(out);
+            response.sendRedirect("https://logglogg.no/nybruker?error=1");
+            // e.printStackTrace(out);
         }
     }
 
     private int nyBruker(String epost, String passord) throws Exception {
         String query = "INSERT INTO users(brukernavn,passord) VALUES (?,?);";
-        return Database.singleUpdateQuery(query, new Object[]{epost, passord}, false);
+        return Database.singleUpdateQuery(query, new Object[]{epost, SessionLogin.generatePasswordHash(passord)}, true);
     }
 
 }
