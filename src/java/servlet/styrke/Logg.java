@@ -51,7 +51,7 @@ public class Logg extends HttpServlet {
     private Form getKondisjonLoggForm(int brukerId) throws Exception {
         Form form = new Form("styrkeLoggForm", "div-form");
         form.addElement(new Select("styrkeId", "styrkeØvelse", brukerId, "styrkeLoggSelect", "select"));
-        form.addElement(new Input("kilo", "kilo", "number", "styrkeLoggInputKilo", "input"));
+        form.addElement(new Input("kilo", "kilo", "number", "styrkeLoggInputKilo", "input", "0.1"));
         form.addElement(new Input("reps", "reps", "number", "styrkeLoggInputReps", "input"));
         form.addElement(new Div("submit", "styrkeLoggSubmit", "submit"));
         return form;
@@ -74,7 +74,7 @@ public class Logg extends HttpServlet {
                         Double.parseDouble(request.getParameter("vekt")),
                         Integer.parseInt(request.getParameter("reps"))
                 ));
-            }  else if (type.equals("deleteStyrkeLogg")) {
+            } else if (type.equals("deleteStyrkeLogg")) {
                 out.print(deleteStyrkeLogg(brukerId, Integer.parseInt(request.getParameter("styrkeLoggId"))));
             }
         } catch (Exception e) {
@@ -95,9 +95,6 @@ public class Logg extends HttpServlet {
                 + " ORDER BY styrkeLoggId DESC;";
         return Database.multiQuery(query, new Object[]{interval}).getJSON();
     }
-
- 
-
 
     private int insertStyrkeLogg(int brukerId, int styrkeId, double vekt, int reps) throws Exception {
         Object[] vars = {styrkeId, vekt, reps};

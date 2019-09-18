@@ -65,7 +65,7 @@ public class LeftNavigation extends Element {
 
     @Override
     public String toString() {
-        String output = "<div " + getInfoString() + ">";
+        String output = "<div " + getInfoString() + "><div id='toggleHide' class='mobile-hide'>";
 
         for (Element element : elements) {
             if (element instanceof Text) {
@@ -75,7 +75,7 @@ public class LeftNavigation extends Element {
             }
         }
 
-        return output += "</div>";
+        return output += "</div><div id='hideMenuButton'>Meny</div></div>";
     }
 
 }

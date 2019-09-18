@@ -17,6 +17,7 @@ public class StandardHtml extends Base {
                 "../../css/new.css",
                 "../../js/LoggLogg.js",
                 new LeftNavigation().toString());
+        addBodyJS("toggleMenuHide('hideMenuButton','toggleHide','mobile-hide');");
     }
 
 }
