@@ -54,11 +54,4 @@ public class AktiverEpost extends HttpServlet {
         }
         return false;
     }
-
-    private int endrePassord(String token, String nyttPassord) throws Exception {
-        String hashedPassword = generatePasswordHash(nyttPassord);
-        String query = "UPDATE users SET passord = ?, resetToken = NULL WHERE resetToken = ?;";
-        Object[] vars = {hashedPassword, token};
-        return Database.singleUpdateQuery(query, vars, false);
-    }
 }
