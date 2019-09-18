@@ -31,6 +31,7 @@ public class NyBruker extends HttpServlet {
             throws ServletException, IOException {
         Headers.GET(response);
         PrintWriter out = response.getWriter();
+        String msg = request.getParameter("msg");
         try {
             IndexHtml html = new IndexHtml("LoggLogg Ny Bruker");
             Input navn = new Input("skriv inn epost her", "epost", "text", "brukernavnInput", "input-registrer", "epost", "on");
@@ -42,6 +43,10 @@ public class NyBruker extends HttpServlet {
                     + properSubmit
                     + "</form>";
             html.addBodyContent(properForm);
+            if (msg != null) {
+                html.addBodyContent("<h3>Epost sendt, sjekk innboks eller spam</h3>");
+            }
+
             out.print(html);
         } catch (Exception e) {
             e.printStackTrace(out);
@@ -64,7 +69,7 @@ public class NyBruker extends HttpServlet {
                     "Hei, din epost har blitt brukt til å lage en konto på logglogg.no",
                     "https://logglogg.no/aktiverepost/");
             sm.send();
-            response.sendRedirect("/aktiverepost/?msg=sendt");
+            response.sendRedirect("/nybruker/?msg=sendt");
 
         } catch (Exception e) {
             response.sendRedirect("https://logglogg.no/nybruker?error=1");
