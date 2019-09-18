@@ -5,12 +5,57 @@
  */
 package servlet;
 
+import static crypto.SessionLogin.generatePasswordHash;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import util.http.Headers;
+import util.sql.Database;
 
 /**
  *
  * @author
  */
-public class AktiverEpost extends HttpServlet{
-    
+public class AktiverEpost extends HttpServlet {
+
+    /* Testing? */
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        Headers.GET(resp);
+        //ValidSession.isValid(request, response);
+        PrintWriter out = resp.getWriter();
+        String token = req.getPathInfo().substring(1);
+        try {
+            if (validToken(token)) {
+                resp.sendRedirect("logglogg.no");
+            } else {
+                resp.sendRedirect("/nybruker/?error=invalidToken");
+            }
+        } catch (Exception e) {
+            e.printStackTrace(out);
+        }
+    }
+
+    private boolean validToken(String token) throws Exception {
+        String query = "SELECT 1 FROM users WHERE resetToken LIKE ?";
+        String[][] rsc = Database.multiQuery(query, new Object[]{token}).getData();
+        int exists = Integer.parseInt(rsc[0][0]);
+        if (exists == 1) {
+            int deleteToken = Database.singleUpdateQuery("UPDATE users resetToken = NULL WHERE resetToken = ?;", new Object[]{token}, false);
+            return deleteToken == 1;
+
+        }
+        return false;
+    }
+
+    private int endrePassord(String token, String nyttPassord) throws Exception {
+        String hashedPassword = generatePasswordHash(nyttPassord);
+        String query = "UPDATE users SET passord = ?, resetToken = NULL WHERE resetToken = ?;";
+        Object[] vars = {hashedPassword, token};
+        return Database.singleUpdateQuery(query, vars, false);
+    }
 }

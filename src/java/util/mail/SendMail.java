@@ -15,21 +15,22 @@ import util.sql.Database;
 public class SendMail {
 
     private final int duration;
-    private final String link = "https://logglogg.no/epostlink/";
     private final String epost;
     private final String token = ResetToken.generateToken();
     private final int id;
     private final String subject;
     private final String anchorDescription;
     private final String bodyDescription;
+    private final String link;
 
-    public SendMail(int duration, String epost, int id, String subject, String anchorDescription, String bodyDescription) {
+    public SendMail(int duration, String epost, int id, String subject, String anchorDescription, String bodyDescription, String link) {
         this.duration = duration;
         this.epost = epost;
         this.id = id;
         this.subject = subject;
         this.anchorDescription = anchorDescription;
         this.bodyDescription = bodyDescription;
+        this.link = link;
     }
 
     //TODO lage skikkelig exceptions

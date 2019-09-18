@@ -63,7 +63,8 @@ public class GlemtPassord extends HttpServlet {
             SendMail sm = new SendMail(4, epost, brukerId,
                     "Få nytt passord på logglogg.no",
                     "Klikk her for å sette et nytt passord",
-                    "Hei, du har nylig bedt om et nytt passord.");
+                    "Hei, du har nylig bedt om et nytt passord.",
+                    "https://logglogg.no/epostlink/");
             sm.send();
             response.sendRedirect("/glemtpassord/?msg=sendt");
         } catch (Exception e) {

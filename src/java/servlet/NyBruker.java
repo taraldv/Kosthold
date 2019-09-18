@@ -61,7 +61,8 @@ public class NyBruker extends HttpServlet {
             SendMail sm = new SendMail(4, epost, brukerId,
                     "Aktiver din bruker på logglogg.no",
                     "Klikk her for å aktivere din bruker",
-                    "Hei, din epost har blitt brukt til å lage en konto på logglogg.no");
+                    "Hei, din epost har blitt brukt til å lage en konto på logglogg.no",
+                    "https://logglogg.no/aktiverepost/");
             sm.send();
             response.sendRedirect("/glemtpassord/?msg=sendt");
 
