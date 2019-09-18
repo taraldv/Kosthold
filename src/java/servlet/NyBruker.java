@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import util.http.Headers;
+import util.sql.Database;
 
 /**
  *
@@ -52,11 +53,15 @@ public class NyBruker extends HttpServlet {
         try {
             String epost = request.getParameter("epost");
             String pw = request.getParameter("passord");
-            out.println(epost);
-            out.println(pw);
+            out.println(nyBruker(epost, pw));
         } catch (Exception e) {
             e.printStackTrace(out);
         }
+    }
+
+    private int nyBruker(String epost, String passord) throws Exception {
+        String query = "INSERT INTO users(brukernavn,passord) VALUES (?,?);";
+        return Database.singleUpdateQuery(query, new Object[]{epost, passord}, false);
     }
 
 }
