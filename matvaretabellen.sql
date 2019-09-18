@@ -7,6 +7,48 @@ DROP TABLE IF EXISTS benevninger;
 DROP TABLE IF EXISTS matvaretabellen;
 DROP TABLE IF EXISTS users;
 /*DROP TRIGGER IF EXISTS userBenevning;*/
+DROP TABLE IF EXISTS `styrkeLogg`;
+DROP TABLE IF EXISTS `styrkeØvelse`;
+DROP TABLE IF EXISTS `kondisjonLogg`;
+DROP TABLE IF EXISTS `kondisjonTurer`;
+
+CREATE TABLE `kondisjonTurer`(
+`kondisjonTurerId` INTEGER AUTO_INCREMENT,
+`navn` varchar(150) NOT NULL,
+`brukerId` INTEGER NOT NULL,
+`mohStart` INTEGER NOT NULL,
+`mohSlutt` INTEGER NOT NULL,
+`km` DECIMAL(5,2) NOT NULL,
+FOREIGN KEY(brukerId) REFERENCES users(brukerId),
+PRIMARY KEY(kondisjonTurerId));
+
+CREATE TABLE `kondisjonLogg`(
+`kondisjonLoggId` INTEGER AUTO_INCREMENT,
+`kondisjonTurerId` INTEGER NOT NULL,
+`brukerId` INTEGER NOT NULL,
+`tidSekunder` INTEGER NOT NULL,
+`dato` DATE NOT NULL,
+FOREIGN KEY(kondisjonTurerId) REFERENCES kondisjonTurer(kondisjonTurerId),
+FOREIGN KEY(brukerId) REFERENCES users(brukerId),
+PRIMARY KEY(kondisjonLoggId));
+
+CREATE TABLE `styrkeØvelse`(
+`styrkeId` INTEGER AUTO_INCREMENT,
+`navn` varchar(150) NOT NULL,
+`brukerId` INTEGER NOT NULL,
+FOREIGN KEY(brukerId) REFERENCES users(brukerId),
+PRIMARY KEY(styrkeId));
+
+CREATE TABLE `styrkeLogg`(
+`styrkeLoggId` INTEGER AUTO_INCREMENT,
+`styrkeId` INTEGER NOT NULL,
+`brukerId` INTEGER NOT NULL,
+`reps` INTEGER NOT NULL,
+`dato` DATE NOT NULL,
+`vekt` DECIMAL(10,2) NOT NULL,
+FOREIGN KEY(styrkeId) REFERENCES styrkeØvelse(styrkeId),
+FOREIGN KEY(brukerId) REFERENCES users(brukerId),
+PRIMARY KEY(styrkeLoggId));
 
 CREATE TABLE benevninger(
 	benevningId INTEGER AUTO_INCREMENT,
@@ -14,6 +56,7 @@ CREATE TABLE benevninger(
 	benevning varchar(10),
 	PRIMARY KEY(benevningId)
 );
+
 
 
 CREATE TABLE matvaretabellen(
