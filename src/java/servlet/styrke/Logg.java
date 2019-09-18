@@ -7,7 +7,7 @@ package servlet.styrke;
 
 import crypto.ValidSession;
 import html.Div;
-import html.Form;
+import html.DivForm;
 import html.Input;
 import html.Select;
 import html.StandardHtml;
@@ -31,7 +31,7 @@ public class Logg extends HttpServlet {
         try {
             int brukerId = (int) req.getSession().getAttribute("brukerId");
             StandardHtml html = new StandardHtml("Styrke Logg");
-            Form form = getKondisjonLoggForm(brukerId);
+            DivForm form = getKondisjonLoggForm(brukerId);
             Div div = new Div("", "styrkeLoggTabell", "div-table");
             Div containerDiv = new Div(form.toString() + div.toString(), "div-container");
             html.addBodyContent(containerDiv.toString());
@@ -48,8 +48,8 @@ public class Logg extends HttpServlet {
 
     }
 
-    private Form getKondisjonLoggForm(int brukerId) throws Exception {
-        Form form = new Form("styrkeLoggForm", "div-form");
+    private DivForm getKondisjonLoggForm(int brukerId) throws Exception {
+        DivForm form = new DivForm("styrkeLoggForm", "div-form");
         form.addElement(new Select("styrkeId", "styrkeØvelse", brukerId, "styrkeLoggSelect", "select"));
         form.addElement(new Input("kilo", "kilo", "number", "styrkeLoggInputKilo", "input", "0.1"));
         form.addElement(new Input("reps", "reps", "number", "styrkeLoggInputReps", "input"));

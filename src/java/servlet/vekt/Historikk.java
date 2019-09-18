@@ -7,7 +7,7 @@ package servlet.vekt;
 
 import crypto.ValidSession;
 import html.Div;
-import html.Form;
+import html.DivForm;
 import html.StandardHtml;
 import java.io.IOException;
 import java.io.PrintWriter;

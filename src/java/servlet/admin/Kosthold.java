@@ -7,7 +7,7 @@ package servlet.admin;
 
 import crypto.ValidSession;
 import html.Div;
-import html.Form;
+import html.DivForm;
 import html.Input;
 import html.Select;
 import html.StandardHtml;
@@ -34,7 +34,7 @@ public class Kosthold extends HttpServlet {
         PrintWriter out = resp.getWriter();
         try {
             StandardHtml html = new StandardHtml("Admin Kosthold");
-            Form form = getBenevningForm();
+            DivForm form = getBenevningForm();
             Div div = new Div("", "benevningTabell", "div-table");
             Div containerDiv = new Div(form.toString() + div.toString(), "div-container");
             String tableArr = "['hentBenevning','benevningTabell','/admin/kosthold/']";
@@ -49,8 +49,8 @@ public class Kosthold extends HttpServlet {
         }
     }
 
-    private Form getBenevningForm() throws Exception {
-        Form form = new Form("benevningForm", "div-form");
+    private DivForm getBenevningForm() throws Exception {
+        DivForm form = new DivForm("benevningForm", "div-form");
         form.addElement(new Select("benevningId", "benevninger", "benevningSelect", "select"));
         form.addElement(new Input("fra verdi", "minimum", "number", "benevningMax", "input"));
         form.addElement(new Input("til verdi", "maksimum", "number", "benevningMin", "input"));

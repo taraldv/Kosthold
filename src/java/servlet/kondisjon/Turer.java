@@ -7,7 +7,7 @@ package servlet.kondisjon;
 
 import crypto.ValidSession;
 import html.Div;
-import html.Form;
+import html.DivForm;
 import html.Input;
 import html.StandardHtml;
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class Turer extends HttpServlet {
         PrintWriter out = resp.getWriter();
         try {
             StandardHtml html = new StandardHtml("Kondisjon Turer");
-            Form form = getKondisjonTurForm();
+            DivForm form = getKondisjonTurForm();
             Div div = new Div("", "kondisjonTurTabell", "div-table");
             Div containerDiv = new Div(form.toString() + div.toString(), "div-container");
             html.addBodyContent(containerDiv.toString());
@@ -50,8 +50,8 @@ public class Turer extends HttpServlet {
 
     }
 
-    private Form getKondisjonTurForm() {
-        Form form = new Form("kondisjonTurForm", "div-form");
+    private DivForm getKondisjonTurForm() {
+        DivForm form = new DivForm("kondisjonTurForm", "div-form");
         // new Input(placeholder, label, inputType, elementId, elementClass)
         form.addElement(new Input("tur navn", "tur navn", "text", "kondisjonTurInputNavn", "input"));
         form.addElement(new Input("kilometer", "kilometer", "number", "kondisjonTurInputKm", "input"));

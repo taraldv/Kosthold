@@ -7,7 +7,7 @@ package servlet.kondisjon;
 
 import crypto.ValidSession;
 import html.Div;
-import html.Form;
+import html.DivForm;
 import html.Input;
 import html.Select;
 import html.StandardHtml;
@@ -36,7 +36,7 @@ public class Logg extends HttpServlet {
         try {
             int brukerId = (int) req.getSession().getAttribute("brukerId");
             StandardHtml html = new StandardHtml("Kondisjon Logg");
-            Form form = getKondisjonLoggForm(brukerId);
+            DivForm form = getKondisjonLoggForm(brukerId);
             Div div = new Div("", "kondisjonLoggTabell", "div-table");
             Div containerDiv = new Div(form.toString() + div.toString(), "div-container");
             html.addBodyContent(containerDiv.toString());
@@ -52,8 +52,8 @@ public class Logg extends HttpServlet {
         }
     }
 
-    private Form getKondisjonLoggForm(int brukerId) throws Exception {
-        Form form = new Form("kondisjonLoggForm", "div-form");
+    private DivForm getKondisjonLoggForm(int brukerId) throws Exception {
+        DivForm form = new DivForm("kondisjonLoggForm", "div-form");
         form.addElement(new Select("kondisjonTurerId", "kondisjonTurer", brukerId, "kondisjonLoggSelect", "select"));
         form.addElement(new Input("minutter", "minutter", "number", "kondisjonLoggInputMinutter", "input"));
         form.addElement(new Input("sekunder", "sekunder", "number", "kondisjonLoggInputSekunder", "input"));

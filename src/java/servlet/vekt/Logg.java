@@ -7,7 +7,7 @@ package servlet.vekt;
 
 import crypto.ValidSession;
 import html.Div;
-import html.Form;
+import html.DivForm;
 import html.Input;
 import html.Select;
 import html.StandardHtml;
@@ -34,7 +34,7 @@ public class Logg extends HttpServlet {
         PrintWriter out = resp.getWriter();
         try {
             StandardHtml html = new StandardHtml("Kondisjon Logg");
-            Form form = getKondisjonLoggForm();
+            DivForm form = getKondisjonLoggForm();
             Div div = new Div("", "vektLoggTabell", "div-table");
             Div containerDiv = new Div(form.toString() + div.toString(), "div-container");
             html.addBodyContent(containerDiv.toString());
@@ -51,8 +51,8 @@ public class Logg extends HttpServlet {
 
     }
 
-    private Form getKondisjonLoggForm() {
-        Form form = new Form("kondisjonLoggForm", "div-form");
+    private DivForm getKondisjonLoggForm() {
+        DivForm form = new DivForm("kondisjonLoggForm", "div-form");
         form.addElement(new Input("kilo", "kilo", "number", "vektLoggInputKilo", "input", "0.1"));
         form.addElement(new Div("submit", "vektLoggSubmit", "submit"));
         return form;

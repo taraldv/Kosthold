@@ -11,12 +11,12 @@ import java.util.ArrayList;
  *
  * @author
  */
-public class Form extends Element {
+public class DivForm extends Element {
 
     //select x inputs div for submit
     private final ArrayList<Element> elements = new ArrayList<>();
 
-    public Form(String elementId, String elementClass) {
+    public DivForm(String elementId, String elementClass) {
         super(elementId, elementClass);
     }
 

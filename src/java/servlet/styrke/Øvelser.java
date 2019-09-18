@@ -7,7 +7,7 @@ package servlet.styrke;
 
 import crypto.ValidSession;
 import html.Div;
-import html.Form;
+import html.DivForm;
 import html.Input;
 import html.StandardHtml;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class Øvelser extends HttpServlet {
         PrintWriter out = resp.getWriter();
         try {
             StandardHtml html = new StandardHtml("Styrke Øvelser");
-            Form form = getStyrkeØvelserForm();
+            DivForm form = getStyrkeØvelserForm();
             Div div = new Div("", "styrkeØvelserTabell", "div-table");
             Div containerDiv = new Div(form.toString() + div.toString(), "div-container");
             html.addBodyContent(containerDiv.toString());
@@ -46,8 +46,8 @@ public class Øvelser extends HttpServlet {
 
     }
 
-    private Form getStyrkeØvelserForm() {
-        Form form = new Form("styrkeØvelseForm", "div-form");
+    private DivForm getStyrkeØvelserForm() {
+        DivForm form = new DivForm("styrkeØvelseForm", "div-form");
         form.addElement(new Input("øvelse navn", "øvelse navn", "text", "styrkeØvelseInputNavn", "input"));
         form.addElement(new Div("submit", "styrkeØvelseSubmit", "submit"));
         return form;
