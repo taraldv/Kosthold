@@ -35,11 +35,14 @@ public class AktiverEpost extends HttpServlet {
             } else {
                 resp.sendRedirect("/nybruker/?error=invalidToken");
             }
+        } catch (ArrayIndexOutOfBoundsException a) {
+            resp.sendRedirect("/nybruker/?error=invalidToken");
         } catch (Exception e) {
             e.printStackTrace(out);
         }
     }
 
+    //TODO blir aldri false, kaster bare errors
     private boolean validToken(String token) throws Exception {
         String query = "SELECT 1 FROM users WHERE resetToken LIKE ?";
         String[][] rsc = Database.multiQuery(query, new Object[]{token}).getData();
