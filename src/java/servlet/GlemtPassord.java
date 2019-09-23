@@ -5,13 +5,14 @@
  */
 package servlet;
 
+import html.ErrorHandling;
+import html.IndexHtml;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.HTML;
 import util.sql.Database;
 import util.http.Headers;
 import util.mail.SendMail;
@@ -27,28 +28,17 @@ public class GlemtPassord extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Headers.GET(resp);
         PrintWriter out = resp.getWriter();
-        String error = req.getParameter("error");
-        String msg = req.getParameter("msg");
-        String beskjed = "";
-        HTML html = new HTML("LoggLogg Glemt passord");
-        html.addBody("<form method='POST' action=''>"
+        ErrorHandling errorHandling = new ErrorHandling(req);
+        IndexHtml html = new IndexHtml("LoggLogg Glemt Passord");
+        html.addBodyContent("<form method='POST' action=''>"
                 + "<div>"
                 + "<div>epost</div>"
                 + "<input name='epost' id='brukernavnInput' type='text'>"
                 + "</div>"
                 + "<input type='submit' value='Send link'>"
                 + "</form>");
-        if (error != null) {
-            //error = 1, sql
-            //error = 2, epost sending eller bash queue
-            //error = 3, nytt passord token ugyldig
-            //error = 4, noe gikk galt under nytt passord sql
-            beskjed = "Noe gikk galt, prøv igjen";
-        } else if (msg != null) {
-            beskjed = "Epost sendt, sjekk innboks eller spam";
-        }
-        html.addBody("<div>" + beskjed + "</div>");
 
+        html.addBodyContent(errorHandling.toString());
         out.print(html.toString());
     }
 
@@ -66,7 +56,7 @@ public class GlemtPassord extends HttpServlet {
                     "Hei, du har nylig bedt om et nytt passord.",
                     "https://logglogg.no/epostlink/");
             sm.send();
-            response.sendRedirect("/glemtpassord/?msg=sendt");
+            response.sendRedirect("/glemtpassord/?msg=1");
         } catch (Exception e) {
             e.printStackTrace(out);
         }

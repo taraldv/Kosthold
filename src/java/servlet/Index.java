@@ -7,6 +7,7 @@ package servlet;
 
 import crypto.SessionLogin;
 import html.Anchor;
+import html.ErrorHandling;
 import html.IndexHtml;
 import html.Input;
 import java.io.BufferedWriter;
@@ -36,6 +37,7 @@ public class Index extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
+        ErrorHandling error = new ErrorHandling(request);
         //ValidSession vs = new ValidSession(request, response);
 
         IndexHtml html = new IndexHtml("LoggLogg");
@@ -51,7 +53,7 @@ public class Index extends HttpServlet {
         Anchor glemtPassord = new Anchor("Glemt Passord", "/glemtpassord", "anchor-login");
         Anchor nyBruker = new Anchor("Ny Bruker", "/nybruker", "anchor-login");
         html.addBodyContent(properForm + glemtPassord.toString() + nyBruker.toString());
-
+        html.addBodyContent(error.toString());
         out.print(html.toString());
     }
 
@@ -101,7 +103,7 @@ public class Index extends HttpServlet {
                 bw.newLine();
 
                 bw.close();
-                response.sendRedirect("https://logglogg.no?feil=1");
+                response.sendRedirect("https://logglogg.no?error=1");
             }
         } catch (Exception e) {
             e.printStackTrace(out);
@@ -109,7 +111,7 @@ public class Index extends HttpServlet {
     }
 
     private String dato() {
-        /* fail2ban regex <HOST> */
+        /* fail2ban regex <HOST> 5 attempts*/
         Calendar date = new GregorianCalendar();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return df.format(date.getTime());
