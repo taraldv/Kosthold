@@ -15,6 +15,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import javax.servlet.ServletException;
@@ -83,23 +85,19 @@ public class Index extends HttpServlet {
 
                 response.sendRedirect("https://logglogg.no" + encodeString(url));
             } else {
-                Calendar date = new GregorianCalendar();
+
                 File log = new File("/home/tarves/passwordFail.log");
                 String userAgent = request.getHeader("user-agent");
                 String epost = request.getParameter("epost");
-                String time = Long.toString(date.getTimeInMillis());
                 String remoteHost = request.getRemoteHost();
                 String remotePort = Integer.toString(request.getRemotePort());
                 BufferedWriter bw = new BufferedWriter(new FileWriter(log, true));
-                bw.write("epost: " + epost);
-               // bw.newLine();
-                bw.write(" remoteHost: " + remoteHost);
-                //bw.newLine();
+                bw.write(remoteHost);
+                bw.write(" [");
+                bw.write(dato());
+                bw.write("] epost: " + epost);
                 bw.write(" remotePort: " + remotePort);
-                //bw.newLine();
                 bw.write(" userAgent: " + userAgent);
-                //bw.newLine();
-                bw.write(" time: " + time);
                 bw.newLine();
 
                 bw.close();
@@ -108,5 +106,11 @@ public class Index extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace(out);
         }
+    }
+
+    private String dato() {
+        Calendar date = new GregorianCalendar();
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return df.format(date.getTime());
     }
 }
