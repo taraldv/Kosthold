@@ -100,7 +100,7 @@ public class Index extends HttpServlet {
                 bw.write(" userAgent: " + userAgent);
                 //bw.newLine();
                 bw.write(" time: " + time);
-                //bw.newLine();
+                bw.newLine();
 
                 bw.close();
                 response.sendRedirect("https://logglogg.no?feil=1");
