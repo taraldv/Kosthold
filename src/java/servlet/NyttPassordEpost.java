@@ -6,8 +6,11 @@
 package servlet;
 
 import static crypto.SessionLogin.generatePasswordHash;
+import html.IndexHtml;
+import html.Input;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,23 +23,32 @@ import util.http.Headers;
  *
  * @author Tarald
  */
-public class EpostLink extends HttpServlet {
+public class NyttPassordEpost extends HttpServlet {
 
     /* Blir sendt til denne siden fra URL i epost */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         Headers.GET(resp);
-        //ValidSession.isValid(request, response);
+        IndexHtml html = new IndexHtml("LoggLogg Nytt Passord");
         PrintWriter out = resp.getWriter();
         String token = req.getPathInfo().substring(1);
         try {
             if (validToken(token) == 1) {
-                out.print(finishedHTML(token).toString());
+                Input epost = new Input("skriv nytt passord her", "nytt passord", "password", "brukernavnInput", "input-login", "nyttPassord", "off");
+                String properSubmit = "<input id='loginSubmitInput' class='input-login' type='submit' value='oppdater passord'>";
+                String hiddenInput = "<input name='token' type='text' value=" + token + " hidden=''>";
+                String properForm = "<form id='registrerForm' class='form-login' method='POST' action=''>"
+                        + epost.toString()
+                        + hiddenInput
+                        + properSubmit
+                        + "</form>";
+                html.addBodyContent(properForm);
+                out.print(html.toString());
             } else {
-                resp.sendRedirect("/glemtpassord/?error=invalidToken");
+                resp.sendRedirect("/glemtpassord/?error=3");
             }
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace(out);
         }
     }
@@ -53,40 +65,23 @@ public class EpostLink extends HttpServlet {
             if (passordEndring > 0) {
                 response.sendRedirect("https://logglogg.no/");
             } else {
-                response.sendRedirect("/glemtpassord/?error=databasePasswordUpdate");
+                response.sendRedirect("/glemtpassord/?error=9");
             }
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace(out);
         }
     }
 
-    private int endrePassord(String token, String nyttPassord) throws Exception {
+    private int endrePassord(String token, String nyttPassord) throws SQLException, ClassNotFoundException {
         String hashedPassword = generatePasswordHash(nyttPassord);
         String query = "UPDATE users SET passord = ?, resetToken = NULL WHERE resetToken = ?;";
         Object[] vars = {hashedPassword, token};
         return Database.singleUpdateQuery(query, vars, false);
     }
 
-    private int validToken(String token) throws Exception {
+    private int validToken(String token) throws SQLException, ClassNotFoundException {
         String query = "SELECT 1 FROM users WHERE resetToken LIKE ?";
         String[][] rsc = Database.multiQuery(query, new Object[]{token}).getData();
         return Integer.parseInt(rsc[0][0]);
     }
-
-    private HTML finishedHTML(String token) throws Exception {
-        HTML html = new HTML("LoggLogg nytt passord");
-        String form = "<form method='POST' action=''>"
-                + "<div>"
-                + "<div>"
-                + "nytt passord"
-                + "</div>"
-                + "<input name='nyttPassord' type='text'>"
-                + "<input name='token' type='text' value=" + token + " hidden=''>"
-                + "</div>"
-                + "<input type='submit' value='Send nytt passord'>"
-                + "</form>";
-        html.addBody(form);
-        return html;
-    }
-
 }

@@ -34,8 +34,9 @@ public class ErrorHandling {
                 case 2:
                     beskjed = "SQL error";
                     break;
+                //NyttPassordEpost.java,AktiverEpost.java
                 case 3:
-                    beskjed = "Ugyldig token";
+                    beskjed = "<p>Ugyldig epost link</p>";
                     break;
                 //NyBruker.java
                 case 4:
@@ -57,7 +58,10 @@ public class ErrorHandling {
                 case 8:
                     beskjed = "<p>Server error, bash script feilet. Vennligst prøv igjen</p>";
                     break;
-
+                //NyttPassordEpost.java
+                case 9:
+                    beskjed = "<p>Noe gikk galt og passord ble ikke oppdatert. Vennligst prøv igjen</p>";
+                    break;
                 default:
                     beskjed = "Noe gikk galt, mangler error kode";
                     break;

@@ -42,14 +42,6 @@ public class GlemtPassord extends HttpServlet {
                 + properSubmit
                 + "</form>";
         html.addBodyContent(properForm);
-        /*html.addBodyContent("<form method='POST' action=''>"
-                + "<div>"
-                + "<div>epost</div>"
-                + "<input name='epost' id='brukernavnInput' type='text'>"
-                + "</div>"
-                + "<input type='submit' value='Send link'>"
-                + "</form>");*/
-
         html.addBodyContent(errorHandling.toString());
         out.print(html.toString());
     }
@@ -80,7 +72,6 @@ public class GlemtPassord extends HttpServlet {
         }
     }
 
-    /* kan denne hoppes over? epost er jo unik */
     private int getBrukerId(String epost) throws SQLException, ClassNotFoundException {
         String query = "SELECT brukerId FROM users WHERE brukernavn = ? AND epostAktivert = 1;";
         Object[] vars = {epost};
@@ -89,11 +80,4 @@ public class GlemtPassord extends HttpServlet {
         return id;
     }
 
-    /* private int queueRemove(String token) throws Exception {
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        String command = "echo \"rm /home/tarves/login/glemt_passord/" + token + ".html\" | at today + 4 hours";
-        processBuilder.command("bash", "-c", command);
-        Process process = processBuilder.start();
-        return process.waitFor();
-    }*/
 }
