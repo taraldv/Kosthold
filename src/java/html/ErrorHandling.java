@@ -29,7 +29,7 @@ public class ErrorHandling {
             switch (errorCode) {
                 //Index.java
                 case 1:
-                    beskjed = "<p>Feil passord og/eller epost</p><p>Etter 5 mislykket forsøk innen 15 minutter, blir din ip bannlyst i 2 timer</p>";
+                    beskjed = "<p>Feil passord og/eller epost</p><p>Etter 5 mislykket forsøk innen 15 minutter, blir din du utestengt i 2 timer</p>";
                     break;
                 case 2:
                     beskjed = "SQL error";

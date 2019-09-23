@@ -7,6 +7,7 @@ package servlet;
 
 import html.ErrorHandling;
 import html.IndexHtml;
+import html.Input;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -34,13 +35,20 @@ public class GlemtPassord extends HttpServlet {
         PrintWriter out = resp.getWriter();
         ErrorHandling errorHandling = new ErrorHandling(req);
         IndexHtml html = new IndexHtml("LoggLogg Glemt Passord");
-        html.addBodyContent("<form method='POST' action=''>"
+        Input epost = new Input("skriv inn epost her", "epost", "text", "brukernavnInput", "input-login", "epost", "on");
+        String properSubmit = "<input id='loginSubmitInput' class='input-login' type='submit' value='send link'>";
+        String properForm = "<form id='registrerForm' class='form-login' method='POST' action=''>"
+                + epost.toString()
+                + properSubmit
+                + "</form>";
+        html.addBodyContent(properForm);
+        /*html.addBodyContent("<form method='POST' action=''>"
                 + "<div>"
                 + "<div>epost</div>"
                 + "<input name='epost' id='brukernavnInput' type='text'>"
                 + "</div>"
                 + "<input type='submit' value='Send link'>"
-                + "</form>");
+                + "</form>");*/
 
         html.addBodyContent(errorHandling.toString());
         out.print(html.toString());

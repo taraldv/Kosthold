@@ -35,22 +35,18 @@ public class NyBruker extends HttpServlet {
         Headers.GET(response);
         PrintWriter out = response.getWriter();
         ErrorHandling errorHandling = new ErrorHandling(request);
-        try {
-            IndexHtml html = new IndexHtml("LoggLogg Ny Bruker");
-            Input navn = new Input("skriv inn epost her", "epost", "text", "brukernavnInput", "input-login", "epost", "on");
-            Input passord = new Input("skriv inn passord her", "passord", "password", "passordInput", "input-login", "passord", "on");
-            String properSubmit = "<input id='loginSubmitInput' class='input-login' type='submit' value='registrer'>";
-            String properForm = "<form id='registrerForm' class='form-login' method='POST' action=''>"
-                    + navn.toString()
-                    + passord.toString()
-                    + properSubmit
-                    + "</form>";
-            html.addBodyContent(properForm);
-            html.addBodyContent(errorHandling.toString());
-            out.print(html);
-        } catch (Exception e) {
-            e.printStackTrace(out);
-        }
+        IndexHtml html = new IndexHtml("LoggLogg Ny Bruker");
+        Input navn = new Input("skriv inn epost her", "epost", "text", "brukernavnInput", "input-login", "epost", "on");
+        Input passord = new Input("skriv inn passord her", "passord", "password", "passordInput", "input-login", "passord", "on");
+        String properSubmit = "<input id='loginSubmitInput' class='input-login' type='submit' value='registrer'>";
+        String properForm = "<form id='registrerForm' class='form-login' method='POST' action=''>"
+                + navn.toString()
+                + passord.toString()
+                + properSubmit
+                + "</form>";
+        html.addBodyContent(properForm);
+        html.addBodyContent(errorHandling.toString());
+        out.print(html);
     }
 
     @Override
