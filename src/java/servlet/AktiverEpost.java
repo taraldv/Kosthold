@@ -12,7 +12,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.exceptions.TokenException;
 import util.exceptions.TokenSetException;
 import util.http.Headers;
 import util.sql.Database;
@@ -36,7 +35,7 @@ public class AktiverEpost extends HttpServlet {
             resp.sendRedirect("https://logglogg.no/");
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace(out);
-        } catch (TokenException e) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             resp.sendRedirect("https://logglogg.no?error=3");
         } catch (TokenSetException e) {
             //egentlig ikke et problem?
@@ -45,10 +44,11 @@ public class AktiverEpost extends HttpServlet {
     }
 
     private void validToken(String token) throws TokenSetException,
-            SQLException, ClassNotFoundException, TokenException {
+            SQLException, ClassNotFoundException, ArrayIndexOutOfBoundsException {
         String query = "SELECT 1 FROM users WHERE resetToken LIKE ?";
         String[][] rsc = Database.multiQuery(query, new Object[]{token}).getData();
         int exists = Integer.parseInt(rsc[0][0]);
+        //trenger vel ikke denne? blir enten 1 eller exception
         if (exists == 1) {
             String validQuery = "UPDATE users SET resetToken = NULL, epostAktivert = 1 WHERE resetToken = ?;";
             int deleteToken = Database.singleUpdateQuery(validQuery, new Object[]{token}, false);
@@ -56,8 +56,6 @@ public class AktiverEpost extends HttpServlet {
             } else {
                 throw new TokenSetException();
             }
-        } else {
-            throw new TokenException();
         }
     }
 }

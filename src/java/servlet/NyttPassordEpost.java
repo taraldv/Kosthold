@@ -15,7 +15,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.HTML;
 import util.sql.Database;
 import util.http.Headers;
 
@@ -50,6 +49,8 @@ public class NyttPassordEpost extends HttpServlet {
             }
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace(out);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            resp.sendRedirect("/glemtpassord/?error=3");
         }
     }
 
@@ -79,7 +80,8 @@ public class NyttPassordEpost extends HttpServlet {
         return Database.singleUpdateQuery(query, vars, false);
     }
 
-    private int validToken(String token) throws SQLException, ClassNotFoundException {
+    //SELECT 1 gir enten 1 eller empty set (arrayoutofboundsexception)
+    private int validToken(String token) throws SQLException, ClassNotFoundException, ArrayIndexOutOfBoundsException {
         String query = "SELECT 1 FROM users WHERE resetToken LIKE ?";
         String[][] rsc = Database.multiQuery(query, new Object[]{token}).getData();
         return Integer.parseInt(rsc[0][0]);
