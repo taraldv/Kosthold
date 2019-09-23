@@ -90,17 +90,17 @@ public class Index extends HttpServlet {
                 String time = Long.toString(date.getTimeInMillis());
                 String remoteHost = request.getRemoteHost();
                 String remotePort = Integer.toString(request.getRemotePort());
-                BufferedWriter bw = new BufferedWriter(new FileWriter(log, false));
+                BufferedWriter bw = new BufferedWriter(new FileWriter(log, true));
                 bw.write("epost: " + epost);
-                bw.newLine();
-                bw.write("remoteHost: " + remoteHost);
-                bw.newLine();
-                bw.write("remotePort: " + remotePort);
-                bw.newLine();
-                bw.write("userAgent: " + userAgent);
-                bw.newLine();
-                bw.write("time: " + time);
-                bw.newLine();
+               // bw.newLine();
+                bw.write(" remoteHost: " + remoteHost);
+                //bw.newLine();
+                bw.write(" remotePort: " + remotePort);
+                //bw.newLine();
+                bw.write(" userAgent: " + userAgent);
+                //bw.newLine();
+                bw.write(" time: " + time);
+                //bw.newLine();
 
                 bw.close();
                 response.sendRedirect("https://logglogg.no?feil=1");
