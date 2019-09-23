@@ -37,7 +37,7 @@ public class Index extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        ErrorHandling error = new ErrorHandling(request);
+        ErrorHandling errorHandling = new ErrorHandling(request);
         //ValidSession vs = new ValidSession(request, response);
 
         IndexHtml html = new IndexHtml("LoggLogg");
@@ -53,7 +53,7 @@ public class Index extends HttpServlet {
         Anchor glemtPassord = new Anchor("Glemt Passord", "/glemtpassord", "anchor-login");
         Anchor nyBruker = new Anchor("Ny Bruker", "/nybruker", "anchor-login");
         html.addBodyContent(properForm + glemtPassord.toString() + nyBruker.toString());
-        html.addBodyContent(error.toString());
+        html.addBodyContent(errorHandling.toString());
         out.print(html.toString());
     }
 

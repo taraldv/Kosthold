@@ -6,6 +6,7 @@
 package servlet;
 
 import crypto.SessionLogin;
+import html.ErrorHandling;
 import html.IndexHtml;
 import html.Input;
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class NyBruker extends HttpServlet {
             throws ServletException, IOException {
         Headers.GET(response);
         PrintWriter out = response.getWriter();
-        String msg = request.getParameter("msg");
+        ErrorHandling errorHandling = new ErrorHandling(request);
         try {
             IndexHtml html = new IndexHtml("LoggLogg Ny Bruker");
             Input navn = new Input("skriv inn epost her", "epost", "text", "brukernavnInput", "input-login", "epost", "on");
@@ -41,10 +42,7 @@ public class NyBruker extends HttpServlet {
                     + properSubmit
                     + "</form>";
             html.addBodyContent(properForm);
-            if (msg != null) {
-                html.addBodyContent("<h3>Epost sendt, sjekk innboks eller spam</h3>");
-            }
-
+            html.addBodyContent(errorHandling.toString());
             out.print(html);
         } catch (Exception e) {
             e.printStackTrace(out);
