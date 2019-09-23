@@ -23,7 +23,7 @@ import util.http.Headers;
  */
 public class EpostLink extends HttpServlet {
 
-    /* Testing? */
+    /* Blir sendt til denne siden fra URL i epost */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
