@@ -58,10 +58,11 @@ public class NyBruker extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
             String epost = request.getParameter("epost");
+            String escapedEpost = escape(epost);
             String pw = request.getParameter("passord");
             //tror ikke nyBruker kan bli noe annet en 1 eller exception
-            int brukerId = nyBruker(epost, pw);
-            SendMail sm = new SendMail(4, epost, brukerId,
+            int brukerId = nyBruker(escapedEpost, pw);
+            SendMail sm = new SendMail(4, escapedEpost, brukerId,
                     "Aktiver din bruker på logglogg.no",
                     "Klikk her for å aktivere din bruker",
                     "Hei, din epost har blitt brukt til å lage en konto på logglogg.no",
@@ -78,6 +79,13 @@ public class NyBruker extends HttpServlet {
     private int nyBruker(String epost, String passord) throws Exception {
         String query = "INSERT INTO users(brukernavn,passord) VALUES (?,?);";
         return Database.singleUpdateQuery(query, new Object[]{epost, SessionLogin.generatePasswordHash(passord)}, true);
+    }
+
+    private String escape(String epost) {
+        String removeSemicolon = epost.replaceAll(";", "");
+        String removeHyp = removeSemicolon.replaceAll("'", "");
+        String removeComma = removeHyp.replaceAll(",", "");
+        return removeComma.replaceAll("\"", "");
     }
 
 }
