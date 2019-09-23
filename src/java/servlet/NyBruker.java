@@ -62,7 +62,7 @@ public class NyBruker extends HttpServlet {
             String pw = request.getParameter("passord");
             //tror ikke nyBruker kan bli noe annet en 1 eller exception
             int brukerId = nyBruker(escapedEpost, pw);
-            SendMail sm = new SendMail(4, escapedEpost, brukerId,
+            SendMail sm = new SendMail(0, escapedEpost, brukerId,
                     "Aktiver din bruker på logglogg.no",
                     "Klikk her for å aktivere din bruker",
                     "Hei, din epost har blitt brukt til å lage en konto på logglogg.no",

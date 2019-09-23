@@ -41,7 +41,8 @@ public class SendMail {
         if (runBashMail() != 0) {
             throw new Exception("Bash mail error");
         }
-        if (queueBashRemove() != 0) {
+        //queueBashRemove skal ikke kjøres hvis duration er 0
+        if (duration != 0 && queueBashRemove() != 0) {
             throw new Exception("Bash queue error");
         }
 
@@ -78,7 +79,7 @@ public class SendMail {
 
     private int queueBashRemove() throws Exception {
         ProcessBuilder processBuilder = new ProcessBuilder();
-        String query = "'UPDATE users SET resetToken = '' WHERE brukerId = " + id + ";'";
+        String query = "\"UPDATE users SET resetToken = 'NULL' WHERE brukerId = " + id + ";\"";
         String command = "echo \"mysql -u kosthold -D kosthold -e " + query + "\" | at today + " + duration + " hours";
         processBuilder.command("bash", "-c", command);
         Process process = processBuilder.start();
