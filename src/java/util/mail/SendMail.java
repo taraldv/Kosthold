@@ -71,10 +71,11 @@ public class SendMail {
                 //+ "<p>Hei, du har nylig bedt om et nytt passord.</p>"
                 // + "<a href=" + link + token + ">Klikk her for å sette et nytt passord</a>"
                 + "<p>" + bodyDescription + "</p>"
-                + "<a href=" + link + token + ">" + anchorDescription + "</a>"
-                + "<p>Linken virker kun i " + duration + " timer</p>"
-                + "</body></html>'";
-        return html;
+                + "<a href=" + link + token + ">" + anchorDescription + "</a>";
+        if (duration > 0) {
+            html += "<p>Linken virker kun i " + duration + " timer</p>";
+        }
+        return html + "</body></html>'";
     }
 
     private int queueBashRemove() throws Exception {
