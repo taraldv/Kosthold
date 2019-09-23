@@ -9,10 +9,14 @@ import html.ErrorHandling;
 import html.IndexHtml;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import util.exceptions.BashMailException;
+import util.exceptions.BashQueueException;
+import util.exceptions.TokenSetException;
 import util.sql.Database;
 import util.http.Headers;
 import util.mail.SendMail;
@@ -57,13 +61,19 @@ public class GlemtPassord extends HttpServlet {
                     "https://logglogg.no/epostlink/");
             sm.send();
             response.sendRedirect("/glemtpassord/?msg=1");
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace(out);
+        } catch (TokenSetException e) {
+            response.sendRedirect("https://logglogg.no/nybruker?error=3");
+        } catch (BashQueueException e) {
+            response.sendRedirect("https://logglogg.no/nybruker?error=8");
+        } catch (BashMailException e) {
+            response.sendRedirect("https://logglogg.no/nybruker?error=4");
         }
     }
 
     /* kan denne hoppes over? epost er jo unik */
-    private int getBrukerId(String epost) throws Exception {
+    private int getBrukerId(String epost) throws SQLException, ClassNotFoundException {
         String query = "SELECT brukerId FROM users WHERE brukernavn = ? AND epostAktivert = 1;";
         Object[] vars = {epost};
         ResultSetContainer rsc = Database.multiQuery(query, vars);

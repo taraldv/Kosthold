@@ -5,7 +5,11 @@
  */
 package crypto;
 
+import java.sql.SQLException;
 import javax.servlet.http.HttpSession;
+import util.exceptions.EpostAktivertException;
+import util.exceptions.LoginFormInputEmptyException;
+import util.exceptions.LoginPasswordException;
 import util.sql.Database;
 import util.sql.ResultSetContainer;
 
@@ -38,11 +42,9 @@ public class SessionLogin {
         return (int) session.getAttribute("brukerId");
     }
 
-    public boolean validLogin() throws Exception {
-        return checkPassword();
-    }
-
-    private boolean checkPassword() throws Exception {
+    public void checkPassword() throws SQLException, ClassNotFoundException,
+            EpostAktivertException, LoginFormInputEmptyException,
+            LoginPasswordException {
         /* sjeker om strings ikke er null, ikke vits med sql spørring med tom string */
         if (validReqestStrings()) {
             String query = "SELECT passord,brukerId,epostAktivert FROM users WHERE brukernavn LIKE ?";
@@ -52,13 +54,18 @@ public class SessionLogin {
             int aktivert = Integer.parseInt(rsc.getData()[0][2]);
 
             /* hvis epost aktivert & gyldig passord, set attributes */
-            if (aktivert==1 && crypto.BCrypt.checkpw(passord, hashedPassword)) {
-                setSession(brukerId);
-                //session.setMaxInactiveInterval(60);
-                return true;
+            if (aktivert == 1) {
+                if (crypto.BCrypt.checkpw(passord, hashedPassword)) {
+                    setSession(brukerId);
+                } else {
+                    throw new LoginPasswordException();
+                }
+            } else {
+                throw new EpostAktivertException();
             }
+        } else {
+            throw new LoginFormInputEmptyException();
         }
-        return false;
     }
 
     private void setSession(int brukerId) {

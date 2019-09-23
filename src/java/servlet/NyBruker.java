@@ -11,10 +11,14 @@ import html.IndexHtml;
 import html.Input;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import util.exceptions.BashMailException;
+import util.exceptions.BashQueueException;
+import util.exceptions.TokenSetException;
 import util.http.Headers;
 import util.mail.SendMail;
 import util.sql.Database;
@@ -58,6 +62,9 @@ public class NyBruker extends HttpServlet {
             String epost = request.getParameter("epost");
             String escapedEpost = escape(epost);
             String pw = request.getParameter("passord");
+            if (pw.length() == 0) {
+                response.sendRedirect("https://logglogg.no/nybruker?error=7");
+            }
             //tror ikke nyBruker kan bli noe annet en 1 eller exception
             int brukerId = nyBruker(escapedEpost, pw);
             SendMail sm = new SendMail(0, escapedEpost, brukerId,
@@ -68,13 +75,18 @@ public class NyBruker extends HttpServlet {
             sm.send();
             response.sendRedirect("/nybruker/?msg=sendt");
 
-        } catch (Exception e) {
-            response.sendRedirect("https://logglogg.no/nybruker?error=1");
-            // e.printStackTrace(out);
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace(out);
+        } catch (TokenSetException e) {
+            response.sendRedirect("https://logglogg.no/nybruker?error=3");
+        } catch (BashQueueException e) {
+            response.sendRedirect("https://logglogg.no/nybruker?error=8");
+        } catch (BashMailException e) {
+            response.sendRedirect("https://logglogg.no/nybruker?error=4");
         }
     }
 
-    private int nyBruker(String epost, String passord) throws Exception {
+    private int nyBruker(String epost, String passord) throws ClassNotFoundException, SQLException {
         String query = "INSERT INTO users(brukernavn,passord) VALUES (?,?);";
         return Database.singleUpdateQuery(query, new Object[]{epost, SessionLogin.generatePasswordHash(passord)}, true);
     }

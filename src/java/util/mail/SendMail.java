@@ -6,6 +6,11 @@
 package util.mail;
 
 import crypto.ResetToken;
+import java.io.IOException;
+import java.sql.SQLException;
+import util.exceptions.BashMailException;
+import util.exceptions.BashQueueException;
+import util.exceptions.TokenSetException;
 import util.sql.Database;
 
 /**
@@ -34,23 +39,19 @@ public class SendMail {
     }
 
     //TODO lage skikkelig exceptions
-    public void send() throws Exception {
-        if (setResetToken() != 1) {
-            throw new Exception("SQL Reset token ikke satt");
-        }
-        if (runBashMail() != 0) {
-            throw new Exception("Bash mail error");
-        }
+    public void send() throws SQLException, ClassNotFoundException,
+            TokenSetException, BashMailException, BashQueueException {
+        setResetToken();
+        runBashMail();
         //queueBashRemove skal ikke kjøres hvis duration er 0
-        if (duration != 0 && queueBashRemove() != 0) {
-            throw new Exception("Bash queue error");
+        if (duration != 0) {
+            queueBashRemove();
         }
 
     }
 
-    private int runBashMail() throws Exception {
+    private void runBashMail() throws BashMailException {
         ProcessBuilder processBuilder = new ProcessBuilder();
-
         // String user = "noreply";
         //   String subject = "\"Få nytt passord på logglogg.no\"";
         String sender = "noreply@logglogg.no";
@@ -61,9 +62,13 @@ public class SendMail {
                 + " " + epost + " <<< " + getMailBody();
 
         processBuilder.command("bash", "-c", command);
-        Process process = processBuilder.start();
-        //0 means normal termination
-        return process.waitFor();
+        //kombinerer 2 exceptions til 1, vet ikke om dette er lurt
+        try {
+            Process process = processBuilder.start();
+            process.waitFor();
+        } catch (IOException | InterruptedException e) {
+            throw new BashMailException();
+        }
     }
 
     private String getMailBody() {
@@ -78,17 +83,22 @@ public class SendMail {
         return html + "</body></html>'";
     }
 
-    private int queueBashRemove() throws Exception {
+    private void queueBashRemove() throws BashQueueException {
         ProcessBuilder processBuilder = new ProcessBuilder();
         String query = "\"UPDATE users SET resetToken = 'NULL' WHERE brukerId = " + id + ";\"";
         String command = "echo \"mysql -u kosthold -D kosthold -e " + query + "\" | at today + " + duration + " hours";
         processBuilder.command("bash", "-c", command);
-        Process process = processBuilder.start();
-        //0 means normal termination
-        return process.waitFor();
+        //kombinerer 2 exceptions til 1, vet ikke om dette er lurt
+        try {
+            Process process = processBuilder.start();
+            //0 means normal termination
+            process.waitFor();
+        } catch (IOException | InterruptedException e) {
+            throw new BashQueueException();
+        }
     }
 
-    private int setResetToken() throws Exception {
+    private int setResetToken() throws SQLException, ClassNotFoundException {
         String query = "UPDATE users SET resetToken = ? WHERE brukerId = " + id + ";";
         return Database.singleUpdateQuery(query, new Object[]{token}, false);
     }

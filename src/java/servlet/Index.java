@@ -16,6 +16,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -24,6 +25,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import util.exceptions.EpostAktivertException;
+import util.exceptions.LoginFormInputEmptyException;
+import util.exceptions.LoginPasswordException;
 import util.http.Headers;
 
 /**
@@ -75,38 +79,41 @@ public class Index extends HttpServlet {
             throws ServletException, IOException {
         Headers.POST(response);
         PrintWriter out = response.getWriter();
+        SessionLogin login = new SessionLogin(request.getParameter("epost"), request.getParameter("passord"), request.getSession());
         try {
-            SessionLogin login = new SessionLogin(request.getParameter("epost"), request.getParameter("passord"), request.getSession());
-            if (login.validLogin()) {
-                String url = (String) request.getSession().getAttribute("url");
-                if (url == null) {
-                    url = "/admin/profil/";
-                }
-                //out.println(url);
-                //out.println(URLDecoder.decode(url, "UTF-8"));
+            login.checkPassword();
 
-                response.sendRedirect("https://logglogg.no" + encodeString(url));
-            } else {
-
-                File log = new File("/home/tarves/passwordFail.log");
-                String userAgent = request.getHeader("user-agent");
-                String epost = request.getParameter("epost");
-                String remoteHost = request.getRemoteHost();
-                String remotePort = Integer.toString(request.getRemotePort());
-                BufferedWriter bw = new BufferedWriter(new FileWriter(log, true));
-                bw.write(remoteHost);
-                bw.write(" [");
-                bw.write(dato());
-                bw.write("] epost: " + epost);
-                bw.write(" remotePort: " + remotePort);
-                bw.write(" userAgent: " + userAgent);
-                bw.newLine();
-
-                bw.close();
-                response.sendRedirect("https://logglogg.no?error=1");
+            String url = (String) request.getSession().getAttribute("url");
+            if (url == null) {
+                url = "/admin/profil/";
             }
-        } catch (Exception e) {
+            //out.println(url);
+            //out.println(URLDecoder.decode(url, "UTF-8"));
+
+            response.sendRedirect("https://logglogg.no" + encodeString(url));
+
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace(out);
+        } catch (EpostAktivertException e) {
+            response.sendRedirect("https://logglogg.no?error=5");
+        } catch (LoginFormInputEmptyException e) {
+            response.sendRedirect("https://logglogg.no?error=6");
+        } catch (LoginPasswordException e) {
+            File log = new File("/home/tarves/passwordFail.log");
+            String userAgent = request.getHeader("user-agent");
+            String epost = request.getParameter("epost");
+            String remoteHost = request.getRemoteHost();
+            String remotePort = Integer.toString(request.getRemotePort());
+            BufferedWriter bw = new BufferedWriter(new FileWriter(log, true));
+            bw.write(remoteHost);
+            bw.write(" [");
+            bw.write(dato());
+            bw.write("] epost: " + epost);
+            bw.write(" remotePort: " + remotePort);
+            bw.write(" userAgent: " + userAgent);
+            bw.newLine();
+            bw.close();
+            response.sendRedirect("https://logglogg.no?error=1");
         }
     }
 

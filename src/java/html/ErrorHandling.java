@@ -37,11 +37,29 @@ public class ErrorHandling {
                 case 3:
                     beskjed = "Ugyldig token";
                     break;
+                //NyBruker.java
                 case 4:
-                    beskjed = "Fikk ikke sendt epost";
+                    beskjed = "<p>Fikk ikke sendt epost</p>";
                     break;
+                //Index.java
+                case 5:
+                    beskjed = "<p>Epost har ikke blitt aktivert</p>";
+                    break;
+                //Index.java
+                case 6:
+                    beskjed = "<p>Epost/Passord felt kan ikke være tomt</p>";
+                    break;
+                //NyBruker.java
+                case 7:
+                    beskjed = "<p>Passord felt kan ikke være tomt</p>";
+                    break;
+                //NyBruker.java
+                case 8:
+                    beskjed = "<p>Server error, bash script feilet. Vennligst prøv igjen</p>";
+                    break;
+
                 default:
-                    beskjed = "Noe gikk galt, prøv igjen";
+                    beskjed = "Noe gikk galt, mangler error kode";
                     break;
 
             }
