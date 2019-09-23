@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
@@ -19,14 +20,14 @@ import java.sql.Types;
  */
 public class Database {
 
-    static private Connection getDatabaseConnection() throws Exception {
+    static private Connection getDatabaseConnection() throws SQLException, ClassNotFoundException {
         Class.forName("com.mysql.jdbc.Driver");
         /* database , brukernavn, passord */
         Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/kosthold", "kosthold", "");
         return connection;
     }
 
-    static public PreparedStatement getprepStatement(String query, int option) throws Exception {
+    static public PreparedStatement getprepStatement(String query, int option) throws SQLException, ClassNotFoundException {
         Connection c = getDatabaseConnection();
         if (option > 0) {
             return c.prepareStatement(query, option);
@@ -35,7 +36,7 @@ public class Database {
         }
     }
 
-    static public int callProcedure(String query, Object[] vars) throws Exception {
+    static public int callProcedure(String query, Object[] vars) throws SQLException, ClassNotFoundException {
         Connection c = getDatabaseConnection();
         CallableStatement cstmt = c.prepareCall(query);
 
@@ -52,7 +53,7 @@ public class Database {
         return rader;
     }
 
-    static public int singleUpdateQuery(String query, Object[] var, boolean returnAutoIncrement) throws Exception {
+    static public int singleUpdateQuery(String query, Object[] var, boolean returnAutoIncrement) throws SQLException, ClassNotFoundException {
         int options = 0;
         if (returnAutoIncrement) {
             options = Statement.RETURN_GENERATED_KEYS;
@@ -85,7 +86,7 @@ public class Database {
         return output;
     }
 
-    static private void setPreparedStatementVariables(PreparedStatement ps, Object[] vars) throws Exception {
+    static private void setPreparedStatementVariables(PreparedStatement ps, Object[] vars) throws SQLException, ClassNotFoundException {
         for (int i = 0; i < vars.length; i++) {
             /* string,double eller int */
             if (vars[i] instanceof Integer) {
@@ -100,7 +101,7 @@ public class Database {
         }
     }
 
-    static public ResultSetContainer multiQuery(String query, Object[] vars) throws Exception {
+    static public ResultSetContainer multiQuery(String query, Object[] vars) throws SQLException, ClassNotFoundException {
         PreparedStatement ps = getprepStatement(query, 0);
         setPreparedStatementVariables(ps, vars);
         ResultSetContainer rsc = new ResultSetContainer(ps.executeQuery());
@@ -108,7 +109,7 @@ public class Database {
         return rsc;
     }
 
-    static public ResultSetContainer normalQuery(String query) throws Exception {
+    static public ResultSetContainer normalQuery(String query) throws SQLException, ClassNotFoundException {
         ResultSetContainer rsc;
         try (Connection c = getDatabaseConnection()) {
             rsc = new ResultSetContainer(c.createStatement().executeQuery(query));
@@ -116,7 +117,7 @@ public class Database {
         return rsc;
     }
 
-    static public int innstillingerMultipleUpdateQueries(String query, String[][] arr, int offset) throws Exception {
+    static public int innstillingerMultipleUpdateQueries(String query, String[][] arr, int offset) throws SQLException, ClassNotFoundException {
         PreparedStatement ps = Database.getprepStatement(query, 0);
         int output = 0;
         /* første array i 'arr' er 'type' og har lengde 1 */

@@ -7,6 +7,7 @@ package util.sql;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -18,11 +19,11 @@ public class ResultSetContainer {
     private String[] columnHeaders;
     private String[][] data;
 
-    public ResultSetContainer(ResultSet rs) throws Exception {
+    public ResultSetContainer(ResultSet rs) throws SQLException {
         parseResultSet(rs);
     }
 
-    private void parseResultSet(ResultSet rset) throws Exception {
+    private void parseResultSet(ResultSet rset) throws SQLException {
         ResultSetMetaData rsmd = rset.getMetaData();
         int colCount = rsmd.getColumnCount();
         ArrayList<String[]> list = new ArrayList<>();
@@ -39,7 +40,7 @@ public class ResultSetContainer {
         data = list.toArray(new String[0][0]);
     }
 
-    private void setHeaders(ResultSetMetaData rsmd, int len) throws Exception {
+    private void setHeaders(ResultSetMetaData rsmd, int len) throws SQLException {
         ArrayList<String> colHeaders = new ArrayList<>();
         for (int i = 0; i < len; i++) {
             colHeaders.add(rsmd.getColumnLabel(i + 1));
@@ -56,7 +57,7 @@ public class ResultSetContainer {
     }
 
     /* x er rader, y er kolonner */
-    public String getJSON() throws Exception {
+    public String getJSON() {
         String json = "{";
 
         for (int x = 0; x < data.length; x++) {
@@ -75,7 +76,7 @@ public class ResultSetContainer {
         return json += "}";
     }
 
-    public String getOneColumnToString(String prepend) throws Exception {
+    public String getOneColumnToString(String prepend) {
         String output = "";
         for (String[] dataArr : data) {
             output += "," + prepend + "`" + dataArr[0] + "`";
