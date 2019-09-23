@@ -74,7 +74,7 @@ public class GlemtPassord extends HttpServlet {
 
     /* kan denne hoppes over? epost er jo unik */
     private int getBrukerId(String epost) throws Exception {
-        String query = "SELECT brukerId FROM users WHERE brukernavn = ? AND aktivertEpost = 1;";
+        String query = "SELECT brukerId FROM users WHERE brukernavn = ? AND epostAktivert = 1;";
         Object[] vars = {epost};
         ResultSetContainer rsc = Database.multiQuery(query, vars);
         int id = Integer.parseInt(rsc.getData()[0][0]);
