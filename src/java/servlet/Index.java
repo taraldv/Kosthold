@@ -109,6 +109,7 @@ public class Index extends HttpServlet {
     }
 
     private String dato() {
+        /* fail2ban regex <HOST> */
         Calendar date = new GregorianCalendar();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return df.format(date.getTime());
