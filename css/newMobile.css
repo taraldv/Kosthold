@@ -1,0 +1,92 @@
+*{
+	margin: 0;
+	padding:0;
+	font-family: sans-serif;
+	text-align: center;
+	width: 100%;
+	outline:none;
+	border:none;
+}
+/*LOGIN*/
+.anchor-login{
+	display: block;
+}
+.select{
+	font-size: 2.5em;
+	border-bottom: 1px solid black;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	background-color: #DCDCDC;
+}
+.input{
+	-moz-appearance: textfield;
+	font-size: 2.5em;
+	border-bottom: 1px solid black;
+	background-color: #F5F5F5;
+}
+.submit{
+	font-size: 2.5em;
+	background-color: #89F27E;
+}
+.input-login{
+	font-size: 1.5em;
+	border-bottom: 1px solid black;
+	border-top: 1px solid black;
+	background-color: #F5F5F5;
+	padding:2px;
+}
+.input-login-label{
+	font-size: 1.5em;
+}
+#loginSubmitInput{
+	font-size: 2.5em;
+	border-bottom: 1px solid black;
+	background-color: #89F27E;
+} 
+
+.mobile-hide{
+	display: none;
+}
+/* NAV */
+#hideMenuButton{
+	font-size: 2.5em;
+	background-color: #89F27E;
+}
+.nav-anchor{
+	padding: 5px;
+	font-size: 1.5em;
+	text-decoration: none;
+}
+
+/* TABLE */
+.data-table,.table-row,.header-row,.header-cell,.table-cell{
+	border-collapse: collapse;
+	table-layout: fixed;
+}
+.table-row{
+
+}
+.table-delete-cell{
+	background-color: #F8D5BE;
+}
+.header-cell{
+	width: 20%;
+}
+.table-delete-cell{
+	border:1px solid grey;
+	font-size: 2em;
+}
+.data-table{
+	border:1px solid grey;
+}
+.table-cell{
+	overflow-wrap: break-word;
+	border-left:1px solid grey;
+	border-right:1px solid grey;
+	border-top:1px solid grey;
+}
+.blank-table-cell{
+	border-left:1px solid grey;
+	border-right:1px solid grey;
+	border-top:0px solid grey;
+}

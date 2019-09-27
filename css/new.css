@@ -1,0 +1,115 @@
+*{
+	margin: 0;
+	padding:0;
+	font-family: sans-serif;
+}
+body{
+	display: block;
+	margin-left: 25%;
+	font-size: 1.2em;
+	overflow-y:scroll;
+}
+
+/*LOGIN*/
+.anchor-login{
+	display: block;
+	margin-left: 25%;
+	font-size: 1.3em;
+	margin-bottom: 10px;
+}
+.input-login-label{
+	display: block;
+}
+.form-login{
+	display: block;
+	margin-left: 25%;
+	margin-top: 10%;
+	font-size: 1.5em;
+}
+.input-login{
+	margin-bottom: 10px;
+	font-size: 0.8em;
+}
+#loginSubmitInput{
+	font-size: 1em;
+}
+/*NAV*/
+.nav-left{
+	background-color: whitesmoke;
+	display: inline-block;
+	border-right: 1px solid black;
+	border-left: 1px solid black;
+	height: 100%;
+	padding: 5px;
+}
+.nav-anchor{
+	padding: 5px;
+	font-size: 1.2em;
+	text-decoration: none;
+}
+.nav-text{
+	padding: 5px;
+}
+.nav-list{
+	list-style: none;
+}
+/*DIV STUFF*/
+.div-form{
+	
+}
+
+.div-table{
+	
+}
+.div-container{
+	vertical-align: top;
+	display: inline-block;
+}
+/*BUTTONS*/
+.submit{
+	margin-left: 5px;
+	padding-left: 5px;
+	padding-right: 5px;
+	border: 1px solid grey;
+	display: inline-block;
+	background-color:#e6e6e6; 
+}
+.submit:hover{
+	cursor: pointer;
+	background-color: #a0db8e;
+}
+.delete{
+
+}
+.delete:hover{
+
+}
+
+/* MOBILE */
+#hideMenuButton{
+	display: none;
+}
+
+/* TABLE */
+.data-table,.table-row,.header-row,.header-cell,.table-cell{
+	border-collapse: collapse;
+}
+.table-row{
+
+}
+.table-delete-cell{
+	border:1px solid grey;
+}
+.data-table{
+	border:1px solid grey;
+}
+.table-cell{
+	border-left:1px solid grey;
+	border-right:1px solid grey;
+	border-top:1px solid grey;
+}
+.blank-table-cell{
+	border-left:1px solid grey;
+	border-right:1px solid grey;
+	border-top:0px solid grey;
+}
