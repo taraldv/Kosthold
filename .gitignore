@@ -11,3 +11,4 @@ build.xml
 *.sql
 !/css/new.css
 !/css/newMobile.css
+!/js/LoggLogg.js
