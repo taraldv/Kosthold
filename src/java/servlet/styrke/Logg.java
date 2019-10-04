@@ -37,7 +37,7 @@ public class Logg extends HttpServlet {
             html.addBodyContent(containerDiv.toString());
             String tableArr = "['getStyrkeLogg','styrkeLoggTabell','/styrke/logg/']";
             String deleteArr = "['deleteStyrkeLogg','styrkeLoggId','/styrke/logg/']";
-            html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + ",2);");
+            html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + ",7);");
             String paramArray = "['styrkeId','vekt','reps']";
             html.addBodyJS("insertRequest('styrkeLoggSubmit','insertStyrkeLogg','/styrke/logg/'," + paramArray + "," + tableArr + "," + deleteArr + ",7);");
             //Form.get(brukerId));

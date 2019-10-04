@@ -11,28 +11,53 @@ function request(data,url,func){
 	oReq.withCredentials = true;
 	oReq.send(data);	
 }
+
+/* Knytter valgt element til ett xmlhttprequest med valgt parameters */
 function insertRequest(buttonId,type,url,parameterArray,tableStuff,deleteStuff,interval){
 	document.getElementById(buttonId).addEventListener('click',(e)=>{
 		let btn = e.target;
 		let children = btn.parentNode.childNodes;
 
-		//parameterArray og inputArray skal være like store
-		let inputArray = [];
 		//leter etter select og inputs
+		let x = 0;
+		let dataString = "";
 		for(let i=0;i<children.length;i++){
 			let tempTag = children[i].tagName;
 			if(tempTag=='SELECT'){
 				let selected = children[i].options[children[i].selectedIndex];
-				inputArray.push(selected.getAttribute('data-id'));
+				let innhold = selected.getAttribute('data-id');
+				dataString+="&"+parameterArray[x]+"="+innhold;
+				x++;
 			} else if(tempTag=='LABEL'){
 				let input = children[i].lastChild;
-				inputArray.push(input.value);
+				let verdi = input.value;	
+				dataString+="&"+parameterArray[x]+"="+verdi;
+				x++;
+			}
+			if (parameterArray.length==x) {
+				break;
 			}
 		}
-		let dataString = "";
-		for(let j=0;j<parameterArray.length;j++){
-			dataString+="&"+parameterArray[j]+"="+inputArray[j];
+
+		/* leter gjennom barns barn etter select/input
+		som ikke har forklaringer i paramterarray,
+		server bruker Map*/
+		for(let i=0;i<children.length;i++){
+			let childrenChildren = children[i].childNodes;
+			for(let j=0;j<childrenChildren.length;j++){
+				let tempTag = childrenChildren[j].tagName;
+				if(tempTag=='SELECT'){
+					let selected = childrenChildren[j].options[childrenChildren[j].selectedIndex];
+					let innhold = selected.getAttribute('data-id');
+					dataString+="&innhold="+innhold;
+				} else if(tempTag=='LABEL'){
+					let input = childrenChildren[j].lastChild;
+					let verdi = input.value;	
+					dataString+="&verdier="+verdi;
+				}
+			}
 		}
+		
 		request("type="+type+dataString,url,function(){
 			if(this.response==1){
 				buildTable(tableStuff,deleteStuff,interval);

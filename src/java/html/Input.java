@@ -12,13 +12,19 @@ package html;
 public class Input extends Element {
 
     private final String placeholder;
-    private final String label;
-    private final String labelClass;
+    private String label;
+    private String labelClass;
     private final String inputType;
     private String autocomplete = "off";
     private String name;
     private String step = "";
 
+    public Input(String placeholder, String inputType, String elementId, String elementClass) {
+        super(elementId, elementClass);
+        this.placeholder = placeholder;
+        this.inputType = inputType;
+    }
+    
     public Input(String placeholder, String label, String inputType, String elementId, String elementClass) {
         super(elementId, elementClass);
         this.placeholder = placeholder;

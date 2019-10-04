@@ -6,14 +6,19 @@
 package servlet.kosthold;
 
 import crypto.ValidSession;
+import html.Div;
+import html.DivForm;
+import html.Input;
+import html.Select;
+import html.StandardHtml;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.HTML;
 import util.sql.Database;
 import util.http.Headers;
 import util.sql.ResultSetContainer;
@@ -29,12 +34,52 @@ public class Matvaretabellen extends HttpServlet {
 
         Headers.GET(resp);
         ValidSession.isValid(req, resp);
-        HTML html = new HTML("Kosthold Logg");
-        html.addStandard();
-        html.addJS("../../js/kosthold.js");
-        html.addJS("../../js/kostholdMatvaretabellen.js");
-        resp.getWriter().print(html.toString());
+        PrintWriter out = resp.getWriter();
+        try {
+            StandardHtml html = new StandardHtml("Kosthold Matvaretabellen");
+            DivForm form = getMatvaretabellenForm();
+            Div div = new Div("", "brukerMatvaretabellTabell", "div-table");
+            Div containerDiv = new Div(form.toString() + div.toString(), "div-container");
+            html.addBodyContent(containerDiv.toString());
+            String tableArr = "['getBrukerMatvaretabell','brukerMatvaretabellTabell','/kosthold/matvaretabellen/']";
+            String deleteArr = "['deleteMatvare','matvareId','/kosthold/matvaretabellen/']";
+            html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + ",0);");
+            String paramArray = "['matvareNavn']";
+            html.addBodyJS("insertRequest('matvaretabellenSubmit','insertMatvaretabell','/kosthold/matvaretabellen/'," + paramArray + "," + tableArr + "," + deleteArr + ",0);");
+            //Form.get(brukerId));
+            out.print(html.toString());
+        } catch (Exception e) {
+            e.printStackTrace(out);
+        }
 
+    }
+
+    private DivForm getMatvaretabellenForm() throws Exception {
+        DivForm form = new DivForm("styrkeLoggForm", "div-form");
+        form.addElement(new Input("navn", "matvare navn", "text", "styrkeLoggInputKilo", "input"));
+        form.addElement(new Div("legg til innhold", "ekstraInnhold", "submit"));
+        form.addElement(new Div("submit", "matvaretabellenSubmit", "submit"));
+
+        form.addElement(customDiv("kilojoule", 3));
+        form.addElement(customDiv("kilokalorier", 4));
+        form.addElement(customDiv("fett", 5));
+        form.addElement(customDiv("mettet", 6));
+        form.addElement(customDiv("enumettet", 12));
+        form.addElement(customDiv("flerumettet", 15));
+        form.addElement(customDiv("karbohydrat", 28));
+        form.addElement(customDiv("sukker, tilsatt", 31));
+        form.addElement(customDiv("kostfiber", 32));
+        form.addElement(customDiv("protein", 33));
+        form.addElement(customDiv("salt", 34));
+
+        return form;
+    }
+
+    private Div customDiv(String navn, int index) throws Exception {
+        Select s = new Select("benevningId", "benevninger", "benevningSelect", "select", index, true);
+        Input i = new Input(navn, "", "number", "", "input", "0.1");
+        Div div = new Div(s.toString() + i.toString(), "inputSelectDiv");
+        return div;
     }
 
     @Override
@@ -42,17 +87,17 @@ public class Matvaretabellen extends HttpServlet {
             throws ServletException, IOException {
         Headers.POST(response);
         ValidSession.isValid(request, response);
-        PrintWriter out =response.getWriter();
+        PrintWriter out = response.getWriter();
         String type = request.getParameter("type");
 
         try {
             int brukerId = (int) request.getSession().getAttribute("brukerId");
             if (type.equals("insertMatvaretabell")) {
-                out.print(matvaretabellInsert(request.getParameterMap(), brukerId, request.getParameter("navn")));
+                out.print(matvaretabellInsert(request.getParameterMap(), brukerId, request.getParameter("matvareNavn")));
             } else if (type.equals("getBrukerMatvaretabell")) {
                 out.print(getMatvaretabellTabell(brukerId));
             } else if (type.equals("deleteMatvare")) {
-                out.print(deleteMatvare(brukerId, Integer.parseInt(request.getParameter("brukerId"))));
+                out.print(deleteMatvare(brukerId, Integer.parseInt(request.getParameter("matvareId"))));
             } else if (type.equals("updateMatvare")) {
                 Map<String, String[]> paras = request.getParameterMap();
 
@@ -66,6 +111,13 @@ public class Matvaretabellen extends HttpServlet {
         }
     }
 
+    /*private String insertMatvaretabell(Map<String, String[]> map, int brukerId, String matvare) throws Exception {
+        String output = "";
+        String[] keys = map.keySet().toArray(new String[0]);
+        output += Arrays.toString(keys);
+        String[] arr = map.get(map);
+        return output;
+    }*/
     private String autocomplete(int brukerId, String matchingParameter, String whichTable) throws Exception {
         String autocompleteQuery = "";
         if (whichTable.equals("matvaretabellen")) {
@@ -139,7 +191,7 @@ public class Matvaretabellen extends HttpServlet {
             if (x != 0) {
                 verifyQuery += " OR";
             }
-            verifyQuery += " navn LIKE ?";
+            verifyQuery += " benevningId = ?";
         }
         /* en slags måte å bruke preparedStatement på kolonneNavn, men tar 2 steg */
         String[][] verifisertKolonneNavn = Database.multiQuery(verifyQuery, kolonneArray).getData();
@@ -158,7 +210,13 @@ public class Matvaretabellen extends HttpServlet {
             valueString += ",?";
 
             /*mapData rader er type,navn,innhold og verdier(3)*/
-            vars[i + 2] = Double.parseDouble(mapData[3][i]);
+            String decimal = mapData[3][i];
+            /* gjør empty string til 0 */
+            if (decimal.length() > 0) {
+                vars[i + 2] = Double.parseDouble(decimal);
+            } else {
+                vars[i + 2] = new Double(0);
+            }
 
         }
         columnString += ") ";

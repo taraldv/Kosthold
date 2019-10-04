@@ -18,6 +18,8 @@ public class Select extends Element {
     private final String tableName;
     private final String optionClass;
     private int brukerId;
+    private boolean disabled;
+    private int index = 1;
 
     public Select(String kolonneId, String tableName, int brukerId, String elementId, String elementClass) throws Exception {
         super(elementId, elementClass);
@@ -38,17 +40,34 @@ public class Select extends Element {
         getOptions(query);
     }
 
+    public Select(String kolonneId, String tableName, String elementId, String elementClass, int index, boolean disabled) throws Exception {
+        super(elementId, elementClass);
+        this.kolonneId = kolonneId;
+        this.tableName = tableName;
+        this.index = index;
+        this.disabled = disabled;
+        optionClass = elementClass + "-option";
+        String query = "SELECT " + kolonneId + ",navn FROM " + tableName + ";";
+        getOptions(query);
+    }
+
     private void getOptions(String query) throws Exception {
         String[][] data = Database.normalQuery(query).getData();
         //[[id,navn],[id,navn]] etc
         options = "";
-        for (String[] strings : data) {
-            options += "<option class='" + optionClass + "' data-id='" + strings[0] + "'>" + strings[1] + "</option>";
+        for (int i = 0; i < data.length; i++) {
+            if ((i + 1) == index) {
+                options += "<option selected class='" + optionClass + "' data-id='" + data[i][0] + "'>" + data[i][1] + "</option>";
+            }
+            options += "<option class='" + optionClass + "' data-id='" + data[i][0] + "'>" + data[i][1] + "</option>";
         }
     }
 
     @Override
     public String toString() {
+        if (disabled) {
+            return "<select disabled " + getInfoString() + ">" + options + "</select>";
+        }
         return "<select " + getInfoString() + ">" + options + "</select>";
     }
 
