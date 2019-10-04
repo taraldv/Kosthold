@@ -58,8 +58,9 @@ public class Select extends Element {
         for (int i = 0; i < data.length; i++) {
             if ((i + 1) == index) {
                 options += "<option selected class='" + optionClass + "' data-id='" + data[i][0] + "'>" + data[i][1] + "</option>";
+            } else {
+                options += "<option class='" + optionClass + "' data-id='" + data[i][0] + "'>" + data[i][1] + "</option>";
             }
-            options += "<option class='" + optionClass + "' data-id='" + data[i][0] + "'>" + data[i][1] + "</option>";
         }
     }
 
