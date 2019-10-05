@@ -37,7 +37,7 @@ public class Historikk extends HttpServlet {
 
             String tableArr = "['getLoggTabell','kostholdHistorikkTabell','/kosthold/logg/']";
             String deleteArr = "['deleteLogg','loggId','/kosthold/logg/']";
-            html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + "," + 365 / 12 + ");");
+            html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + "," + 31 + ");");
             out.print(html.toString());
         } catch (Exception e) {
             e.printStackTrace(out);
