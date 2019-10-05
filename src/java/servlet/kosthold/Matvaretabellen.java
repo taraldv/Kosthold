@@ -55,7 +55,7 @@ public class Matvaretabellen extends HttpServlet {
 
     private DivForm getMatvaretabellenForm() throws Exception {
         DivForm form = new DivForm("matvaretabellForm", "div-form");
-        form.addElement(new Input("Navn", "Matvare navn", "text", "styrkeLoggInputKilo", "input"));
+        form.addElement(new Input("Navn", "Matvare navn", "text", "kostholdMatvaretabellenNavnInput", "input"));
         form.addElement(new Div("Legg til innhold", "ekstraInnhold", "submit"));
         form.addElement(new Div("Submit", "matvaretabellenSubmit", "submit"));
 

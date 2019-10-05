@@ -14,8 +14,8 @@ import util.sql.Database;
 public class Select extends Element {
 
     private String options;
-    private final String kolonneId;
-    private final String tableName;
+    private String kolonneId;
+    private String tableName;
     private final String optionClass;
     private int brukerId;
     private boolean disabled;
@@ -29,6 +29,13 @@ public class Select extends Element {
         optionClass = elementClass + "-option";
         String query = "SELECT " + kolonneId + ",navn FROM " + tableName + " WHERE brukerId = " + brukerId + " ORDER BY navn;";
         getOptions(query);
+    }
+
+    public Select(String selectQuery, String elementId, String elementClass) throws Exception {
+        super(elementId, elementClass);
+        optionClass = elementClass + "-option";
+        String query = "SELECT " + selectQuery + ";";
+        getSimpleOptions(query);
     }
 
     public Select(String kolonneId, String tableName, String elementId, String elementClass) throws Exception {
@@ -49,6 +56,20 @@ public class Select extends Element {
         optionClass = elementClass + "-option";
         String query = "SELECT " + kolonneId + ",navn FROM " + tableName + ";";
         getOptions(query);
+    }
+
+    //options uten data-id
+    private void getSimpleOptions(String query) throws Exception {
+        String[][] data = Database.normalQuery(query).getData();
+        //[[id,navn],[id,navn]] etc
+        options = "";
+        for (int i = 0; i < data.length; i++) {
+            if ((i + 1) == index) {
+                options += "<option selected class='" + optionClass + "'>" + data[i][0] + "</option>";
+            } else {
+                options += "<option class='" + optionClass + "'>" + data[i][0] + "</option>";
+            }
+        }
     }
 
     private void getOptions(String query) throws Exception {

@@ -160,12 +160,14 @@ CREATE TABLE måltider(
 
 CREATE TABLE ingredienser(
 	ingredienseId INTEGER AUTO_INCREMENT,
+	brukerId INTEGER NOT NULL,
 	matvareId INTEGER NOT NULL,
 	måltidId INTEGER NOT NULL,
 	mengde DECIMAL(8,2) NOT NULL,
 	PRIMARY KEY(ingredienseId),
 	FOREIGN KEY(matvareId) REFERENCES matvaretabellen(matvareId),
-	FOREIGN KEY(måltidId) REFERENCES måltider(måltidId)
+	FOREIGN KEY(måltidId) REFERENCES måltider(måltidId),
+	FOREIGN KEY(brukerId) REFERENCES users(brukerId)
 );
 
 CREATE TABLE logg(

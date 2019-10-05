@@ -12,6 +12,27 @@ function request(data,url,func){
 	oReq.send(data);	
 }
 
+function test(divId,url){
+	request("type=getMåltider",url,function(){
+		let data = JSON.parse(this.response);
+		let keys = Object.keys(data);
+		for(let i=0;i<keys.length;i++){
+			let tempDivId = "måltidContainerId"+i;
+			let forklaring = getElement("h3","","");
+			forklaring.innerText = data[i].navn;
+			let tempContainerDiv = getElement("div","måltiderContainer","");
+			let tempDiv = getElement("div","ingrediensContainer",tempDivId);
+			tempContainerDiv.appendChild(forklaring);
+			tempContainerDiv.appendChild(tempDiv);
+			document.getElementById(divId).appendChild(tempContainerDiv);
+			let tempId = data[i].måltidId;
+			let miniTableStuff = ["getMåltiderIngredienser&måltidId="+tempId,tempDivId,'/kosthold/måltider/'];
+			let miniTableDeleteStuff = ['deleteMåltidIngrediens','ingredienseId','/kosthold/måltider/'];
+			buildTable(miniTableStuff,miniTableDeleteStuff,0);
+		}
+	});
+}
+
 /* Knytter valgt element til ett xmlhttprequest med valgt parameters */
 function insertRequest(buttonId,type,url,parameterArray,tableStuff,deleteStuff,interval){
 	document.getElementById(buttonId).addEventListener('click',(e)=>{
@@ -81,17 +102,33 @@ function buildTableHeader(obj){
 	return headerRow;
 }
 
-//knytter et server request til en button event
-function attachServerRequestToButton(type,buttonId,url,id){
-	let btn = document.getElementById(buttonId);
-	btn.addEventListener('click',(e)=>{
-		request("type="+type,url,function(){
-			document.getElementById(id).insertAdjacentHTML('beforeend', this.response);
+
+function attachServerRequestToSelect(type,data,selectId,url,containerId,removeId){
+	let select = document.getElementById(selectId);
+	select.addEventListener('change',(e)=>{
+		if(removeId){
+			let elemToBeRemoved = document.getElementById(removeId);
+			elemToBeRemoved.parentNode.removeChild(elemToBeRemoved);
+		}
+		let selected = select.options[select.selectedIndex];
+		request("type="+type+"&"+data+"="+selected.innerText,url,function(){
+			document.getElementById(containerId).insertAdjacentHTML('beforeend', this.response);
 		});
 	});
 }
 
-//stuff er array med [typeNavn,idNavn,url]
+//knytter et server request til en button event
+function attachServerRequestToButton(type,buttonId,url,containerId){
+	let btn = document.getElementById(buttonId);
+	btn.addEventListener('click',(e)=>{
+		request("type="+type,url,function(){
+			document.getElementById(containerId).insertAdjacentHTML('beforeend', this.response);
+		});
+	});
+}
+
+//tableStuff er array med [type,elementAppendId,url]
+//deleteStuff er array med [type,sqlKolonneId,url]
 function buildTable(tableStuff,deleteStuff,interval){
 	let table = getElement("table","data-table");
 	request("interval="+interval+"&type="+tableStuff[0],tableStuff[2],function(){
