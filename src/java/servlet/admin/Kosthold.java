@@ -52,9 +52,9 @@ public class Kosthold extends HttpServlet {
     private DivForm getBenevningForm() throws Exception {
         DivForm form = new DivForm("benevningForm", "div-form");
         form.addElement(new Select("benevningId", "benevninger", "benevningSelect", "select"));
-        form.addElement(new Input("fra verdi", "minimum", "number", "benevningMax", "input"));
-        form.addElement(new Input("til verdi", "maksimum", "number", "benevningMin", "input"));
-        form.addElement(new Div("submit", "benevningSubmit", "submit"));
+        form.addElement(new Input("Fra verdi", "minimum", "number", "benevningMax", "input"));
+        form.addElement(new Input("Til verdi", "maksimum", "number", "benevningMin", "input"));
+        form.addElement(new Div("Submit", "benevningSubmit", "submit"));
         return form;
     }
 

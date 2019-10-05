@@ -13,7 +13,6 @@ import html.Select;
 import html.StandardHtml;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -56,21 +55,21 @@ public class Matvaretabellen extends HttpServlet {
 
     private DivForm getMatvaretabellenForm() throws Exception {
         DivForm form = new DivForm("matvaretabellForm", "div-form");
-        form.addElement(new Input("navn", "matvare navn", "text", "styrkeLoggInputKilo", "input"));
-        form.addElement(new Div("legg til innhold", "ekstraInnhold", "submit"));
-        form.addElement(new Div("submit", "matvaretabellenSubmit", "submit"));
+        form.addElement(new Input("Navn", "Matvare navn", "text", "styrkeLoggInputKilo", "input"));
+        form.addElement(new Div("Legg til innhold", "ekstraInnhold", "submit"));
+        form.addElement(new Div("Submit", "matvaretabellenSubmit", "submit"));
 
-        form.addElement(customDiv("kilojoule", 3));
-        form.addElement(customDiv("kilokalorier", 4));
-        form.addElement(customDiv("fett", 5));
-        form.addElement(customDiv("mettet", 6));
-        form.addElement(customDiv("enumettet", 12));
-        form.addElement(customDiv("flerumettet", 15));
-        form.addElement(customDiv("karbohydrat", 28));
-        form.addElement(customDiv("sukker, tilsatt", 31));
-        form.addElement(customDiv("kostfiber", 32));
-        form.addElement(customDiv("protein", 33));
-        form.addElement(customDiv("salt", 34));
+        form.addElement(customDiv("Kilojoule", 3));
+        form.addElement(customDiv("Kilokalorier", 4));
+        form.addElement(customDiv("Fett", 5));
+        form.addElement(customDiv("Mettet", 6));
+        form.addElement(customDiv("Enumettet", 12));
+        form.addElement(customDiv("Flerumettet", 15));
+        form.addElement(customDiv("Karbohydrat", 28));
+        form.addElement(customDiv("Sukker, tilsatt", 31));
+        form.addElement(customDiv("Kostfiber", 32));
+        form.addElement(customDiv("Protein", 33));
+        form.addElement(customDiv("Salt", 34));
 
         return form;
     }

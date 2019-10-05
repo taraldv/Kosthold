@@ -53,8 +53,8 @@ public class Logg extends HttpServlet {
 
     private DivForm getKondisjonLoggForm() {
         DivForm form = new DivForm("kondisjonLoggForm", "div-form");
-        form.addElement(new Input("kilo", "kilo", "number", "vektLoggInputKilo", "input", "0.1"));
-        form.addElement(new Div("submit", "vektLoggSubmit", "submit"));
+        form.addElement(new Input("Kilo", "kilo", "number", "vektLoggInputKilo", "input", "0.1"));
+        form.addElement(new Div("Submit", "vektLoggSubmit", "submit"));
         return form;
     }
 

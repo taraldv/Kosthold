@@ -51,9 +51,9 @@ public class Logg extends HttpServlet {
     private DivForm getKondisjonLoggForm(int brukerId) throws Exception {
         DivForm form = new DivForm("styrkeLoggForm", "div-form");
         form.addElement(new Select("styrkeId", "styrkeØvelse", brukerId, "styrkeLoggSelect", "select"));
-        form.addElement(new Input("kilo", "kilo", "number", "styrkeLoggInputKilo", "input", "0.1"));
-        form.addElement(new Input("reps", "reps", "number", "styrkeLoggInputReps", "input"));
-        form.addElement(new Div("submit", "styrkeLoggSubmit", "submit"));
+        form.addElement(new Input("Kilo", "kilo", "number", "styrkeLoggInputKilo", "input", "0.1"));
+        form.addElement(new Input("Reps", "reps", "number", "styrkeLoggInputReps", "input"));
+        form.addElement(new Div("Submit", "styrkeLoggSubmit", "submit"));
         return form;
     }
 

@@ -35,7 +35,7 @@ public class GlemtPassord extends HttpServlet {
         PrintWriter out = resp.getWriter();
         ErrorHandling errorHandling = new ErrorHandling(req);
         IndexHtml html = new IndexHtml("LoggLogg Glemt Passord");
-        Input epost = new Input("skriv inn epost her", "epost", "text", "brukernavnInput", "input-login", "epost", "on");
+        Input epost = new Input("Skriv inn epost her", "Epost", "text", "brukernavnInput", "input-login", "epost", "on");
         String properSubmit = "<input id='loginSubmitInput' class='input-login' type='submit' value='send link'>";
         String properForm = "<form id='registrerForm' class='form-login' method='POST' action=''>"
                 + epost.toString()

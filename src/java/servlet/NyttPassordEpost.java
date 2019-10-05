@@ -34,7 +34,7 @@ public class NyttPassordEpost extends HttpServlet {
         String token = req.getPathInfo().substring(1);
         try {
             if (validToken(token) == 1) {
-                Input epost = new Input("skriv nytt passord her", "nytt passord", "password", "brukernavnInput", "input-login", "nyttPassord", "off");
+                Input epost = new Input("Skriv nytt passord her", "Nytt passord", "password", "brukernavnInput", "input-login", "nyttPassord", "off");
                 String properSubmit = "<input id='loginSubmitInput' class='input-login' type='submit' value='oppdater passord'>";
                 String hiddenInput = "<input name='token' type='text' value=" + token + " hidden=''>";
                 String properForm = "<form id='registrerForm' class='form-login' method='POST' action=''>"

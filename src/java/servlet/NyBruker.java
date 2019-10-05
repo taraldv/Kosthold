@@ -36,8 +36,8 @@ public class NyBruker extends HttpServlet {
         PrintWriter out = response.getWriter();
         ErrorHandling errorHandling = new ErrorHandling(request);
         IndexHtml html = new IndexHtml("LoggLogg Ny Bruker");
-        Input navn = new Input("skriv inn epost her", "epost", "text", "brukernavnInput", "input-login", "epost", "on");
-        Input passord = new Input("skriv inn passord her", "passord", "password", "passordInput", "input-login", "passord", "on");
+        Input navn = new Input("Skriv inn epost her", "Epost", "text", "brukernavnInput", "input-login", "epost", "on");
+        Input passord = new Input("Skriv inn passord her", "Passord", "password", "passordInput", "input-login", "passord", "on");
         String properSubmit = "<input id='loginSubmitInput' class='input-login' type='submit' value='registrer'>";
         String properForm = "<form id='registrerForm' class='form-login' method='POST' action=''>"
                 + navn.toString()

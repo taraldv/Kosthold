@@ -48,8 +48,8 @@ public class Øvelser extends HttpServlet {
 
     private DivForm getStyrkeØvelserForm() {
         DivForm form = new DivForm("styrkeØvelseForm", "div-form");
-        form.addElement(new Input("øvelse navn", "øvelse navn", "text", "styrkeØvelseInputNavn", "input"));
-        form.addElement(new Div("submit", "styrkeØvelseSubmit", "submit"));
+        form.addElement(new Input("Øvelse navn", "øvelse navn", "text", "styrkeØvelseInputNavn", "input"));
+        form.addElement(new Div("Submit", "styrkeØvelseSubmit", "submit"));
         return form;
     }
 
