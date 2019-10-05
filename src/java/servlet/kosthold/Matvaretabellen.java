@@ -46,7 +46,7 @@ public class Matvaretabellen extends HttpServlet {
             html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + ",0);");
             String paramArray = "['matvareNavn']";
             html.addBodyJS("insertRequest('matvaretabellenSubmit','insertMatvaretabell','/kosthold/matvaretabellen/'," + paramArray + "," + tableArr + "," + deleteArr + ",0);");
-            //Form.get(brukerId));
+            html.addBodyJS("attachServerRequestToButton('getDiv','ekstraInnhold','/kosthold/matvaretabellen/','matvaretabellForm')");
             out.print(html.toString());
         } catch (Exception e) {
             e.printStackTrace(out);
@@ -55,7 +55,7 @@ public class Matvaretabellen extends HttpServlet {
     }
 
     private DivForm getMatvaretabellenForm() throws Exception {
-        DivForm form = new DivForm("styrkeLoggForm", "div-form");
+        DivForm form = new DivForm("matvaretabellForm", "div-form");
         form.addElement(new Input("navn", "matvare navn", "text", "styrkeLoggInputKilo", "input"));
         form.addElement(new Div("legg til innhold", "ekstraInnhold", "submit"));
         form.addElement(new Div("submit", "matvaretabellenSubmit", "submit"));
@@ -105,6 +105,11 @@ public class Matvaretabellen extends HttpServlet {
                 //out.print(request.getParameter("rowData"));
             } else if (type.equals("autocomplete")) {
                 out.print(autocomplete(brukerId, request.getParameter("string"), request.getParameter("table")));
+            } else if (type.equals("getDiv")) {
+                Select s = new Select("benevningId", "benevninger", "benevningSelect", "select");
+                Input i = new Input("", "", "number", "", "input", "0.1");
+                Div div = new Div(s.toString() + i.toString(), "inputSelectDiv");
+                out.print(div.toString());
             }
         } catch (Exception e) {
             e.printStackTrace(out);

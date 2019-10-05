@@ -80,6 +80,17 @@ function buildTableHeader(obj){
 	}
 	return headerRow;
 }
+
+//knytter et server request til en button event
+function attachServerRequestToButton(type,buttonId,url,id){
+	let btn = document.getElementById(buttonId);
+	btn.addEventListener('click',(e)=>{
+		request("type="+type,url,function(){
+			document.getElementById(id).insertAdjacentHTML('beforeend', this.response);
+		});
+	});
+}
+
 //stuff er array med [typeNavn,idNavn,url]
 function buildTable(tableStuff,deleteStuff,interval){
 	let table = getElement("table","data-table");
