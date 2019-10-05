@@ -6,6 +6,7 @@
 package servlet.kosthold;
 
 import crypto.ValidSession;
+import html.Div;
 import html.StandardHtml;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -29,9 +30,14 @@ public class Historikk extends HttpServlet {
         PrintWriter out = resp.getWriter();
         try {
             StandardHtml html = new StandardHtml("Kosthold Historikk");
-            String tableArr = "['getBrukerMatvaretabell','brukerMatvaretabellTabell','/kosthold/matvaretabellen/']";
-            String deleteArr = "['deleteMatvare','matvareId','/kosthold/matvaretabellen/']";
-            html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + ",0);");
+
+            Div div = new Div("", "kostholdHistorikkTabell", "div-table");
+            Div containerDiv = new Div(div.toString(), "div-container");
+            html.addBodyContent(containerDiv.toString());
+
+            String tableArr = "['getLoggTabell','kostholdHistorikkTabell','/kosthold/logg/']";
+            String deleteArr = "['deleteLogg','loggId','/kosthold/logg/']";
+            html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + "," + 365 / 4 + ");");
             out.print(html.toString());
         } catch (Exception e) {
             e.printStackTrace(out);
