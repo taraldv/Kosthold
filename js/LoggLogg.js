@@ -208,3 +208,152 @@ function toggleMenuHide(clickId,hideId,toggleClass){
 		hideElement.classList.toggle(toggleClass);
 	});
 }
+
+/* OLD STUFF */
+
+function removeAutocompleteDiv(){
+	var elem = document.getElementById("autocompleteDiv");
+	while(elem){
+		elem.remove();
+		var elem = document.getElementById("autocompleteDiv");
+	}
+
+}
+function removeActiveAutocompleteLI(ulId){
+	let ul = document.getElementById(ulId);
+	let listItems = ul.children;
+	for(let i=0;i<listItems.length;i++){
+		listItems[i].removeAttribute('id');
+	}
+}
+function removeAutocompleteUL(ulId){
+	if(document.getElementById(ulId)){
+		removeChildren(document.getElementById(ulId));
+	}
+}
+function getActiveAutocompleteElement(ulId){
+	let ul = document.getElementById(ulId);
+	let listItems = ul.children;
+	for(let i=0;i<listItems.length;i++){
+		if(listItems[i].getAttribute('id')=="activeAutocompleteLI"){
+			return i;
+		}
+	}
+	return false;
+}
+/* BRUKES AV: måltider 2 ganger & logg */
+function getNewAutocomplete(txtId,ulId,func){
+	let main = getDiv();
+	let inputDiv = getDiv();
+	
+	let btn = getDiv("divButton");
+	btn.innerText = "Legg til";
+	btn.addEventListener("click",func);
+
+	let ul = document.createElement('ul');
+	ul.setAttribute('id',ulId);
+	ul.setAttribute('class',"autocompleteUL")
+
+	let numberInput = document.createElement('input');
+	numberInput.setAttribute("type","number");
+	numberInput.addEventListener('keyup',(e)=>{
+		if(e.key=='Enter'){
+			func();
+		}
+	});
+	//numberInput.setAttribute('id',numberId);
+
+	let textInput = document.createElement('input');
+	textInput.setAttribute("type","text");
+	textInput.setAttribute("autocomplete","off")
+	textInput.setAttribute("id",txtId);
+	textInput.addEventListener('blur',function(event){
+		removeAutocompleteUL(ulId);
+	});
+
+	//div keylistener
+
+	textInput.addEventListener('keydown',(event) =>{
+		let txt = textInput.value;
+		let listItems = ul.children;
+		let activeElement = getActiveAutocompleteElement(ulId);	
+
+		if(event.key == 'ArrowDown'){
+			removeActiveAutocompleteLI(ulId);
+			if(parseInt(activeElement) >= 0 && parseInt(activeElement) < listItems.length-1){
+				listItems[activeElement+1].setAttribute('id','activeAutocompleteLI');
+			}else {
+				listItems[0].setAttribute('id','activeAutocompleteLI');
+			}
+
+		} else if(event.key == 'ArrowUp'){
+			removeActiveAutocompleteLI(ulId);
+			if(parseInt(activeElement) > 0){
+				listItems[activeElement-1].setAttribute('id','activeAutocompleteLI');
+			}else {
+				listItems[listItems.length-1].setAttribute('id','activeAutocompleteLI');
+			}
+
+		} else if(event.key == 'Enter' || event.key == 'Tab'){
+			event.preventDefault();
+			event.stopPropagation();
+			let temp = listItems[activeElement];
+			textInput.setAttribute('data-id',temp.getAttribute('data-id'));
+			textInput.value = temp.innerText;
+			numberInput.focus();
+			removeAutocompleteUL(ulId);
+		} else if(event.key=='Escape'){
+			removeAutocompleteUL(ulId);
+		} else {
+			request("type=autocomplete&string="+txt+"&table=matvaretabellen",TomcatURL.KostholdMatvaretabellen(),function(){
+				removeChildren(ul);
+				let data = JSON.parse(this.response);
+				let search = data.search;
+				let len = Object.keys(data).length;
+				for(let i=0;i<len-1;i++){
+					let tempLI = document.createElement('li');
+					tempLI.setAttribute('data-id',data[i].matvareId);
+					tempLI.innerHTML = highlightString(data[i].matvare,search);
+					tempLI.addEventListener('mousedown',(event)=>{
+						let temp = event.target;
+						textInput.setAttribute('data-id',temp.getAttribute('data-id'));
+						textInput.value = temp.innerText;
+						textInput.nextSibling.focus();
+						removeAutocompleteUL();
+					});
+					let klasse = "normalLI";
+					if(data[i].matvareId<=1721){
+						klasse += " matvaretabellenLI";
+					} else if(data[i].matvareId<=2251 && data[i].matvareId>=1816){
+						klasse += " crawlerLI";
+					}
+					tempLI.setAttribute('class',klasse);
+					ul.appendChild(tempLI);
+				}
+			});
+		}
+
+	});
+
+
+	inputDiv.appendChild(textInput)
+	inputDiv.appendChild(numberInput);
+	inputDiv.appendChild(btn);
+	main.appendChild(inputDiv);
+	main.appendChild(ul);
+	return main;
+}
+
+
+/* brukes av autocomplete */
+function highlightString(original, stringToMatch){
+	var index = original.toLowerCase().indexOf(stringToMatch.toLowerCase());
+	if(index>=0){
+		var beforeString = original.slice(0,index);
+		var slicedString = original.slice(index,index+stringToMatch.length);
+		var afterString = original.slice(index+stringToMatch.length);
+		return beforeString.concat("<strong>"+slicedString+"</strong>",afterString);
+	} else {
+		return original;
+	}
+}

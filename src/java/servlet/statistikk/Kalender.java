@@ -69,11 +69,13 @@ public class Kalender extends HttpServlet {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         for (int i = 0; i < styrkeDatoer.length; i++) {
             Calendar cal = new GregorianCalendar();
+            cal.setFirstDayOfWeek(Calendar.MONDAY);
             cal.setTime(df.parse(styrkeDatoer[i][0]));
             arr[i] = cal;
         }
         for (int j = 0; j < kondisjonDatoer.length; j++) {
             Calendar cal = new GregorianCalendar();
+            cal.setFirstDayOfWeek(Calendar.MONDAY);
             cal.setTime(df.parse(kondisjonDatoer[j][0]));
             arr[styrkeDatoer.length + j] = cal;
         }
@@ -126,7 +128,7 @@ public class Kalender extends HttpServlet {
             tableString += "<tr class='kalenderTableRow'>";
             for (int j = 0; j < cols; j++) {
                 int week = ((i * cols) + (j + 1));
-                tableString += "<td>";
+                tableString += "<td class='kalenderTableCell'>";
                 tableString += "<div class='color" + arr[week - 1] + "'>" + week + "</div>";
                 tableString += "</td>";
             }
