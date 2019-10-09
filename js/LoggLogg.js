@@ -129,6 +129,7 @@ function attachServerRequestToButton(type,buttonId,url,containerId){
 
 //tableStuff er array med [type,elementAppendId,url]
 //deleteStuff er array med [type,sqlKolonneId,url]
+//TODO tror den er n^2 algo, må endres til n
 function buildTable(tableStuff,deleteStuff,interval){
 	let table = getElement("table","data-table");
 	request("interval="+interval+"&type="+tableStuff[0],tableStuff[2],function(){
