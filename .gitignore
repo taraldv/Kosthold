@@ -13,3 +13,4 @@ build.xml
 !/css/newMobile.css
 !/js/LoggLogg.js
 upload.bat
+*.bat

@@ -93,7 +93,7 @@ public class Kalender extends HttpServlet {
 
         Calendar[] datoer = parseKalenderData(styrkeData, kondisjonData);
         int[] ukeTelling = countDatesInWeek(datoer);
-        String kalenderTabell = buildKalender(ukeTelling);
+        String kalenderTabell = buildKalender(ukeTelling, datoer);
 
         //return Arrays.deepToString(data);
         return kalenderTabell;
@@ -119,8 +119,9 @@ public class Kalender extends HttpServlet {
         return output;
     }
 
-    private String buildKalender(int[] arr) {
+    private String buildKalender(int[] arr, Calendar[] datoer) {
         String infoString = "<p>Antall dager på trening i uka (gj.snitt): " + gjennomsnitt(arr) + "</p>";
+        String infoString2 = "<p>Antall dager på trening: " + datoer.length + "</p>";
         String tableString = "<table class='kalenderTable'>";
         int rows = 13;
         int cols = 4;
@@ -134,7 +135,7 @@ public class Kalender extends HttpServlet {
             }
             tableString += "</tr>";
         }
-        return "<div id='kalenderTableDiv'>" + infoString + tableString + "</table></div>";
+        return "<div id='kalenderTableDiv'>" + infoString2 + infoString + tableString + "</table></div>";
     }
 
 }

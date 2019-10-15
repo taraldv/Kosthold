@@ -129,7 +129,6 @@ function attachServerRequestToButton(type,buttonId,url,containerId){
 
 //tableStuff er array med [type,elementAppendId,url]
 //deleteStuff er array med [type,sqlKolonneId,url]
-//TODO tror den er n^2 algo, må endres til n
 function buildTable(tableStuff,deleteStuff,interval){
 	let table = getElement("table","data-table");
 	request("interval="+interval+"&type="+tableStuff[0],tableStuff[2],function(){
@@ -137,6 +136,8 @@ function buildTable(tableStuff,deleteStuff,interval){
 		let dataLength = Object.keys(data).length;
 		
 		table.appendChild(buildTableHeader(data[0]));
+		//array som inneholder siste j, hvor cellen hadde nytt innhold
+		let lastContentIndexArray = new Array(Object.keys(data[0]).length).fill(0);
 
 		for(let j=0;j<dataLength;j++){
 			let keys = Object.keys(data[j]);
@@ -146,26 +147,12 @@ function buildTable(tableStuff,deleteStuff,interval){
 			for(let i=1;i<keys.length;i++){
 				let tempCell = getElement("td","table-cell");
 				let cellText = data[j][keys[i]];
-
-
+				let previousCellText = data[lastContentIndexArray[i-1]][keys[i]];
 				/*logikk for å hoppe over text i celle hvis cellen over har samme text*/
-				if(j>0){
-					for(let y=j;y>0;y--){
-						let previousRow = table.childNodes[y];
-						let previousRowCellText = previousRow.childNodes[i-1].innerText;
-						if(previousRowCellText==cellText){
-							/*hvis forrige celle er lik, la denne cellen være tom*/
-							tempCell.classList.add("blank-table-cell");
-							break;
-						} else if(previousRowCellText==""){
-							/*hvis forrige celle er blank, fortsett loop bakover*/
-							continue;
-						} else {
-							tempCell.innerText = cellText;
-							break;
-						}
-					}
+				if(j>0 && cellText==previousCellText){
+					tempCell.classList.add("blank-table-cell");
 				} else {
+					lastContentIndexArray[i-1] = j;
 					tempCell.innerText = cellText;
 				}
 				tempTR.appendChild(tempCell);
