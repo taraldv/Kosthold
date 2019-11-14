@@ -126,7 +126,8 @@ function test(divId,url){
 			deleteMåltidDiv.addEventListener("click",(e)=>{
 				request("type=deleteMåltider&måltidId="+tempId,url,function(){
 					/* TODO error og dynamisk */
-					console.log(this.response);
+					//console.log(this.response);
+					location.reload(); 
 				});
 			});
 			tempContainerDiv.appendChild(deleteMåltidDiv);
