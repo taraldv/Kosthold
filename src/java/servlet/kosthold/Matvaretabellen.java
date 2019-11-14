@@ -103,7 +103,7 @@ public class Matvaretabellen extends HttpServlet {
                 out.print(updateMatvare(paras, brukerId, Integer.parseInt(request.getParameter("rowId"))));
                 //out.print(request.getParameter("rowData"));
             } else if (type.equals("autocomplete")) {
-                out.print(autocomplete(brukerId, request.getParameter("string"), request.getParameter("table")));
+                out.print(autocomplete(brukerId, request.getParameter("string")));
             } else if (type.equals("getDiv")) {
                 Select s = new Select("benevningId", "benevninger", "benevningSelect", "select");
                 Input i = new Input("", "", "number", "", "input", "0.1");
@@ -122,13 +122,10 @@ public class Matvaretabellen extends HttpServlet {
         String[] arr = map.get(map);
         return output;
     }*/
-    private String autocomplete(int brukerId, String matchingParameter, String whichTable) throws Exception {
-        String autocompleteQuery = "";
-        if (whichTable.equals("matvaretabellen")) {
-            autocompleteQuery = "SELECT matvare,matvareId FROM matvaretabellen WHERE matvare LIKE ? LIMIT 30;";
-        } else if (whichTable.equals("næringsinnhold")) {
-            autocompleteQuery = "SELECT navn,benevning FROM benevninger WHERE navn LIKE ? LIMIT 15;";
-        }
+    private String autocomplete(int brukerId, String matchingParameter) throws Exception {
+
+        String autocompleteQuery = "SELECT matvare,matvareId FROM matvaretabellen WHERE matvare LIKE ? LIMIT 30;";
+
         ResultSetContainer rsc = Database.multiQuery(autocompleteQuery, new Object[]{"%" + matchingParameter + "%"});
         String completeJson = rsc.getJSON();
         if (completeJson.length() > 2) {

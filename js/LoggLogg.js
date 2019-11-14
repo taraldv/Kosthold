@@ -12,6 +12,98 @@ function request(data,url,func){
 	oReq.send(data);	
 }
 
+function attachAutocompleteToClass(inputClass){
+	let elements = document.getElementsByClassName(inputClass);
+	for(let i=0;i<elements.length;i++){
+		elements[i].addEventListener('keyup',autocomplete);
+	}
+}
+
+function attachAutocompleteToId(divId){
+	let input = document.getElementById(divId);
+	input.addEventListener('keyup',autocomplete);
+}
+
+/*function getAutocompleteDiv(json){
+	var autocompleteDiv = getElement('div',"autocompleteDivClass","autocompleteDivId");
+
+	var searchWord = json.search;
+	var length = Object.keys(json).length;
+
+	for(i=0;i<length-1;i++){
+		var keys = Object.keys(json[i]);
+		var tempDiv = document.createElement("div");
+		tempDiv.setAttribute("data-id",json[i][keys[1]]);
+		var wholeString = json[i][keys[0]];
+		tempDiv.innerHTML = highlightString(wholeString,searchWord)
+
+		tempDiv.addEventListener("click",function(){
+			var parent = this.parentNode.parentNode;
+			console.log(parent);
+			var firstChild = parent.firstChild;
+			firstChild.value = this.innerText;
+			var id = this.getAttribute("data-id");
+			if(isNaN(parseInt(id))){
+				var mengdeInput = parent.nextSibling;
+				mengdeInput.placeholder = id;
+			} else {
+				firstChild.setAttribute("data-id",id);
+			}			
+			removeAutocompleteDiv();
+		})
+		autocompleteDiv.appendChild(tempDiv);
+	}
+	return autocompleteDiv;
+}*/
+
+function appendAutocompleteData(input,div,json){
+	var searchWord = json.search;
+	var length = Object.keys(json).length;
+
+	for(i=0;i<length-1;i++){
+		var keys = Object.keys(json[i]);
+		var tempDiv = document.createElement("div");
+		tempDiv.setAttribute("data-id",json[i][keys[1]]);
+		var wholeString = json[i][keys[0]];
+		tempDiv.innerHTML = highlightString(wholeString,searchWord);
+
+		tempDiv.addEventListener("click",function(){
+			input.value = this.innerText;
+			div.remove();
+			input.focus();
+		});
+		div.appendChild(tempDiv);
+	}
+}
+
+/* Funksjon som blir kjørt når keypress aktiveres i valgt inputs */
+function autocomplete(event){
+	let keyPressed = event.key;
+	let activeInput = this;
+
+	if(keyPressed=="Enter"){
+		
+	}
+
+	let labelParent = this.parentNode;
+	let autocompleteDiv = labelParent.lastChild;
+	let autocompleteDivClass = autocompleteDiv.getAttribute('class');
+	if(autocompleteDivClass == "autocompleteDiv"){
+		autocompleteDiv.remove();
+	} 
+	autocompleteDiv = getElement('div','autocompleteDiv','');
+	labelParent.appendChild(autocompleteDiv);
+	
+	//console.log(activeInput.value);
+	request("type=autocomplete&string="+activeInput.value,"/kosthold/matvaretabellen/",function(){
+		var obj = JSON.parse(this.response);
+		//var whichInputActivatedAutocomplete = document.getElementById("activatedAutocomplete");
+		appendAutocompleteData(activeInput,autocompleteDiv,obj);
+	});
+	
+}
+
+/* noe med måltider */
 function test(divId,url){
 	request("type=getMåltider",url,function(){
 		let data = JSON.parse(this.response);
@@ -29,6 +121,15 @@ function test(divId,url){
 			let miniTableStuff = ["getMåltiderIngredienser&måltidId="+tempId,tempDivId,'/kosthold/måltider/'];
 			let miniTableDeleteStuff = ['deleteMåltidIngrediens','ingredienseId','/kosthold/måltider/'];
 			buildTable(miniTableStuff,miniTableDeleteStuff,0);
+			let deleteMåltidDiv = getElement("div","","");
+			deleteMåltidDiv.innerText = "Slett";
+			deleteMåltidDiv.addEventListener("click",(e)=>{
+				request("type=deleteMåltider&måltidId="+tempId,url,function(){
+					/* TODO error og dynamisk */
+					console.log(this.response);
+				});
+			});
+			tempContainerDiv.appendChild(deleteMåltidDiv);
 		}
 	});
 }
@@ -195,141 +296,6 @@ function toggleMenuHide(clickId,hideId,toggleClass){
 		let hideElement = document.getElementById(hideId);
 		hideElement.classList.toggle(toggleClass);
 	});
-}
-
-/* OLD STUFF */
-
-function removeAutocompleteDiv(){
-	var elem = document.getElementById("autocompleteDiv");
-	while(elem){
-		elem.remove();
-		var elem = document.getElementById("autocompleteDiv");
-	}
-
-}
-function removeActiveAutocompleteLI(ulId){
-	let ul = document.getElementById(ulId);
-	let listItems = ul.children;
-	for(let i=0;i<listItems.length;i++){
-		listItems[i].removeAttribute('id');
-	}
-}
-function removeAutocompleteUL(ulId){
-	if(document.getElementById(ulId)){
-		removeChildren(document.getElementById(ulId));
-	}
-}
-function getActiveAutocompleteElement(ulId){
-	let ul = document.getElementById(ulId);
-	let listItems = ul.children;
-	for(let i=0;i<listItems.length;i++){
-		if(listItems[i].getAttribute('id')=="activeAutocompleteLI"){
-			return i;
-		}
-	}
-	return false;
-}
-/* BRUKES AV: måltider 2 ganger & logg */
-function getNewAutocomplete(txtId,ulId,func){
-	let main = getDiv();
-	let inputDiv = getDiv();
-	
-	let btn = getDiv("divButton");
-	btn.innerText = "Legg til";
-	btn.addEventListener("click",func);
-
-	let ul = document.createElement('ul');
-	ul.setAttribute('id',ulId);
-	ul.setAttribute('class',"autocompleteUL")
-
-	let numberInput = document.createElement('input');
-	numberInput.setAttribute("type","number");
-	numberInput.addEventListener('keyup',(e)=>{
-		if(e.key=='Enter'){
-			func();
-		}
-	});
-	//numberInput.setAttribute('id',numberId);
-
-	let textInput = document.createElement('input');
-	textInput.setAttribute("type","text");
-	textInput.setAttribute("autocomplete","off")
-	textInput.setAttribute("id",txtId);
-	textInput.addEventListener('blur',function(event){
-		removeAutocompleteUL(ulId);
-	});
-
-	//div keylistener
-
-	textInput.addEventListener('keydown',(event) =>{
-		let txt = textInput.value;
-		let listItems = ul.children;
-		let activeElement = getActiveAutocompleteElement(ulId);	
-
-		if(event.key == 'ArrowDown'){
-			removeActiveAutocompleteLI(ulId);
-			if(parseInt(activeElement) >= 0 && parseInt(activeElement) < listItems.length-1){
-				listItems[activeElement+1].setAttribute('id','activeAutocompleteLI');
-			}else {
-				listItems[0].setAttribute('id','activeAutocompleteLI');
-			}
-
-		} else if(event.key == 'ArrowUp'){
-			removeActiveAutocompleteLI(ulId);
-			if(parseInt(activeElement) > 0){
-				listItems[activeElement-1].setAttribute('id','activeAutocompleteLI');
-			}else {
-				listItems[listItems.length-1].setAttribute('id','activeAutocompleteLI');
-			}
-
-		} else if(event.key == 'Enter' || event.key == 'Tab'){
-			event.preventDefault();
-			event.stopPropagation();
-			let temp = listItems[activeElement];
-			textInput.setAttribute('data-id',temp.getAttribute('data-id'));
-			textInput.value = temp.innerText;
-			numberInput.focus();
-			removeAutocompleteUL(ulId);
-		} else if(event.key=='Escape'){
-			removeAutocompleteUL(ulId);
-		} else {
-			request("type=autocomplete&string="+txt+"&table=matvaretabellen",TomcatURL.KostholdMatvaretabellen(),function(){
-				removeChildren(ul);
-				let data = JSON.parse(this.response);
-				let search = data.search;
-				let len = Object.keys(data).length;
-				for(let i=0;i<len-1;i++){
-					let tempLI = document.createElement('li');
-					tempLI.setAttribute('data-id',data[i].matvareId);
-					tempLI.innerHTML = highlightString(data[i].matvare,search);
-					tempLI.addEventListener('mousedown',(event)=>{
-						let temp = event.target;
-						textInput.setAttribute('data-id',temp.getAttribute('data-id'));
-						textInput.value = temp.innerText;
-						textInput.nextSibling.focus();
-						removeAutocompleteUL();
-					});
-					let klasse = "normalLI";
-					if(data[i].matvareId<=1721){
-						klasse += " matvaretabellenLI";
-					} else if(data[i].matvareId<=2251 && data[i].matvareId>=1816){
-						klasse += " crawlerLI";
-					}
-					tempLI.setAttribute('class',klasse);
-					ul.appendChild(tempLI);
-				}
-			});
-		}
-
-	});
-
-
-	inputDiv.appendChild(textInput)
-	inputDiv.appendChild(numberInput);
-	inputDiv.appendChild(btn);
-	main.appendChild(inputDiv);
-	main.appendChild(ul);
-	return main;
 }
 
 

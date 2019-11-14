@@ -136,3 +136,31 @@ body{
 .color7{
 	background-color: #317f32;
 }
+
+
+/* AUTOCOMPLETE: */
+.normalLI:hover{
+	cursor: pointer;
+	background-color: #a0db8e;
+}
+.normalLI{
+	border-left:1px solid black;
+	border-right:1px solid black;
+	border-bottom:1px solid black;
+}
+.matvaretabellenLI{
+	color: #3B3B3B;
+	font-style: italic;
+}
+.crawlerLI{
+
+}
+#activeAutocompleteLI{
+	background-color: #a0db8e;
+}
+.autocompleteUL{
+	list-style: none;
+	position: absolute;
+	z-index: 1;
+	background-color: whitesmoke;
+}

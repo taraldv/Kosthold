@@ -12,14 +12,16 @@ import html.Input;
 import html.StandardHtml;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.HTML;
 import util.sql.Database;
 import util.http.Headers;
+import util.sql.ResultSetContainer;
 
 /**
  *
@@ -39,12 +41,14 @@ public class Måltider extends HttpServlet {
             Div div = new Div("", "måltiderTabell", "div-table");
             Div containerDiv = new Div(form.toString() + div.toString(), "div-container");
             html.addBodyContent(containerDiv.toString());
-            html.addBodyJS("test('måltiderTabell','/kosthold/måltider/')");
-            //String tableArr = "['getMåltiderTabell','måltiderTabell','/kosthold/måltider/']";
-            //String deleteArr = "['deleteMatvare','matvareId','/kosthold/matvaretabellen/']";
+            html.addBodyJS("test('måltiderTabell','/kosthold/måltider/');");
+            html.addBodyJS("attachAutocompleteToClass('autocompleteInput');");
+            //html.addBodyJS("autocomplete();");
+            String tableArr = "['getMåltiderTabell','måltiderTabell','/kosthold/måltider/']";
+            String deleteArr = "['deleteMatvare','matvareId','/kosthold/matvaretabellen/']";
             //html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + ",0);");
-            // String paramArray = "['matvareNavn']";
-            // html.addBodyJS("insertRequest('matvaretabellenSubmit','insertMatvaretabell','/kosthold/måltider/'," + paramArray + "," + tableArr + "," + deleteArr + ",0);");
+            String paramArray = "['måltidNavn']";
+            html.addBodyJS("insertRequest('måltiderSubmit','insertMåltider','/kosthold/måltider/'," + paramArray + "," + tableArr + "," + deleteArr + ",0);");
             // html.addBodyJS("attachServerRequestToButton('getDiv','ekstraInnhold','/kosthold/matvaretabellen/','matvaretabellForm')");
             out.print(html.toString());
         } catch (Exception e) {
@@ -68,7 +72,7 @@ public class Måltider extends HttpServlet {
     }
 
     private Div customInputDiv() {
-        Input matvare = new Input("Matvare", "Matvare", "text", "", "input");
+        Input matvare = new Input("Matvare", "Matvare", "text", "", "input autocompleteInput");
         Input mengde = new Input("Mengde", "Mengde", "number", "", "input", "0.1");
         Div d = new Div(matvare.toString() + mengde.toString(), "måltiderInputDiv");
         return d;
@@ -85,7 +89,7 @@ public class Måltider extends HttpServlet {
         try {
             int brukerId = (int) request.getSession().getAttribute("brukerId");
             if (type.equals("insertMåltider")) {
-                out.print(insertMåltider(brukerId, request.getParameter("navn"), request.getParameterMap()));
+                out.print(insertMåltider(brukerId, request.getParameter("måltidNavn"), request.getParameterMap()));
             } else if (type.equals("getMåltider")) {
                 out.print(getMåltider(brukerId));
             } else if (type.equals("getMåltiderIngredienser")) {
@@ -192,16 +196,41 @@ public class Måltider extends HttpServlet {
         return Database.normalQuery(query).getJSON();
     }
 
+    /* Brukes til å filtrere empty strings fra paramter map, og gjøre matvare navn */
+    private Object[] getIdFromStringArray(String[][] arr) throws SQLException, ClassNotFoundException {
+        String[] navnOgVerdi = arr[2];
+
+        ArrayList<Object> objList = new ArrayList<>();
+        String query = "SELECT matvareId FROM matvaretabellen WHERE matvare = ?;";
+
+        for (int i = 0; i < navnOgVerdi.length; i = i + 2) {
+            String tempNavn = navnOgVerdi[i];
+            ResultSetContainer rsc = Database.multiQuery(query, new Object[]{tempNavn});
+            try {
+                Integer id = Integer.parseInt(rsc.getData()[0][0]);
+                Double verdi = Double.parseDouble(navnOgVerdi[i + 1]);
+                objList.add(id);
+                objList.add(verdi);
+            } catch (ArrayIndexOutOfBoundsException e) {
+
+            }
+        }
+        return objList.toArray();
+    }
+
+    /* TODO atomisk */
     private int insertMåltider(int brukerId, String navn, Map<String, String[]> map) throws Exception {
         int lastInsertedId = Database.singleUpdateQuery("INSERT INTO måltider(navn,brukerId) VALUES (?," + brukerId + ");", new Object[]{navn}, true);
         String[][] arr = map.values().toArray(new String[0][0]);
+        //return Arrays.deepToString(arr);
         /* arr inneholder [[type][navn][id,id,id....][verdi,verdi,verdi.....]] */
-        Object[] vars = new Object[arr[2].length * 2];
+        // Object[] vars = new Object[arr[2].length * 2];
+        Object[] vars = getIdFromStringArray(arr);
         String baseline = "INSERT INTO ingredienser(brukerId,måltidId, matvareId, mengde) VALUES ";
         String row = "";
-        for (int i = 0; i < arr[2].length; i++) {
-            vars[2 * i] = Integer.parseInt(arr[2][i]);
-            vars[(2 * i) + 1] = Double.parseDouble(arr[3][i]);
+        for (int i = 0; i < vars.length / 2; i++) {
+            /*vars[2 * i] = Integer.parseInt(arr[2][i]);
+            vars[(2 * i) + 1] = Double.parseDouble(arr[3][i]);*/
             if (i != 0) {
                 row += ",";
             }
