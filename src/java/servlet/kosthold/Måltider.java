@@ -41,6 +41,7 @@ public class Måltider extends HttpServlet {
             Div div = new Div("", "måltiderTabell", "div-table");
             Div containerDiv = new Div(form.toString() + div.toString(), "div-container");
             html.addBodyContent(containerDiv.toString());
+            html.addBodyJS("addButtonEventToInsertHTMLString('måltiderForm',\"" + customInputDiv().toString() + "\",'Legg til matvare ingrediens');");
             html.addBodyJS("test('måltiderTabell','/kosthold/måltider/');");
             html.addBodyJS("attachAutocompleteToClass('autocompleteInput');");
             //html.addBodyJS("autocomplete();");
@@ -49,6 +50,7 @@ public class Måltider extends HttpServlet {
             //html.addBodyJS("buildTable(" + tableArr + "," + deleteArr + ",0);");
             String paramArray = "['måltidNavn']";
             html.addBodyJS("insertRequest('måltiderSubmit','insertMåltider','/kosthold/måltider/'," + paramArray + "," + tableArr + "," + deleteArr + ",0);");
+
             // html.addBodyJS("attachServerRequestToButton('getDiv','ekstraInnhold','/kosthold/matvaretabellen/','matvaretabellForm')");
             out.print(html.toString());
         } catch (Exception e) {
@@ -58,15 +60,15 @@ public class Måltider extends HttpServlet {
     }
 
     private DivForm getMåltiderForm() throws Exception {
-        DivForm form = new DivForm("matvaretabellForm", "div-form");
+        DivForm form = new DivForm("måltiderForm", "div-form");
         form.addElement(new Input("Navn", "Måltid navn", "text", "kostholdMåltiderNavnInput", "input"));
         form.addElement(new Div("Submit", "måltiderSubmit", "submit"));
 
         form.addElement(customInputDiv());
-        form.addElement(customInputDiv());
-        form.addElement(customInputDiv());
-        form.addElement(customInputDiv());
-        form.addElement(customInputDiv());
+        //form.addElement(customInputDiv());
+        // form.addElement(customInputDiv());
+        //form.addElement(customInputDiv());
+        //form.addElement(customInputDiv());
 
         return form;
     }

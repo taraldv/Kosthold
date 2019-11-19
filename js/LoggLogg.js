@@ -24,37 +24,17 @@ function attachAutocompleteToId(divId){
 	input.addEventListener('keyup',autocomplete);
 }
 
-/*function getAutocompleteDiv(json){
-	var autocompleteDiv = getElement('div',"autocompleteDivClass","autocompleteDivId");
-
-	var searchWord = json.search;
-	var length = Object.keys(json).length;
-
-	for(i=0;i<length-1;i++){
-		var keys = Object.keys(json[i]);
-		var tempDiv = document.createElement("div");
-		tempDiv.setAttribute("data-id",json[i][keys[1]]);
-		var wholeString = json[i][keys[0]];
-		tempDiv.innerHTML = highlightString(wholeString,searchWord)
-
-		tempDiv.addEventListener("click",function(){
-			var parent = this.parentNode.parentNode;
-			console.log(parent);
-			var firstChild = parent.firstChild;
-			firstChild.value = this.innerText;
-			var id = this.getAttribute("data-id");
-			if(isNaN(parseInt(id))){
-				var mengdeInput = parent.nextSibling;
-				mengdeInput.placeholder = id;
-			} else {
-				firstChild.setAttribute("data-id",id);
-			}			
-			removeAutocompleteDiv();
-		})
-		autocompleteDiv.appendChild(tempDiv);
-	}
-	return autocompleteDiv;
-}*/
+function addButtonEventToInsertHTMLString(id,string,btnText){
+	let containerDiv = document.getElementById(id);
+	let button = getElement('div',"","");
+	button.addEventListener("click",function(){
+		//console.log("what");
+		button.insertAdjacentHTML('beforebegin',string);
+		attachAutocompleteToClass("autocompleteInput");
+	});
+	button.innerText=btnText;
+	containerDiv.appendChild(button);
+}
 
 function appendAutocompleteData(input,div,json){
 	var searchWord = json.search;
