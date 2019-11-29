@@ -24,6 +24,7 @@ public class LeftNavigation extends Element {
         List statistikkList = new List(listClass);
         statistikkList.addElement(new Anchor("Kosthold", "/statistikk/kosthold/", anchorClass));
         statistikkList.addElement(new Anchor("Kalender", "/statistikk/kalender/", anchorClass));
+        statistikkList.addElement(new Anchor("Helse", "/statistikk/helse/", anchorClass));
         elements.add(new Text("h2", "Statistikk", textClass));
         elements.add(statistikkList);
 
