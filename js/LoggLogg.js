@@ -161,7 +161,7 @@ function insertRequest(buttonId,type,url,parameterArray,tableStuff,deleteStuff,i
 			}
 		}
 		
-		request("type="+type+dataString,url,function(){
+		request("type="+type+encodeURI(dataString),url,function(){
 			if(this.response==1){
 				buildTable(tableStuff,deleteStuff,interval);
 			} else {

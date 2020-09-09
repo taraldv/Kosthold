@@ -39,7 +39,8 @@ public class Kalender extends HttpServlet {
             int brukerId = (int) req.getSession().getAttribute("brukerId");
             StandardHtml html = new StandardHtml("Statistikk Styrke");
             Select s = new Select("distinct year(dato) as dato from styrkeLogg order by dato desc", "kalenderYearSelect", "select");
-            Div div = new Div(s.toString() + getKalender(brukerId, 2019), "kalenderContainerDiv", "div-container");
+            Calendar cal = new GregorianCalendar();
+            Div div = new Div(s.toString() + getKalender(brukerId, cal.get(Calendar.YEAR)), "kalenderContainerDiv", "div-container");
             html.addBodyContent(div.toString());
             html.addBodyJS("attachServerRequestToSelect('getKalender','datoYear','kalenderYearSelect','statistikk/kalender/','kalenderContainerDiv','kalenderTableDiv')");
             out.print(html.toString());
@@ -129,6 +130,10 @@ public class Kalender extends HttpServlet {
     
     private int[] countDatesInWeek(Calendar[] arr) {
         int[] output = new int[52];
+        Calendar cal = new GregorianCalendar();
+        if(arr.length > 0 && arr[0].get(Calendar.YEAR) == cal.get(Calendar.YEAR)){
+            output = new int[cal.get(Calendar.WEEK_OF_YEAR)];
+        }
         for (int i = 0; i < arr.length; i++) {
             int week = arr[i].get(Calendar.WEEK_OF_YEAR);
             output[week - 1]++;
@@ -147,7 +152,11 @@ public class Kalender extends HttpServlet {
             for (int j = 0; j < cols; j++) {
                 int week = ((i * cols) + (j + 1));
                 tableString += "<td class='kalenderTableCell'>";
-                tableString += "<div class='color" + arr[week - 1] + "'>" + week + "</div>";
+                try{
+                    tableString += "<div class='color" + arr[week - 1] + "'>" + week + "</div>";
+                }catch(ArrayIndexOutOfBoundsException e){
+                    tableString += "<div class='color0'>" + week + "</div>";
+                }
                 tableString += "</td>";
             }
             tableString += "</tr>";
