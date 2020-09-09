@@ -22,19 +22,19 @@ public class LeftNavigation extends Element {
         super("nav-left");
         
         List statistikkList = new List(listClass);
-        statistikkList.addElement(new Anchor("Kosthold", "/statistikk/kosthold/", anchorClass));
+        //statistikkList.addElement(new Anchor("Kosthold", "/statistikk/kosthold/", anchorClass));
         statistikkList.addElement(new Anchor("Kalender", "/statistikk/kalender/", anchorClass));
-        statistikkList.addElement(new Anchor("Helse", "/statistikk/helse/", anchorClass));
+       // statistikkList.addElement(new Anchor("Helse", "/statistikk/helse/", anchorClass));
         elements.add(new Text("h2", "Statistikk", textClass));
         elements.add(statistikkList);
 
-        List kostholdList = new List(listClass);
+       /* List kostholdList = new List(listClass);
         kostholdList.addElement(new Anchor("Logg", "/kosthold/logg/", anchorClass));
         kostholdList.addElement(new Anchor("Måltider", "/kosthold/måltider/", anchorClass));
         kostholdList.addElement(new Anchor("Historikk", "/kosthold/historikk/", anchorClass));
         kostholdList.addElement(new Anchor("Matvaretabellen", "/kosthold/matvaretabellen/", anchorClass));
         elements.add(new Text("h2", "Kosthold", textClass));
-        elements.add(kostholdList);
+        elements.add(kostholdList);*/
 
         List styrkeList = new List(listClass);
         styrkeList.addElement(new Anchor("Logg", "/styrke/logg/", anchorClass));
@@ -58,7 +58,7 @@ public class LeftNavigation extends Element {
         
         List adminList = new List(listClass);
         adminList.addElement(new Anchor("Profil", "/admin/profil/", anchorClass));
-        adminList.addElement(new Anchor("Kosthold", "/admin/kosthold/", anchorClass));
+       // adminList.addElement(new Anchor("Kosthold", "/admin/kosthold/", anchorClass));
         adminList.addElement(new Anchor("Logg ut", "/admin/loggut/", anchorClass));
         elements.add(new Text("h2", "Admin", textClass));
         elements.add(adminList);
