@@ -29,12 +29,14 @@ import util.sql.Database;
  * @author
  */
 public class Kalender extends HttpServlet {
-    
+
+    PrintWriter out;// = resp.getWriter();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Headers.GET(resp);
         ValidSession.isValid(req, resp);
-        PrintWriter out = resp.getWriter();
+        /*PrintWriter*/ out = resp.getWriter();
         try {
             int brukerId = (int) req.getSession().getAttribute("brukerId");
             StandardHtml html = new StandardHtml("Statistikk Styrke");
@@ -48,13 +50,13 @@ public class Kalender extends HttpServlet {
             e.printStackTrace(out);
         }
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Headers.POST(response);
         PrintWriter out = response.getWriter();
         String type = request.getParameter("type");
-        
+
         try {
             int brukerId = (int) request.getSession().getAttribute("brukerId");
             if (type.equals("getKalender")) {
@@ -64,7 +66,7 @@ public class Kalender extends HttpServlet {
             e.printStackTrace(out);
         }
     }
-    
+
     private Calendar[] parseKalenderData(String[][] styrkeDatoer, String[][] kondisjonDatoer) throws Exception {
         Calendar[] arr = new GregorianCalendar[styrkeDatoer.length + kondisjonDatoer.length];
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -82,7 +84,7 @@ public class Kalender extends HttpServlet {
         }
         return arr;
     }
-    
+
     private Calendar[] getCalendarArrayFromSQLData(String[][] sqlData) throws Exception {
         Calendar[] arr = new GregorianCalendar[sqlData.length];
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -92,10 +94,10 @@ public class Kalender extends HttpServlet {
             cal.setTime(df.parse(sqlData[i][0]));
             arr[i] = cal;
         }
-        
+
         return arr;
     }
-    
+
     private String getKalender(int brukerId, int year) throws Exception {
         String styrkeQuery = "SELECT DISTINCT dato FROM styrkeLogg WHERE brukerId = " + brukerId
                 + " AND YEAR(dato) = ?;";
@@ -104,19 +106,19 @@ public class Kalender extends HttpServlet {
         String kondisjonQuery = "SELECT DISTINCT dato FROM kondisjonLogg WHERE brukerId = " + brukerId
                 + " AND YEAR(dato) = ?;";
         String[][] kondisjonData = Database.multiQuery(kondisjonQuery, new Object[]{year}).getData();
-        
+
         Calendar[] datoer = parseKalenderData(styrkeData, kondisjonData);
         int[] ukeTelling = countDatesInWeek(datoer);
-        
+
         Calendar[] styrkeCalendarArray = getCalendarArrayFromSQLData(styrkeData);
         Calendar[] kondisCalendarArray = getCalendarArrayFromSQLData(kondisjonData);
-        
+
         String kalenderTabell = buildKalenderBetter(ukeTelling, countDatesInWeek(styrkeCalendarArray), countDatesInWeek(kondisCalendarArray));
 
         //return Arrays.deepToString(data);
         return kalenderTabell;
     }
-    
+
     private double gjennomsnitt(int[] arr) {
         double sum = 0;
         for (int i : arr) {
@@ -127,20 +129,39 @@ public class Kalender extends HttpServlet {
         int forkorting = (int) sum;
         return ((double) forkorting) / 100;
     }
-    
+
+    /*
+    * Input is an Calendar array containing all dates which have been logged in a specific year
+    * Output is an int array which has a count for every week.
+    * Exmple: [0,0,0,0,2,3,4,5,0...]
+    * The output should have a max length of current weeknumber, or 52
+     */
     private int[] countDatesInWeek(Calendar[] arr) {
         int[] output = new int[52];
         Calendar cal = new GregorianCalendar();
-        if(arr.length > 0 && arr[0].get(Calendar.YEAR) == cal.get(Calendar.YEAR)){
-            output = new int[cal.get(Calendar.WEEK_OF_YEAR)];
+        //If the dates belong to the current year, only count up to current weeknumber
+        if (arr.length > 0 && arr[0].get(Calendar.YEAR) == cal.get(Calendar.YEAR)) {
+            //Problems arise when it is december and week of year says 1 
+            if (cal.get(Calendar.WEEK_OF_MONTH) != 5 || cal.get(Calendar.MONTH) != 11) {
+                output = new int[cal.get(Calendar.WEEK_OF_YEAR)];
+            }
         }
         for (int i = 0; i < arr.length; i++) {
             int week = arr[i].get(Calendar.WEEK_OF_YEAR);
-            output[week - 1]++;
+            /*
+            * Week 1 in late december should be put in week 52 not week 1.
+            * This function does not have access to the next year, where it probably
+            * should have been put
+             */
+            if (arr[i].get(Calendar.WEEK_OF_MONTH) == 5 && arr[i].get(Calendar.MONTH) == 11) {
+                output[51]++;
+            } else {
+                output[week - 1]++;
+            }
         }
         return output;
     }
-    
+
     private String buildKalenderBetter(int[] arr, int[] styrkeArr, int[] kondisArr) {
         String infoString = "<p>Antall dager på trening i uka (gj.snitt): " + gjennomsnitt(styrkeArr) + "</p>";
         String infoString2 = "<p>Antall dager med jogging i uka (gj.snitt): " + gjennomsnitt(kondisArr) + "</p>";
@@ -152,9 +173,9 @@ public class Kalender extends HttpServlet {
             for (int j = 0; j < cols; j++) {
                 int week = ((i * cols) + (j + 1));
                 tableString += "<td class='kalenderTableCell'>";
-                try{
+                try {
                     tableString += "<div class='color" + arr[week - 1] + "'>" + week + "</div>";
-                }catch(ArrayIndexOutOfBoundsException e){
+                } catch (ArrayIndexOutOfBoundsException e) {
                     tableString += "<div class='color0'>" + week + "</div>";
                 }
                 tableString += "</td>";
@@ -163,7 +184,7 @@ public class Kalender extends HttpServlet {
         }
         return "<div id='kalenderTableDiv'>" + infoString2 + infoString + tableString + "</table></div>";
     }
-    
+
     private String buildKalender(int[] arr, Calendar[] datoer) {
         String infoString = "<p>Antall dager på trening i uka (gj.snitt): " + gjennomsnitt(arr) + "</p>";
         String infoString2 = "<p>Antall dager på trening: " + datoer.length + "</p>";
@@ -182,5 +203,5 @@ public class Kalender extends HttpServlet {
         }
         return "<div id='kalenderTableDiv'>" + infoString2 + infoString + tableString + "</table></div>";
     }
-    
+
 }
